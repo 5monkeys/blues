@@ -23,6 +23,7 @@ setup(
     keywords=['fabric', 'blueprints', 'deploy', 'build'],
     license='BSD',
     packages=find_packages(exclude='tests'),
+    install_requires=['cuisine'],
     include_package_data=False,
     zip_safe=False,
     classifiers=[
