@@ -1,25 +1,26 @@
 import os
-from jinja2 import Environment, FileSystemLoader
 from fabric.context_managers import cd
-
-from refabric.contrib.templates import blueprint_templates, get_jinja_environment, upload
+from refabric.contrib import blueprints
 from fabric.decorators import task
 from fabric.operations import prompt
-from refabric.state import blueprint_settings
-from refabric.context_managers import silent, sudo
+from refabric.context_managers import sudo
 from refabric.contrib import debian
 from . import git
 from . import user
 from . import virtualenv
 
+blueprint = blueprints.get(__name__)
 
-settings = blueprint_settings(__name__)
-templates = blueprint_templates(__name__)
+project_home = lambda: os.path.join(app_root(), blueprint.get('project'))
+app_root = lambda: blueprint.get('root_path') or '/srv/app'
+source_path = lambda: os.path.join(project_home(), 'src')
+git_path = lambda: os.path.join(source_path(), '{}.git'.format(blueprint.get('project')))
+virtualenv_path = lambda: os.path.join(project_home(), 'env')
 
 
 @task
 def manage(cmd=''):
-    django_settings = settings('settings_module')
+    django_settings = blueprint.get('settings_module')
 
     if django_settings:
         django_settings = '--settings={}'.format(django_settings)
@@ -29,124 +30,113 @@ def manage(cmd=''):
 
     print 'manage.py {cmd} {settings}'.format(cmd=cmd,
                                               settings=django_settings)
-    repo = settings('git')
+    repo = blueprint.get('git')
 
 
 @task
 def install():
     with sudo():
-        # Create global paths
-        root_path = get_app_root()
+        # # Create global paths
+        root_path = app_root()
         debian.mkdir(root_path)
 
-    # Create project user
-    install_project_user()
+        # Create project user
+        install_project_user()
 
-    # Install system-dependencies
-    install_deb_packages()
+        # Install system-dependencies
+        install_system_dependencies()
 
-    # Clone repository
-    install_git()
+        # Clone repository
+        install_git()
 
-    # Create virtualenv
-    install_virtualenv()
+        # Create virtualenv
+        install_virtualenv()
+
 
 @task
 def upgrade():
-    # Reset git repo
-    update_git()
+    project_name = blueprint.get('project')
+    with sudo(project_name):
+        # Reset git repo
+        update_git()
 
-    # Update uwsgi-configuration
-    upload_server_conf()
+        # Install repo requirements.txt
+        install_requirements()
+
+        # Update uwsgi-configuration
+        upload_server_conf()
 
 
 def upload_server_conf():
-    server = settings('server')
+    server = blueprint.get('server')
     if server['type'] == 'uwsgi':
         upload_uwsgi_conf()
 
 
 def upload_uwsgi_conf():
-    server = settings('server')
-    project_name = settings('project')
-    uwsgi_conf_path = '/etc/uwsgi/apps-available/{}.ini'.format(project_name)
-    with sudo():
-        context = {
-            'server': server
-        }
-        upload(templates['uwsgi.ini'], uwsgi_conf_path, context)
+    project_name = blueprint.get('project')
+    owner = debian.get_user(project_name)
+
+    context = dict(owner)  # name, uid, gid, ...
+    context.update(blueprint.get('server'))  # workers, ...
+    context.update({
+        'source': git_path(),
+        'virtualenv': virtualenv_path(),
+
+    })
+
+    remote_conf = os.path.join(project_home(), 'uwsgi.d')
+    blueprint.upload('uwsgi/', remote_conf, context=context)
 
 
 def install_project_user():
-    username = settings('project')
-    home_path = get_project_home()
+    username = blueprint.get('project')
+    home_path = project_home()
 
     # Get UID for project user
     user.create(username, home_path)
     # Upload deploy keys for project user
-    user.upload_auth_keys(username, templates['deploy_keys'])
     user.set_strict_host_checking(username, 'github.com')
 
 
-def install_deb_packages():
-    django_packages = settings('deb_packages')
-    debian.apt_get('install', *django_packages)
+def install_system_dependencies():
+    django_dependencies = blueprint.get('system_dependencies')
+    if django_dependencies:
+        debian.apt_get('install', *django_dependencies)
 
 
 def install_virtualenv():
-    username = settings('project')
+    username = blueprint.get('project')
     virtualenv.install()
     with sudo(username):
-        virtualenv.create(get_virtualenv_path())
-    install_requirements()
+        virtualenv.create(virtualenv_path())
 
 
 def install_requirements():
-    path = get_virtualenv_path()
-    requirements_path = os.path.join(get_git_path(), 'requirements.txt')
-    virtualenv.pip('install', path, '-r {}'.format(requirements_path))
+    path = virtualenv_path()
+    pip_log_path = os.path.join(project_home(), '.pip', 'pip.log')
+    requirements_path = os.path.join(git_path(), 'requirements.txt')
+    with virtualenv.activate(path):
+        virtualenv.pip('install', '-r {} --log={}'.format(requirements_path, pip_log_path))
 
 
 def install_git():
     git.install()
 
-    project_name = settings('project')
-    branch = settings('git_branch')
-    git_url = settings('git_url')
+    project_name = blueprint.get('project')
+    branch = blueprint.get('git_branch')
+    git_url = blueprint.get('git_url')
 
     with sudo(project_name):
-        source_path = get_source_path()
-        debian.mkdir(source_path, owner=project_name, group=project_name)
-        with cd(source_path):
-            git_path = git.clone(git_url, branch)
-            git.reset(git_path, branch)
+        path = source_path()
+        debian.mkdir(path, owner=project_name, group=project_name)
+        print 'cd ',path
+        with cd(path):
+            git.clone(git_url, branch)
 
 
 def update_git():
-    project_name = settings('project')
-    with sudo(project_name):
-        git_path = get_git_path()
-        branch = settings('git_branch')
-        git.reset(git_path, branch)
-
-
-def get_project_home():
-    return os.path.join(get_app_root(), settings('project'))
-
-
-def get_app_root():
-    return settings('root_path') or '/srv/app'
-
-
-def get_source_path():
-    return os.path.join(get_project_home(), 'src')
-
-
-def get_git_path():
-    project_name = settings('project')
-    source_path = get_source_path()
-    return os.path.join(source_path, '{}.git'.format(project_name))
-
-
-def get_virtualenv_path():
-    return os.path.join(get_project_home(), 'env')
+    path = git_path()
+    branch = blueprint.get('git_branch')
+    with cd(path):
+        git.reset(branch)

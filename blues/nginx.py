@@ -1,11 +1,8 @@
 from fabric.decorators import task
-from refabric.contrib import debian
-from refabric.contrib.templates import blueprint_templates, upload
-from refabric.state import blueprint_settings
+from refabric.contrib import debian, blueprints
 from refabric.utils import info
 
-settings = blueprint_settings(__name__)
-templates = blueprint_templates(__name__)
+blueprint = blueprints.get(__name__)
 
 
 @task

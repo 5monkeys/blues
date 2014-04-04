@@ -1,9 +1,12 @@
-import os
+from contextlib import contextmanager
+from fabric.context_managers import prefix
 from fabric.contrib import files
 from fabric.decorators import task
-from refabric.contrib import debian
+from refabric.contrib import debian, blueprints
 from refabric.operations import run
 from refabric.utils import info
+
+blueprint = blueprints.get(__name__)
 
 
 @task
@@ -29,13 +32,15 @@ def create(path):
         info('Virtualenv already exists: {}', path)
 
 
-def pip(command, virtualenv=None, *options):
+def pip(command, *options):
     info('Running pip {}', command)
-    pip_bin = 'pip'
-    if virtualenv:
-        pip_bin = os.path.join(virtualenv, 'bin', 'pip')
-    run('{} {} {}'.format(pip_bin, command, ' '.join(options)))
+    run('pip {} {}'.format(command, ' '.join(options)))
 
 
-def get_virtualenv_path(path, directory='env'):
-    return os.path.join(path, directory)
+@contextmanager
+def activate(path=None):
+    if not path:
+        path = debian.pwd()
+
+    with prefix('source %s/bin/activate' % path):
+        yield
