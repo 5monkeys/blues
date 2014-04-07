@@ -1,0 +1,18 @@
+server {    
+    listen          80;
+    server_name     localhost;
+    access_log      /var/log/nginx/default.access.log;
+
+    server_name_in_redirect  off;
+
+    index index.html;
+    root  /usr/local/nginx/default/html/;
+
+    location /nginx_status {
+       stub_status on;
+       access_log   off;
+       allow 127.0.0.1;
+       allow 31.24.64.0/21;
+       deny all;
+    }
+}
