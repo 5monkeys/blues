@@ -1,5 +1,7 @@
 import os
+from pprint import pprint
 from fabric.context_managers import cd
+from fabric.state import env
 from refabric.contrib import blueprints
 from fabric.decorators import task
 from fabric.operations import prompt
@@ -88,13 +90,40 @@ def upload_uwsgi_conf():
     remote_conf = os.path.join(project_home(), 'uwsgi.d')
     blueprint.upload('uwsgi/', remote_conf, context=context)
 
+@task
+def generate_uwsgi_upstream(role='www'):
+    name = blueprint.get('project')
+    socket = blueprint.get('server.socket', default='0.0.0.0:3030')
+    host, _, port = socket.partition(':')
+    if port:
+        sockets = ['{}:{}'.format(host, port) for host in env.hosts]
+    else:
+        sockets = [socket]
+
+    context = {
+        'name': name,
+        'sockets': sockets,
+        'ip_hash': blueprint.get('server.ip_hash', False)
+    }
+
+    upstream = blueprint.render_template('nginx/upstream.conf', context)
+    upstream_dir = os.path.join(os.path.dirname(env['real_fabfile']),
+                                'templates', role, 'nginx', 'conf.d')
+    upstream_path = os.path.join(upstream_dir, '{}.conf'.format(name))
+
+    if not os.path.exists(upstream_dir):
+        os.makedirs(upstream_dir)
+
+    with open(upstream_path, 'w+') as f:
+        f.write(upstream)
+
 
 def install_project_user():
     username = blueprint.get('project')
     home_path = project_home()
 
     # Get UID for project user
-    user.create(username, home_path)
+    user.create(username, home_path, groups=['app-data'])
     # Upload deploy keys for project user
     user.set_strict_host_checking(username, 'github.com')
 
@@ -130,7 +159,6 @@ def install_git():
     with sudo(project_name):
         path = source_path()
         debian.mkdir(path, owner=project_name, group=project_name)
-        print 'cd ',path
         with cd(path):
             git.clone(git_url, branch)
 

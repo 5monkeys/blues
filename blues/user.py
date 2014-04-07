@@ -6,14 +6,16 @@ from refabric.context_managers import sudo
 blueprint = blueprints.get(__name__)
 
 
-def create(name, home=None):
+def create(name, home=None, groups=None):
     """
     Create a system user
     """
+    for group in groups:
+        debian.groupadd(group, gid_min=10000)
     with sudo(user='root'):
-        debian.groupadd(name, gid_min=10000)
-        debian.useradd(name, gid=name, home=home, uid_min=10000, shell='/bin/bash')
+        debian.useradd(name, home=home, uid_min=10000, shell='/bin/bash', groups=groups)
         create_ssh_path(name)
+
 
 def create_ssh_path(username):
     user = debian.get_user(username)
