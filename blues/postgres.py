@@ -20,7 +20,6 @@ restart = task(partial(debian.service, 'postgresql', 'restart', check_status=Fal
 reload = task(partial(debian.service, 'postgresql', 'reload', check_status=False))
 
 
-@task
 def install():
     with sudo():
         debian.apt_get('install',
@@ -32,27 +31,42 @@ def install():
 
 
 @task
-def upgrade():
+def setup():
+    install()
     # Bump shared memory limits
     setup_shared_memory()
 
     # Generate pgtune.conf
     generate_pgtune_conf()
 
+    # Upload templates
+    upgrade()
+
+    # Create databases and related users
+    setup_databases()
+
+
+@task
+def upgrade():
     updates = blueprint.upload('./', postgres_root)
     if updates:
         restart()
+
 
 @task
 def setup_databases():
     databases = blueprint.get('databases', [])
     with sudo('postgres'):
         for database in databases:
-            print database
-            with sudo('postgres'):
-                _client_exec("CREATE USER %(user)s WITH PASSWORD '%(password)s'",
-                             user=database['user'], password=database['password'])
-                run('createdb -O {} {}'.format(database['user'], database['schema']))
+            user, password, schema = database['user'], database['password'], database['schema']
+            info('Creating user {}', user)
+            _client_exec("CREATE USER %(user)s WITH PASSWORD '%(password)s'",
+                         user=user, password=password)
+            info('Creating schema {}', user)
+            _client_exec('CREATE DATABASE %(name)s', name=schema)
+            info('Granting user {} to schema {}'.format(user, schema))
+            _client_exec("GRANT ALL PRIVILEGES ON DATABASE %(schema)s to %(user)s",
+                         schema=schema, user=user)
 
 
 def _client_exec(cmd, **kwargs):

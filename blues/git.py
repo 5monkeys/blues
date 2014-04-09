@@ -16,8 +16,14 @@ def install():
 
 
 @task
+def setup():
+    install()
+    upgrade()
+
+
+@task
 def upgrade():
-    raise NotImplementedError
+    pass
 
 
 def clone(url, branch, repository_path=None):

@@ -4,8 +4,8 @@ from fabric.state import env
 from fabric.utils import indent
 from refabric.contrib import blueprints
 from fabric.decorators import task
-from fabric.operations import prompt
-from refabric.context_managers import sudo
+from fabric.operations import prompt, run
+from refabric.context_managers import sudo, shell_env
 from refabric.contrib import debian
 from refabric.utils import info
 from . import git
@@ -23,28 +23,38 @@ virtualenv_path = lambda: os.path.join(project_home(), 'env')
 
 @task
 def manage(cmd=''):
-    django_settings = blueprint.get('settings_module')
-
-    if django_settings:
-        django_settings = '--settings={}'.format(django_settings)
-
     if not cmd:
         cmd = prompt('Enter django management command:')
-
-    print 'manage.py {cmd} {settings}'.format(cmd=cmd,
-                                              settings=django_settings)
-    repo = blueprint.get('git')
+    project_name = blueprint.get('project')
+    with sudo(project_name), cd(git_path()), virtualenv.activate(virtualenv_path()), shell_env():
+        run('python {project_name}/manage.py {cmd}'.format(project_name=project_name, cmd=cmd))
 
 
 @task
+def setup():
+    install()
+    upgrade()
+    manage('syncdb')
+
+
 def install():
     with sudo():
-        # # Create global paths
+        # Create global paths
         root_path = app_root()
         debian.mkdir(root_path)
 
         # Create project user
         install_project_user()
+
+        # Create static paths
+        project_name = blueprint.get('project')
+        static_base = os.path.join('/srv/www/', project_name)
+        static_path = os.path.join(static_base, 'static')
+        media_path = os.path.join(static_base, 'media')
+        debian.mkdir(static_path, group='www-data')
+        debian.chmod(static_path, mode=1775)
+        debian.mkdir(media_path, group='www-data')
+        debian.chmod(media_path, mode=1775)
 
         # Install system-dependencies
         install_system_dependencies()
@@ -110,15 +120,19 @@ def upload_uwsgi_conf():
     ini = '{}.ini'.format(project_name)
     template = os.path.join('uwsgi', ini)
     remote_conf = os.path.join(project_home(), 'uwsgi.d')
+    updates = []
     # Check if a specific web vassal have been created or use the default
     if template not in blueprint.get_template_loader().list_templates():
         # Upload default web vassal
         info(indent('...using default web vassal'))
         template = os.path.join('uwsgi', 'default', 'web.ini')
-        blueprint.upload(template, os.path.join(remote_conf, ini), context=context)
+        updates = blueprint.upload(template, os.path.join(remote_conf, ini), context=context)
 
     # Upload remaining vassals
-    blueprint.upload('uwsgi/', remote_conf, context=context)
+    updated = blueprint.upload('uwsgi/', remote_conf, context=context)
+    updates.extend(updated)
+    if updates:
+        uwsgi.reload()
 
 
 @task

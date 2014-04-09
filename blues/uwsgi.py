@@ -18,6 +18,11 @@ reload = task(partial(debian.service, 'uwsgi', 'reload'))
 
 
 @task
+def setup():
+    install()
+    upgrade()
+
+
 def install():
     with sudo():
         # PIP install system wide uWSGI

@@ -22,12 +22,17 @@ reload = task(partial(debian.service, 'nginx', 'reload', check_status=False))
 
 
 @task
+def setup():
+    install()
+    upgrade()
+    restart()
+
+
 def install():
     # Install package
     with sudo():
         debian.apt_get('install', 'nginx')
         debian.apt_get('install', 'nginx-extras')
-        restart()
 
 
 @task
