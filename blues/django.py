@@ -1,12 +1,13 @@
 import os
-from pprint import pprint
 from fabric.context_managers import cd
 from fabric.state import env
+from fabric.utils import indent
 from refabric.contrib import blueprints
 from fabric.decorators import task
 from fabric.operations import prompt
 from refabric.context_managers import sudo
 from refabric.contrib import debian
+from refabric.utils import info
 from . import git
 from . import user
 from . import virtualenv
@@ -74,48 +75,83 @@ def upload_server_conf():
     if server['type'] == 'uwsgi':
         upload_uwsgi_conf()
 
-
+@task
 def upload_uwsgi_conf():
+    from blues import uwsgi
     project_name = blueprint.get('project')
     owner = debian.get_user(project_name)
 
     context = dict(owner)  # name, uid, gid, ...
-    context.update(blueprint.get('server'))  # workers, ...
-    context.update({
-        'source': git_path(),
-        'virtualenv': virtualenv_path(),
 
+    # Memory optimized options
+    cpu_count = blueprint.get('server.max_cores', debian.nproc())
+    total_memory = blueprint.get('server.max_memory',
+                                 default=debian.total_memory() / 1024 / 1024 / 1024)
+    workers = blueprint.get('server.workers', default=uwsgi.get_worker_count(cpu_count))
+
+    info('Generating uWSGI conf based on {} core(s), {} GB memory and {} worker(s)',
+         cpu_count, total_memory, workers)
+
+    # TODO: Handle different loop engines (gevent)
+    context.update({
+        'cpu_affinity': uwsgi.get_cpu_affinity(cpu_count, workers),
+        'workers': workers,
+        'max_requests': uwsgi.get_max_requests(total_memory),
+        'reload_on_as': uwsgi.get_reload_on_as(total_memory),
+        'reload_on_rss': uwsgi.get_reload_on_rss(total_memory),
+        'limit_as': uwsgi.get_limit_as(total_memory),
+        'source': os.path.join(git_path(), project_name),
+        'virtualenv': virtualenv_path(),
     })
 
+    # Override defaults
+    context.update(blueprint.get('server'))
+
+    ini = '{}.ini'.format(project_name)
+    template = os.path.join('uwsgi', ini)
     remote_conf = os.path.join(project_home(), 'uwsgi.d')
+    # Check if a specific web vassal have been created or use the default
+    if template not in blueprint.get_template_loader().list_templates():
+        # Upload default web vassal
+        info(indent('...using default web vassal'))
+        template = os.path.join('uwsgi', 'default', 'web.ini')
+        blueprint.upload(template, os.path.join(remote_conf, ini), context=context)
+
+    # Upload remaining vassals
     blueprint.upload('uwsgi/', remote_conf, context=context)
 
+
 @task
-def generate_uwsgi_upstream(role='www'):
+def generate_nginx_conf(role='www'):
     name = blueprint.get('project')
     socket = blueprint.get('server.socket', default='0.0.0.0:3030')
     host, _, port = socket.partition(':')
     if port:
         sockets = ['{}:{}'.format(host, port) for host in env.hosts]
     else:
-        sockets = [socket]
+        sockets = ['unix:{}'.format(socket)]
 
     context = {
         'name': name,
         'sockets': sockets,
+        'domain': blueprint.get('server.domain', default='_'),
+        'ssl': blueprint.get('server.ssl', False),
         'ip_hash': blueprint.get('server.ip_hash', False)
     }
+    template = 'nginx/site.conf'
+    server_type = blueprint.get('server.type')
+    if server_type and server_type == 'uwsgi':
+        template = 'nginx/uwsgi_site.conf'
+    conf = blueprint.render_template(template, context)
+    conf_dir = os.path.join(os.path.dirname(env['real_fabfile']), 'templates', role, 'nginx',
+                            'sites-available')
+    conf_path = os.path.join(conf_dir, '{}.conf'.format(name))
 
-    upstream = blueprint.render_template('nginx/upstream.conf', context)
-    upstream_dir = os.path.join(os.path.dirname(env['real_fabfile']),
-                                'templates', role, 'nginx', 'conf.d')
-    upstream_path = os.path.join(upstream_dir, '{}.conf'.format(name))
+    if not os.path.exists(conf_dir):
+        os.makedirs(conf_dir)
 
-    if not os.path.exists(upstream_dir):
-        os.makedirs(upstream_dir)
-
-    with open(upstream_path, 'w+') as f:
-        f.write(upstream)
+    with open(conf_path, 'w+') as f:
+        f.write(conf)
 
 
 def install_project_user():
@@ -123,7 +159,7 @@ def install_project_user():
     home_path = project_home()
 
     # Get UID for project user
-    user.create(username, home_path, groups=['app-data'])
+    user.create(username, home_path, groups=['app-data', 'www-data'])
     # Upload deploy keys for project user
     user.set_strict_host_checking(username, 'github.com')
 

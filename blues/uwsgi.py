@@ -1,5 +1,5 @@
-from functools import partial
 import os
+from functools import partial
 from fabric.decorators import task
 from refabric.context_managers import sudo, hide_prefix
 from refabric.contrib import debian, blueprints
@@ -10,6 +10,11 @@ blueprint = blueprints.get(__name__)
 
 log_path = '/var/log/uwsgi'
 tmpfs_path = '/run/uwsgi/'
+
+start = task(partial(debian.service, 'uwsgi', 'start'))
+stop = task(partial(debian.service, 'uwsgi', 'stop'))
+restart = task(partial(debian.service, 'uwsgi', 'restart'))
+reload = task(partial(debian.service, 'uwsgi', 'reload'))
 
 
 @task
@@ -47,7 +52,47 @@ def top():
         run('uwsgitop {}'.format(stats_path))
 
 
-start = task(partial(debian.service, 'uwsgi', 'start'))
-stop = task(partial(debian.service, 'uwsgi', 'stop'))
-restart = task(partial(debian.service, 'uwsgi', 'restart'))
-reload = task(partial(debian.service, 'uwsgi', 'reload'))
+def get_worker_count(cores):
+    """
+    Get number of workers to run depending on server core count
+    """
+    return cores * 2
+
+
+def get_cpu_affinity(cores, workers=None):
+    """
+    Get CPU affinity depending on server core count
+    http://lists.unbit.it/pipermail/uwsgi/2011-March/001594.html
+    """
+    workers = workers or get_worker_count(cores)
+    if workers <= 4:
+        return 1
+    elif cores < 8:
+        return 2
+    else:
+        return 3
+
+
+def get_max_requests(gb_memory):
+    """
+    Get max_requests setting depending on server memory in GB
+    """
+    return gb_memory * 2000
+
+
+def get_reload_on_as(gb_memory):
+    """
+    Get reload_on_as setting depending on server memory in GB
+    """
+    return gb_memory * 256
+
+
+def get_reload_on_rss(gb_memory):
+    """
+    Get reload_on_rss setting depending on server memory in GB
+    """
+    return get_reload_on_as(gb_memory) / 2
+
+
+def get_limit_as(gb_memory):
+    return gb_memory * 512
