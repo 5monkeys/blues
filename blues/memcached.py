@@ -1,3 +1,4 @@
+from functools import partial
 from fabric.decorators import task
 from refabric.context_managers import sudo, silent
 from refabric.contrib import debian, blueprints
@@ -5,6 +6,12 @@ from refabric.operations import run
 from refabric.utils import info
 
 blueprint = blueprints.get(__name__)
+
+
+start = task(partial(debian.service, 'memcached', 'start', check_status=False))
+stop = task(partial(debian.service, 'memcached', 'stop', check_status=False))
+restart = task(partial(debian.service, 'memcached', 'restart', check_status=False))
+status = task(partial(debian.service, 'memcached', 'status', check_status=False))
 
 
 @task
@@ -19,7 +26,8 @@ def install():
 @task
 def upgrade():
     context = {
-        'size': blueprint.get('size', 256)
+        'size': blueprint.get('size', 256),
+        'bind': blueprint.get('bind', '127.0.0.1')
     }
     blueprint.upload('memcached', '/etc/', context)
 
