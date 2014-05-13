@@ -1,4 +1,5 @@
 import os
+from contextlib import contextmanager
 from fabric.context_managers import cd
 from fabric.state import env
 from fabric.utils import indent
@@ -28,6 +29,13 @@ def manage(cmd=''):
     project_name = blueprint.get('project')
     with sudo(project_name), cd(git_path()), virtualenv.activate(virtualenv_path()), shell_env():
         run('python {project_name}/manage.py {cmd}'.format(project_name=project_name, cmd=cmd))
+
+
+@contextmanager
+def sudo_project():
+    project_name = blueprint.get('project')
+    with sudo(project_name):
+        yield
 
 
 @task
@@ -68,22 +76,21 @@ def install():
 
 @task
 def upgrade():
-    project_name = blueprint.get('project')
-    with sudo(project_name):
-        # Reset git repo
-        update_git()
+    # Reset git repo
+    update_git()
 
-        # Install repo requirements.txt
-        install_requirements()
+    # Install repo requirements.txt
+    install_requirements()
 
-        # Update uwsgi-configuration
-        upload_server_conf()
+    # Update uwsgi-configuration
+    upload_server_conf()
 
 
 def upload_server_conf():
-    server = blueprint.get('server')
-    if server['type'] == 'uwsgi':
-        upload_uwsgi_conf()
+    with sudo_project():
+        server = blueprint.get('server')
+        if server['type'] == 'uwsgi':
+            upload_uwsgi_conf()
 
 @task
 def upload_uwsgi_conf():
@@ -192,11 +199,12 @@ def install_virtualenv():
 
 
 def install_requirements():
-    path = virtualenv_path()
-    pip_log_path = os.path.join(project_home(), '.pip', 'pip.log')
-    requirements_path = os.path.join(git_path(), 'requirements.txt')
-    with virtualenv.activate(path):
-        virtualenv.pip('install', '-r {} --log={}'.format(requirements_path, pip_log_path))
+    with sudo_project():
+        path = virtualenv_path()
+        pip_log_path = os.path.join(project_home(), '.pip', 'pip.log')
+        requirements_path = os.path.join(git_path(), 'requirements.txt')
+        with virtualenv.activate(path):
+            virtualenv.pip('install', '-r {} --log={}'.format(requirements_path, pip_log_path))
 
 
 def install_git():
@@ -214,7 +222,8 @@ def install_git():
 
 
 def update_git():
-    path = git_path()
-    branch = blueprint.get('git_branch')
-    with cd(path):
-        git.reset(branch)
+    with sudo_project():
+        path = git_path()
+        branch = blueprint.get('git_branch')
+        with cd(path):
+            git.reset(branch)
