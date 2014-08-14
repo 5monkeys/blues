@@ -1,13 +1,14 @@
-from functools import partial
 import os
+from functools import partial
+
 from fabric.context_managers import cd
 from fabric.contrib import files
 from fabric.decorators import task
-from fabric.utils import indent, warn
+from fabric.utils import warn
+
+from refabric.api import run, info
 from refabric.context_managers import sudo, silent
-from refabric.contrib import debian, blueprints
-from refabric.operations import run
-from refabric.utils import info
+from refabric.contrib import blueprints, debian
 
 blueprint = blueprints.get(__name__)
 

@@ -1,14 +1,16 @@
 import os
 from contextlib import contextmanager
+
 from fabric.context_managers import cd
+from fabric.decorators import task
+from fabric.operations import prompt
 from fabric.state import env
 from fabric.utils import indent
-from refabric.contrib import blueprints
-from fabric.decorators import task
-from fabric.operations import prompt, run
+
+from refabric.api import run, info
 from refabric.context_managers import sudo, shell_env
-from refabric.contrib import debian
-from refabric.utils import info
+from refabric.contrib import blueprints, debian
+
 from . import git
 from . import user
 from . import virtualenv
@@ -83,6 +85,7 @@ def upload_server_conf():
         server = blueprint.get('server')
         if server['type'] == 'uwsgi':
             upload_uwsgi_conf()
+
 
 @task
 def upload_uwsgi_conf():

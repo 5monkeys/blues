@@ -1,12 +1,12 @@
 from functools import partial
+
 from fabric.decorators import task
+
+from refabric.api import run, info
 from refabric.context_managers import sudo, silent
-from refabric.contrib import debian, blueprints
-from refabric.operations import run
-from refabric.utils import info
+from refabric.contrib import blueprints, debian
 
 blueprint = blueprints.get(__name__)
-
 
 start = task(partial(debian.service, 'memcached', 'start', check_status=False))
 stop = task(partial(debian.service, 'memcached', 'stop', check_status=False))

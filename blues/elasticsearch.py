@@ -1,10 +1,12 @@
 from fabric.contrib import files
 from fabric.decorators import task
+
+from refabric.api import info
 from refabric.context_managers import sudo
-from refabric.contrib import debian, blueprints
-from refabric.utils import info
+from refabric.contrib import blueprints, debian
 
 blueprint = blueprints.get(__name__)
+
 
 @task
 def setup():
@@ -27,4 +29,4 @@ def install():
 
 @task
 def upgrade():
-    pass
+    raise NotImplementedError

@@ -1,11 +1,12 @@
 import os
+
 from fabric.context_managers import cd
 from fabric.contrib import files
 from fabric.decorators import task
-from refabric.context_managers import silent, sudo
-from refabric.contrib import debian, blueprints
-from refabric.operations import run
-from refabric.utils import info
+
+from refabric.api import run, info
+from refabric.context_managers import sudo, silent
+from refabric.contrib import blueprints, debian
 
 blueprint = blueprints.get(__name__)
 

@@ -1,14 +1,15 @@
+import os
 from datetime import datetime
 from functools import partial
-import os
+
 from fabric.contrib import files
 from fabric.decorators import task
 from fabric.state import env
 from fabric.utils import warn
+
+from refabric.api import run, info
 from refabric.context_managers import sudo, silent
 from refabric.contrib import debian, blueprints
-from refabric.operations import run
-from refabric.utils import info
 
 blueprint = blueprints.get(__name__)
 

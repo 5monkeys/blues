@@ -1,10 +1,11 @@
 from functools import partial
+
 from fabric.decorators import task
+
 from refabric.context_managers import sudo
 from refabric.contrib import debian, blueprints
 
 blueprint = blueprints.get(__name__)
-
 
 start = task(partial(debian.service, 'redis-server', 'start', check_status=False))
 stop = task(partial(debian.service, 'redis-server', 'stop', check_status=False))

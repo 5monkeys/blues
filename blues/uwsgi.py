@@ -1,10 +1,11 @@
 import os
 from functools import partial
+
 from fabric.decorators import task
+
+from refabric.api import run, info
 from refabric.context_managers import sudo, hide_prefix
-from refabric.contrib import debian, blueprints
-from refabric.operations import run
-from refabric.utils import info
+from refabric.contrib import blueprints, debian
 
 blueprint = blueprints.get(__name__)
 
