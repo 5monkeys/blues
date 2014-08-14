@@ -26,16 +26,8 @@ virtualenv_path = lambda: os.path.join(project_home(), 'env')
 def manage(cmd=''):
     if not cmd:
         cmd = prompt('Enter django management command:')
-    project_name = blueprint.get('project')
-    with sudo(project_name), cd(git_path()), virtualenv.activate(virtualenv_path()), shell_env():
-        run('python {project_name}/manage.py {cmd}'.format(project_name=project_name, cmd=cmd))
-
-
-@contextmanager
-def sudo_project():
-    project_name = blueprint.get('project')
-    with sudo(project_name):
-        yield
+    with sudo_project() as project, cd(git_path()), virtualenv.activate(virtualenv_path()), shell_env():
+        run('python {project_name}/manage.py {cmd}'.format(project_name=project, cmd=cmd))
 
 
 @task
@@ -210,13 +202,12 @@ def install_requirements():
 def install_git():
     git.install()
 
-    project_name = blueprint.get('project')
     branch = blueprint.get('git_branch')
     git_url = blueprint.get('git_url')
 
-    with sudo(project_name):
+    with sudo_project() as project:
         path = source_path()
-        debian.mkdir(path, owner=project_name, group=project_name)
+        debian.mkdir(path, owner=project, group=project)
         with cd(path):
             git.clone(git_url, branch)
 
@@ -227,3 +218,10 @@ def update_git():
         branch = blueprint.get('git_branch')
         with cd(path):
             git.reset(branch)
+
+
+@contextmanager
+def sudo_project():
+    project_name = blueprint.get('project')
+    with sudo(project_name):
+        yield project_name
