@@ -41,4 +41,11 @@ def install():
 
 @task
 def upgrade():
-    raise NotImplementedError
+    context = {
+        'cluster_name': blueprint.get('cluster_name', 'elasticsearch'),
+        'number_of_shards': blueprint.get('number_of_shards', '5'),
+        'number_of_replicas': blueprint.get('number_of_replicas', '0')
+    }
+    uploads = blueprint.upload('elasticsearch', '/etc/elasticsearch/', context)
+    if uploads:
+        restart()
