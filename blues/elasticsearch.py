@@ -1,3 +1,5 @@
+from functools import partial
+
 from fabric.contrib import files
 from fabric.decorators import task
 
@@ -7,10 +9,16 @@ from refabric.contrib import blueprints, debian
 
 blueprint = blueprints.get(__name__)
 
+start = task(partial(debian.service, 'elasticsearch', 'start', check_status=False))
+stop = task(partial(debian.service, 'elasticsearch', 'stop', check_status=False))
+restart = task(partial(debian.service, 'elasticsearch', 'restart', check_status=False))
+reload = task(partial(debian.service, 'elasticsearch', 'force-reload', check_status=False))
+
 
 @task
 def setup():
     install()
+    upgrade()
 
 
 def install():
