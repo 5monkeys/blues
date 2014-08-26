@@ -36,7 +36,7 @@ def install():
         debian.apt_get('install', 'oracle-java7-installer', 'elasticsearch')
 
         # Enable on boot
-        debian.add_service('elasticsearch', priorities='defaults 95 10')
+        debian.add_rc_service('elasticsearch', priorities='defaults 95 10')
 
 
 @task
