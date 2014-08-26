@@ -46,6 +46,6 @@ def upgrade():
         'number_of_shards': blueprint.get('number_of_shards', '5'),
         'number_of_replicas': blueprint.get('number_of_replicas', '0')
     }
-    uploads = blueprint.upload('elasticsearch', '/etc/elasticsearch/', context)
+    uploads = blueprint.upload('./', '/etc/elasticsearch/', context)
     if uploads:
         restart()
