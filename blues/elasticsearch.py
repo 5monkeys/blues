@@ -1,6 +1,5 @@
 from functools import partial
 
-from fabric.contrib import files
 from fabric.decorators import task
 
 from refabric.api import info
@@ -26,12 +25,17 @@ def install():
         debian.add_apt_ppa('webupd8team/java')
         debian.debconf_set_selections('shared/accepted-oracle-license-v1-1 select true',
                                       'shared/accepted-oracle-license-v1-1 seen true')
-        # Install elastic search
+
         version = blueprint.get('version', '1.0')
-        repository = 'deb http://packages.elasticsearch.org/elasticsearch/{0}/debian stable main'.format(version)
-        info('Adding key for {0}'.format(repository))
+        info('Adding apt repository for {} version {}', 'elasticsearch', version)
+        repository = 'http://packages.elasticsearch.org/elasticsearch/{0}/debian stable main'.format(version)
+        debian.add_apt_repository(repository)
+
+        info('Adding apt key for', repository)
         debian.add_apt_key('http://packages.elasticsearch.org/GPG-KEY-elasticsearch')
-        files.append('/etc/apt/sources.list', repository, shell=True)
+
+        # Install elasticsearch (and java)
+        info('Installing {} version {}', 'elasticsearch', version)
         debian.apt_get('update')
         debian.apt_get('install', 'oracle-java7-installer', 'elasticsearch')
 
@@ -44,7 +48,10 @@ def upgrade():
     context = {
         'cluster_name': blueprint.get('cluster_name', 'elasticsearch'),
         'number_of_shards': blueprint.get('number_of_shards', '5'),
-        'number_of_replicas': blueprint.get('number_of_replicas', '0')
+        'number_of_replicas': blueprint.get('number_of_replicas', '0'),
+        'bind_host': blueprint.get('network_bind_host'),
+        'publish_host': blueprint.get('network_publish_host'),
+        'host': blueprint.get('network_host')
     }
     uploads = blueprint.upload('./', '/etc/elasticsearch/', context)
     if uploads:

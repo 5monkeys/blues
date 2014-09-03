@@ -200,16 +200,22 @@ index.number_of_replicas: {{ number_of_replicas }}
 
 # Set the bind address specifically (IPv4 or IPv6):
 #
-#network.bind_host: 192.168.0.1
+{% if bind_host %}
+network.bind_host: {{ bind_host }}
+{% endif %}
 
 # Set the address other nodes will use to communicate with this node. If not
 # set, it is automatically derived. It must point to an actual IP address.
 #
-#network.publish_host: 192.168.0.1
+{% if publish_host %}
+network.publish_host: {{ publish_host }}
+{% endif %}
 
 # Set both 'bind_host' and 'publish_host':
 #
-#network.host: 192.168.0.1
+{% if host %}
+network.host: {{ host }}
+{% endif %}
 
 # Set a custom port for the node to node communication (9300 by default):
 #
