@@ -28,8 +28,8 @@ virtualenv_path = lambda: os.path.join(project_home(), 'env')
 def manage(cmd=''):
     if not cmd:
         cmd = prompt('Enter django management command:')
-    with sudo_project() as project, cd(git_path()), virtualenv.activate(virtualenv_path()), shell_env():
-        run('python {project_name}/manage.py {cmd}'.format(project_name=project, cmd=cmd))
+    with sudo_project(), cd(git_path()), virtualenv.activate(virtualenv_path()), shell_env():
+        run('python manage.py {cmd}'.format(cmd=cmd))
 
 
 @task
@@ -112,7 +112,7 @@ def upload_uwsgi_conf():
         'reload_on_as': uwsgi.get_reload_on_as(total_memory),
         'reload_on_rss': uwsgi.get_reload_on_rss(total_memory),
         'limit_as': uwsgi.get_limit_as(total_memory),
-        'source': os.path.join(git_path(), project_name),
+        'source': os.path.join(git_path(), 'src'),
         'virtualenv': virtualenv_path(),
     })
 
