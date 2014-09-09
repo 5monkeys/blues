@@ -33,10 +33,10 @@ def install():
 
         info('Adding apt key for', repository)
         debian.add_apt_key('http://packages.elasticsearch.org/GPG-KEY-elasticsearch')
+        debian.apt_get('update')
 
         # Install elasticsearch (and java)
         info('Installing {} version {}', 'elasticsearch', version)
-        debian.apt_get('update')
         debian.apt_get('install', 'oracle-java7-installer', 'elasticsearch')
 
         # Enable on boot
