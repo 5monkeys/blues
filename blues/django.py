@@ -1,7 +1,7 @@
 import os
 from contextlib import contextmanager
 
-from fabric.context_managers import cd
+from fabric.context_managers import cd, settings
 from fabric.decorators import task
 from fabric.operations import prompt
 from fabric.state import env
@@ -77,18 +77,40 @@ def upgrade():
     install_requirements()
 
     # Update uwsgi-configuration
-    upload_server_conf()
-
-
-def upload_server_conf():
-    with sudo_project():
-        server = blueprint.get('server')
-        if server['type'] == 'uwsgi':
-            upload_uwsgi_conf()
+    upload_deamon_conf()
 
 
 @task
-def upload_uwsgi_conf():
+def upload_deamon_conf():
+    from blues import uwsgi
+    updates = []
+
+    with sudo_project():
+        default_templates = uwsgi.blueprint.get_default_template_root()
+        destination = os.path.join(project_home(), 'uwsgi.d')
+
+        with settings(template_dirs=[default_templates]):
+            wsgi_deamon = blueprint.get('wsgi.deamon')
+            if wsgi_deamon == 'uwsgi':
+                context = get_uwsgi_wsgi_context()
+
+                wsgi_vassals = upload_uwsgi_wsgi_conf(destination, context=context)
+                updates.extend(wsgi_vassals)
+
+                # Upload remaining vassals
+                user_vassals = blueprint.upload('uwsgi/', destination, context=context)  # TODO: skip subdirs
+                updates.extend(user_vassals)
+
+            celery_deamon = blueprint.get('celery.deamon')
+            if celery_deamon == 'uwsgi':
+                celery_vassals = upload_uwsgi_celery_conf(destination)
+                updates.extend(celery_vassals)
+
+    if updates:
+        uwsgi.restart()
+
+
+def get_uwsgi_wsgi_context():
     from blues import uwsgi
     project_name = blueprint.get('project')
     owner = debian.get_user(project_name)
@@ -96,10 +118,10 @@ def upload_uwsgi_conf():
     context = dict(owner)  # name, uid, gid, ...
 
     # Memory optimized options
-    cpu_count = blueprint.get('server.max_cores', debian.nproc())
-    total_memory = blueprint.get('server.max_memory',
+    cpu_count = blueprint.get('wsgi.max_cores', debian.nproc())
+    total_memory = blueprint.get('wsgi.max_memory',
                                  default=debian.total_memory() / 1024 / 1024 / 1024)
-    workers = blueprint.get('server.workers', default=uwsgi.get_worker_count(cpu_count))
+    workers = blueprint.get('wsgi.workers', default=uwsgi.get_worker_count(cpu_count))
 
     info('Generating uWSGI conf based on {} core(s), {} GB memory and {} worker(s)',
          cpu_count, total_memory, workers)
@@ -117,27 +139,55 @@ def upload_uwsgi_conf():
     })
 
     # Override defaults
-    context.update(blueprint.get('server'))
+    context.update(blueprint.get('wsgi'))
+
+    return context
+
+
+def upload_uwsgi_wsgi_conf(destination, context=None):
+    project_name = blueprint.get('project')
 
     ini = '{}.ini'.format(project_name)
     template = os.path.join('uwsgi', ini)
-    remote_conf = os.path.join(project_home(), 'uwsgi.d')
     updates = []
     # Check if a specific web vassal have been created or use the default
     if template not in blueprint.get_template_loader().list_templates():
         # Upload default web vassal
         info(indent('...using default web vassal'))
         template = os.path.join('uwsgi', 'default', 'web.ini')
-        updates = blueprint.upload(template, os.path.join(remote_conf, ini), context=context)
+        updates = blueprint.upload(template, os.path.join(destination, ini), context=context)
 
-    # Upload remaining vassals
-    updated = blueprint.upload('uwsgi/', remote_conf, context=context)
-    updates.extend(updated)
-    if updates:
-        uwsgi.reload()
+    return updates
 
 
-@task
+def upload_uwsgi_celery_conf(destination):
+    updates = []
+
+    if not destination.endswith(os.path.sep):
+        destination = destination + os.path.sep
+
+    project_name = blueprint.get('project')
+    owner = debian.get_user(project_name)
+    context = dict(owner)  # name, uid, gid, ...
+
+    context.update({
+        'workers': blueprint.get('celery.workers', debian.nproc()),
+        'source': os.path.join(git_path(), 'src'),
+        'virtualenv': virtualenv_path(),
+    })
+
+    # Override defaults
+    context.update(blueprint.get('celery'))
+
+    # Upload vassals
+    for vassal in ('celery.ini', 'beat.ini', 'flower.ini'):
+        template = os.path.join('uwsgi', 'default', vassal)
+        uploads = blueprint.upload(template, destination, context=context)
+        updates.extend(uploads)
+
+    return updates
+
+
 def generate_nginx_conf(role='www'):
     name = blueprint.get('project')
     socket = blueprint.get('server.socket', default='0.0.0.0:3030')
