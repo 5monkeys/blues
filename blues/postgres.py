@@ -55,7 +55,7 @@ def upgrade():
 
 
 @task
-def setup_databases():
+def setup_databases(drop=False):
     databases = blueprint.get('databases', [])
     with sudo('postgres'):
         for database in databases:
@@ -63,7 +63,10 @@ def setup_databases():
             info('Creating user {}', user)
             _client_exec("CREATE USER %(user)s WITH PASSWORD '%(password)s'",
                          user=user, password=password)
-            info('Creating schema {}', user)
+            if drop:
+                info('Droping schema {}', schema)
+                _client_exec('DROP DATABASE %(name)s', name=schema)
+            info('Creating schema {}', schema)
             _client_exec('CREATE DATABASE %(name)s', name=schema)
             info('Granting user {} to schema {}'.format(user, schema))
             _client_exec("GRANT ALL PRIVILEGES ON DATABASE %(schema)s to %(user)s",
