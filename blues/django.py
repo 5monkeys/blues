@@ -193,6 +193,7 @@ def upload_uwsgi_celery_conf(destination):
     return updates
 
 
+@task
 def generate_nginx_conf(role='www'):
     name = blueprint.get('project')
     socket = blueprint.get('server.socket', default='0.0.0.0:3030')
