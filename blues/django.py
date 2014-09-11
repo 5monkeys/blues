@@ -87,6 +87,7 @@ def upload_deamon_conf():
     with sudo_project():
         default_templates = uwsgi.blueprint.get_default_template_root()
         destination = os.path.join(project_home(), 'uwsgi.d')
+        debian.mkdir(destination)
 
         with settings(template_dirs=[default_templates]):
             wsgi_deamon = blueprint.get('wsgi.deamon')
