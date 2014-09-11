@@ -196,7 +196,7 @@ def upload_uwsgi_celery_conf(destination):
 @task
 def generate_nginx_conf(role='www'):
     name = blueprint.get('project')
-    socket = blueprint.get('server.socket', default='0.0.0.0:3030')
+    socket = blueprint.get('wsgi.socket', default='0.0.0.0:3030')
     host, _, port = socket.partition(':')
     if port:
         sockets = ['{}:{}'.format(host, port) for host in env.hosts]
@@ -206,13 +206,13 @@ def generate_nginx_conf(role='www'):
     context = {
         'name': name,
         'sockets': sockets,
-        'domain': blueprint.get('server.domain', default='_'),
-        'ssl': blueprint.get('server.ssl', False),
-        'ip_hash': blueprint.get('server.ip_hash', False)
+        'domain': blueprint.get('wsgi.domain', default='_'),
+        'ssl': blueprint.get('wsgi.ssl', False),
+        'ip_hash': blueprint.get('wsgi.ip_hash', False)
     }
     template = 'nginx/site.conf'
-    server_type = blueprint.get('server.type')
-    if server_type and server_type == 'uwsgi':
+    deamon = blueprint.get('wsgi.deamon')
+    if deamon and deamon == 'uwsgi':
         template = 'nginx/uwsgi_site.conf'
     conf = blueprint.render_template(template, context)
     conf_dir = os.path.join(os.path.dirname(env['real_fabfile']), 'templates', role, 'nginx',
