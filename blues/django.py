@@ -94,16 +94,19 @@ def upload_deamon_conf():
                 context = get_uwsgi_wsgi_context()
 
                 wsgi_vassals = upload_uwsgi_wsgi_conf(destination, context=context)
-                updates.extend(wsgi_vassals)
+                if wsgi_vassals:
+                    updates.extend(wsgi_vassals)
 
                 # Upload remaining vassals
                 user_vassals = blueprint.upload('uwsgi/', destination, context=context)  # TODO: skip subdirs
-                updates.extend(user_vassals)
+                if user_vassals:
+                    updates.extend(user_vassals)
 
             celery_deamon = blueprint.get('celery.deamon')
             if celery_deamon == 'uwsgi':
                 celery_vassals = upload_uwsgi_celery_conf(destination)
-                updates.extend(celery_vassals)
+                if celery_vassals:
+                    updates.extend(celery_vassals)
 
     if updates:
         uwsgi.restart()
@@ -154,7 +157,9 @@ def upload_uwsgi_wsgi_conf(destination, context=None):
         # Upload default web vassal
         info(indent('...using default web vassal'))
         template = os.path.join('uwsgi', 'default', 'web.ini')
-        updates = blueprint.upload(template, os.path.join(destination, ini), context=context)
+        uploads = blueprint.upload(template, os.path.join(destination, ini), context=context)
+        if uploads:
+            updates.extend(uploads)
 
     return updates
 
