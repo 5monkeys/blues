@@ -48,7 +48,7 @@ def reset(branch, repository_path=None):
         repository_path = debian.pwd()
 
     with cd(repository_path):
-        name = repository_path.rsplit('/')[-1]
+        name = get_repository_name(repository_path)
         info('Resetting git repository: {}@{}', name, branch)
         commands = [
             'git fetch origin',  # Fetch branches and tags
@@ -61,3 +61,7 @@ def reset(branch, repository_path=None):
             output = run(' && '.join(commands))
             output = output.split(os.linesep)[-1].lstrip('HEAD is now at ')
             info('HEAD is now at: {}', output)
+
+
+def get_repository_name(url):
+    return url.rsplit('/')[-1].split('@')[0]
