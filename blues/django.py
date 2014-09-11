@@ -20,7 +20,6 @@ blueprint = blueprints.get(__name__)
 project_home = lambda: os.path.join(app_root(), blueprint.get('project'))
 app_root = lambda: blueprint.get('root_path') or '/srv/app'
 source_path = lambda: os.path.join(project_home(), 'src')
-git_path = lambda: os.path.join(source_path(), '{}.git'.format(blueprint.get('project')))
 virtualenv_path = lambda: os.path.join(project_home(), 'env')
 
 
@@ -250,6 +249,11 @@ def install_requirements():
         requirements_path = os.path.join(git_path(), 'requirements.txt')
         with virtualenv.activate(path):
             virtualenv.pip('install', '-r {} --log={}'.format(requirements_path, pip_log_path))
+
+
+def git_path():
+    repository = git.get_repository_name(blueprint.get('git_url'))
+    return os.path.join(source_path(), repository)
 
 
 def install_git():
