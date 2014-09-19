@@ -27,7 +27,7 @@ def setup():
 def install():
     with sudo():
         # PIP install system wide uWSGI
-        cmd = 'pip install uwsgi'
+        cmd = 'pip install uwsgi gevent'
         version = blueprint.get('version')
         if version:
             cmd += '=={}'.format(version)

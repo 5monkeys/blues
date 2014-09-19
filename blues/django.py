@@ -125,6 +125,7 @@ def get_uwsgi_wsgi_context():
     total_memory = blueprint.get('wsgi.max_memory',
                                  default=debian.total_memory() / 1024 / 1024 / 1024)
     workers = blueprint.get('wsgi.workers', default=uwsgi.get_worker_count(cpu_count))
+    gevent = blueprint.get('wsgi.gevent', default=0)
 
     info('Generating uWSGI conf based on {} core(s), {} GB memory and {} worker(s)',
          cpu_count, total_memory, workers)
@@ -139,6 +140,7 @@ def get_uwsgi_wsgi_context():
         'limit_as': uwsgi.get_limit_as(total_memory),
         'source': os.path.join(git_path(), 'src'),
         'virtualenv': virtualenv_path(),
+        'gevent': gevent,
     })
 
     # Override defaults
