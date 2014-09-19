@@ -179,7 +179,7 @@ def upgrade_forwarder():
     uploads = blueprint.upload('forwarder/logstash-forwarder.conf', '/etc/logstash-forwarder', context=context)
 
     ssl_path = 'ssl/logstash-forwarder.crt'
-    if not os.path.exists(blueprint.get_template_path(ssl_path)):
+    if not os.path.exists(blueprint.get_user_template_path(ssl_path)):
         download_server_ssl_cert(ssl_path)
     blueprint.upload('ssl/logstash-forwarder.crt', '/etc/pki/tls/certs/')
 
