@@ -76,11 +76,11 @@ def upgrade():
     install_requirements()
 
     # Update uwsgi-configuration
-    upload_deamon_conf()
+    upload_daemon_conf()
 
 
 @task
-def upload_deamon_conf():
+def upload_daemon_conf():
     from blues import uwsgi
     updates = []
 
@@ -90,8 +90,8 @@ def upload_deamon_conf():
         debian.mkdir(destination)
 
         with settings(template_dirs=[default_templates]):
-            wsgi_deamon = blueprint.get('wsgi.deamon')
-            if wsgi_deamon == 'uwsgi':
+            wsgi_daemon = blueprint.get('wsgi.daemon')
+            if wsgi_daemon == 'uwsgi':
                 context = get_uwsgi_wsgi_context()
 
                 wsgi_vassals = upload_uwsgi_wsgi_conf(destination, context=context)
@@ -103,8 +103,8 @@ def upload_deamon_conf():
                 if user_vassals:
                     updates.extend(user_vassals)
 
-            celery_deamon = blueprint.get('celery.deamon')
-            if celery_deamon == 'uwsgi':
+            celery_daemon = blueprint.get('celery.daemon')
+            if celery_daemon == 'uwsgi':
                 celery_vassals = upload_uwsgi_celery_conf(destination)
                 if celery_vassals:
                     updates.extend(celery_vassals)
@@ -213,8 +213,8 @@ def generate_nginx_conf(role='www'):
         'ip_hash': blueprint.get('wsgi.ip_hash', False)
     }
     template = 'nginx/site.conf'
-    deamon = blueprint.get('wsgi.deamon')
-    if deamon and deamon == 'uwsgi':
+    daemon = blueprint.get('wsgi.daemon')
+    if daemon and daemon == 'uwsgi':
         template = 'nginx/uwsgi_site.conf'
     conf = blueprint.render_template(template, context)
     conf_dir = os.path.join(os.path.dirname(env['real_fabfile']), 'templates', role, 'nginx',
