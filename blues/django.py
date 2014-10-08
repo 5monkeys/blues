@@ -75,6 +75,9 @@ def upgrade():
     # Install repo requirements.txt
     install_requirements()
 
+    # Collect static files
+    info('Collect static files')
+    manage('collectstatic --noinput')
 
     # Migrate database
     info('Migrate database')
