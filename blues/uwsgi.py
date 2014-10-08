@@ -7,6 +7,8 @@ from refabric.api import run, info
 from refabric.context_managers import sudo, hide_prefix
 from refabric.contrib import blueprints, debian
 
+from . import python
+
 blueprint = blueprints.get(__name__)
 
 log_path = '/var/log/uwsgi'
@@ -26,14 +28,17 @@ def setup():
 
 def install():
     with sudo():
+        # Ensure python (pip) is installed
+        python.install()
+
         # PIP install system wide uWSGI
-        cmd = 'pip install uwsgi gevent'
+        package = 'uwsgi'
         version = blueprint.get('version')
         if version:
-            cmd += '=={}'.format(version)
+            package += '=={}'.format(version)
         info('Installing: {} ({})', 'uWSGI', version if version else 'latest')
-        run(cmd)
-        run('pip install uwsgitop')
+        python.pip('install', package)
+        python.pip('install', 'uwsgitop', 'gevent')
 
         # Create group
         debian.groupadd('app-data', gid_min=10000)
