@@ -70,9 +70,11 @@ def install():
 @task
 def upgrade():
     # Reset git repo
+    info('Update source')
     update_git()
 
     # Install repo requirements.txt
+    info('Install requirements')
     install_requirements()
 
     # Collect static files
