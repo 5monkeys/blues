@@ -28,14 +28,14 @@ def manage(cmd=''):
     if not cmd:
         cmd = prompt('Enter django management command:')
     with sudo_project(), cd(git_path()), virtualenv.activate(virtualenv_path()), shell_env():
-        run('python manage.py {cmd}'.format(cmd=cmd))
+        return run('python manage.py {cmd}'.format(cmd=cmd))
 
 
 @task
 def setup():
     install()
     upgrade()
-    manage('syncdb')
+    manage('syncdb --noinput')
 
 
 def install():
@@ -77,6 +77,26 @@ def upgrade():
 
     # Update uwsgi-configuration
     upload_daemon_conf()
+
+    # Migrate database
+    info('Migrate database')
+    migrate()
+
+
+def get_version():
+    version = manage('--version')
+    return tuple(map(int, version.split('\n')[0].strip().split('.')))
+
+
+@task
+def migrate():
+    version = get_version()
+    if version >= (1, 7):
+        manage('migrate')
+    elif blueprint.get('use_south', True):
+        manage('migrate --merge')
+    else:
+        manage('syncdb --noinput')
 
 
 @task
