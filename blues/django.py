@@ -17,8 +17,8 @@ from . import virtualenv
 
 blueprint = blueprints.get(__name__)
 
-project_home = lambda: os.path.join(app_root(), blueprint.get('project'))
 app_root = lambda: blueprint.get('root_path') or '/srv/app'
+project_home = lambda: os.path.join(app_root(), blueprint.get('project'))
 source_path = lambda: os.path.join(project_home(), 'src')
 virtualenv_path = lambda: os.path.join(project_home(), 'env')
 
@@ -261,29 +261,31 @@ def install_requirements():
 
 
 def git_path():
-    repository = git.get_repository_name(blueprint.get('git_url'))
-    return os.path.join(source_path(), repository)
+    repository = git.parse_url(blueprint.get('git_url'))
+    return os.path.join(source_path(), repository['name'])
+
+
+def git_repository():
+    return git.parse_url(blueprint.get('git_url'), branch=blueprint.get('git_branch'))
 
 
 def install_git():
     git.install()
 
-    branch = blueprint.get('git_branch')
-    git_url = blueprint.get('git_url')
-
     with sudo_project() as project:
         path = source_path()
         debian.mkdir(path, owner=project, group=project)
         with cd(path):
-            git.clone(git_url, branch)
+            repository = git_repository()
+            git.clone(repository['url'], branch=repository['branch'])
 
 
 def update_git():
     with sudo_project():
         path = git_path()
-        branch = blueprint.get('git_branch')
+        repository = git_repository()
         with cd(path):
-            git.reset(branch)
+            git.reset(repository['branch'])
 
 
 @contextmanager

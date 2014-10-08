@@ -19,16 +19,18 @@ def install():
 @task
 def setup():
     install()
-    upgrade()
 
 
 @task
 def upgrade():
-    pass
+    raise NotImplementedError
 
 
-def clone(url, branch, repository_path=None):
-    name = url.rsplit('/')[-1]
+def clone(url, branch=None, repository_path=None, **kwargs):
+    print url, branch
+    repository = parse_url(url, branch=branch)
+    name = repository['name']
+    branch = repository['branch']
 
     if not repository_path:
         repository_path = os.path.join('.', name)
@@ -43,12 +45,12 @@ def clone(url, branch, repository_path=None):
     return repository_path
 
 
-def reset(branch, repository_path=None):
+def reset(branch, repository_path=None, **kwargs):
     if not repository_path:
         repository_path = debian.pwd()
 
     with cd(repository_path):
-        name = get_repository_name(repository_path)
+        name = os.path.basename(repository_path)
         info('Resetting git repository: {}@{}', name, branch)
         commands = [
             'git fetch origin',  # Fetch branches and tags
@@ -63,5 +65,23 @@ def reset(branch, repository_path=None):
             info('HEAD is now at: {}', output)
 
 
-def get_repository_name(url):
-    return url.rsplit('/')[-1].split('@')[0]
+def parse_url(url, branch=None):
+    egg = None
+
+    if '@' in url.split(':', 1)[-1]:
+        url, url_branch = url.rsplit('@', 1)
+
+        if '#' in url_branch:
+            url_branch, egg = url_branch.split('#', 1)
+
+        if not branch:
+            branch = url_branch
+
+    repository_name = url.rsplit('/', 1)[-1]
+
+    return {
+        'url': url,
+        'name': repository_name,
+        'branch': branch,
+        'egg': egg
+    }
