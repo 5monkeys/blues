@@ -257,7 +257,7 @@ def install_requirements():
         pip_log_path = os.path.join(project_home(), '.pip', 'pip.log')
         requirements_path = os.path.join(git_path(), 'requirements.txt')
         with virtualenv.activate(path):
-            virtualenv.pip('install', '-r {} --log={}'.format(requirements_path, pip_log_path))
+            python.pip('install', '-r {} --log={}'.format(requirements_path, pip_log_path))
 
 
 def git_path():

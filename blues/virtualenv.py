@@ -13,16 +13,15 @@ blueprint = blueprints.get(__name__)
 @task
 def setup():
     install()
-    upgrade()
-
-
-def install():
-    debian.apt_get('install', 'python-virtualenv')
 
 
 @task
 def upgrade():
     raise NotImplementedError
+
+
+def install():
+    debian.apt_get('install', 'python-virtualenv')
 
 
 def create(path):
@@ -31,11 +30,6 @@ def create(path):
         run('virtualenv {}'.format(path))
     else:
         info('Virtualenv already exists: {}', path)
-
-
-def pip(command, *options):
-    info('Running pip {}', command)
-    run('pip {} {}'.format(command, ' '.join(options)))
 
 
 @contextmanager
