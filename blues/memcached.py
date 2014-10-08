@@ -16,11 +16,12 @@ status = task(partial(debian.service, 'memcached', 'status', check_status=False)
 
 @task
 def setup():
-    debian.apt_get('install', 'memcached')
+    install()
 
 
 def install():
-    debian.apt_get('install', 'memcached')
+    with sudo():
+        debian.apt_get('install', 'memcached')
 
 
 @task
