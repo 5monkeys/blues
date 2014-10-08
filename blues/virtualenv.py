@@ -7,6 +7,8 @@ from fabric.decorators import task
 from refabric.api import run, info
 from refabric.contrib import blueprints, debian
 
+from . import python
+
 blueprint = blueprints.get(__name__)
 
 
@@ -21,6 +23,7 @@ def upgrade():
 
 
 def install():
+    python.install()
     debian.apt_get('install', 'python-virtualenv')
 
 

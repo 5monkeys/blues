@@ -13,6 +13,7 @@ from refabric.contrib import blueprints, debian
 
 from . import git
 from . import user
+from . import python
 from . import virtualenv
 
 blueprint = blueprints.get(__name__)
