@@ -75,8 +75,6 @@ def upgrade():
     # Install repo requirements.txt
     install_requirements()
 
-    # Update uwsgi-configuration
-    upload_daemon_conf()
 
     # Migrate database
     info('Migrate database')
