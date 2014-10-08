@@ -48,14 +48,16 @@ def generate_nginx_conf(role='www'):
     template = 'nginx/kibana.conf'
     conf = blueprint.render_template(template, context)
     pwd = os.path.dirname(env['real_fabfile'])
-    conf_dir = os.path.join(pwd, 'templates', role, 'nginx', 'sites-available')
-    conf_path = os.path.join(conf_dir, 'kibana.conf')
 
-    if not os.path.exists(conf_dir):
-        os.makedirs(conf_dir)
+    for _dir, _conf in [('sites-available', 'kibana.conf'), ('includes', 'kibana-locations.conf')]:
+        conf_dir = os.path.join(pwd, 'templates', role, 'nginx', _dir)
+        conf_path = os.path.join(conf_dir, _conf)
 
-    with open(conf_path, 'w+') as f:
-        f.write(conf)
+        if not os.path.exists(conf_dir):
+            os.makedirs(conf_dir)
+
+        with open(conf_path, 'w+') as f:
+            f.write(conf)
 
     info('Select username and password...')
     passwd_dir = os.path.join(pwd, 'templates', role, 'nginx', 'conf.d')
