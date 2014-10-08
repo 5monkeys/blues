@@ -35,7 +35,7 @@ def install():
 
 @task
 def upgrade():
-    blueprint.upload('config.js', '/srv/www/kibana/')
+    blueprint.upload('config.js', '/srv/www/kibana/', user='www-data', group='www-data')
 
 
 @task
