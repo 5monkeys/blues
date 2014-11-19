@@ -24,4 +24,4 @@ def install():
 
 def pip(command, *options):
     info('Running pip {}', command)
-    run('pip {} {}'.format(command, ' '.join(options)))
+    run('pip {} {} -v --log-file=/tmp/pip.log'.format(command, ' '.join(options)))
