@@ -1,5 +1,3 @@
-from functools import partial
-
 from fabric.decorators import task
 
 from refabric.api import run, info
@@ -20,6 +18,7 @@ status = debian.service_task('memcached', 'status')
 @task
 def setup():
     install()
+    upgrade()
 
 
 def install():
@@ -30,14 +29,17 @@ def install():
 @task
 def upgrade():
     context = {
-        'size': blueprint.get('size', 256),
-        'bind': blueprint.get('bind', '127.0.0.1')
+        'size': blueprint.get('size', 64),
+        'bind': blueprint.get('bind', None)
     }
     blueprint.upload('memcached', '/etc/', context)
 
 
 @task
 def flush():
+    """
+    Delete all cached keys
+    """
     info('Flushing Memcached...')
     with sudo(), silent():
         run('echo "flush_all" | /bin/netcat -q 2 127.0.0.1 11211')
