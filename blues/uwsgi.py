@@ -1,23 +1,24 @@
 import os
-from functools import partial
 
 from fabric.decorators import task
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, hide_prefix
-from refabric.contrib import blueprints, debian
+from refabric.contrib import blueprints
 
+from . import debian
 from . import python
+
 
 blueprint = blueprints.get(__name__)
 
 log_path = '/var/log/uwsgi'
 tmpfs_path = '/run/uwsgi/'
 
-start = task(partial(debian.service, 'uwsgi', 'start'))
-stop = task(partial(debian.service, 'uwsgi', 'stop'))
-restart = task(partial(debian.service, 'uwsgi', 'restart'))
-reload = task(partial(debian.service, 'uwsgi', 'reload'))
+start = debian.service_task('uwsgi', 'start')
+stop = debian.service_task('uwsgi', 'stop')
+restart = debian.service_task('uwsgi', 'restart')
+reload = debian.service_task('uwsgi', 'reload')
 
 
 @task

@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from functools import partial
 
 from fabric.contrib import files
 from fabric.decorators import task
@@ -9,16 +8,19 @@ from fabric.utils import warn
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
-from refabric.contrib import debian, blueprints
+from refabric.contrib import blueprints
+
+from . import debian
+
 
 blueprint = blueprints.get(__name__)
 
 postgres_root = '/etc/postgresql/9.1/main'
 
-start = task(partial(debian.service, 'postgresql', 'start', check_status=False))
-stop = task(partial(debian.service, 'postgresql', 'stop', check_status=False))
-restart = task(partial(debian.service, 'postgresql', 'restart', check_status=False))
-reload = task(partial(debian.service, 'postgresql', 'reload', check_status=False))
+start = debian.service_task('postgresql', 'start')
+stop = debian.service_task('postgresql', 'stop')
+restart = debian.service_task('postgresql', 'restart')
+reload = debian.service_task('postgresql', 'reload')
 
 
 def install():

@@ -1,5 +1,4 @@
 import os
-from functools import partial
 
 from fabric.context_managers import cd
 from fabric.contrib import files
@@ -8,7 +7,10 @@ from fabric.utils import warn
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
-from refabric.contrib import blueprints, debian
+from refabric.contrib import blueprints
+
+from . import debian
+
 
 blueprint = blueprints.get(__name__)
 
@@ -16,10 +18,10 @@ nginx_root = '/etc/nginx'
 sites_available_path = os.path.join(nginx_root, 'sites-available')
 sites_enabled_path = os.path.join(nginx_root, 'sites-enabled')
 
-start = task(partial(debian.service, 'nginx', 'start', check_status=False))
-stop = task(partial(debian.service, 'nginx', 'stop', check_status=False))
-restart = task(partial(debian.service, 'nginx', 'restart', check_status=False))
-reload = task(partial(debian.service, 'nginx', 'reload', check_status=False))
+start = debian.service_task('nginx', 'start')
+stop = debian.service_task('nginx', 'stop')
+restart = debian.service_task('nginx', 'restart')
+reload = debian.service_task('nginx', 'reload')
 
 
 @task

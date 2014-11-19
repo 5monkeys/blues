@@ -5,9 +5,11 @@ from fabric.contrib import files
 from fabric.decorators import task
 
 from refabric.api import run, info
-from refabric.contrib import blueprints, debian
+from refabric.contrib import blueprints
 
+from . import debian
 from . import python
+
 
 blueprint = blueprints.get(__name__)
 

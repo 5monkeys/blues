@@ -9,7 +9,10 @@ from fabric.utils import warn, abort
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
-from refabric.contrib import blueprints, debian
+from refabric.contrib import blueprints
+
+from . import debian
+
 
 blueprint = blueprints.get(__name__)
 
@@ -201,3 +204,7 @@ def service(target=None, action=None):
 start = task(partial(service, action='start'))
 stop = task(partial(service, action='stop'))
 restart = task(partial(service, action='restart'))
+
+start.__doc__ = 'Start logstash'
+stop.__doc__ = 'Stop logstash'
+restart.__doc__ = 'Restart logstash'

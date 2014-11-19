@@ -9,7 +9,7 @@ from fabric.utils import indent
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, shell_env
-from refabric.contrib import blueprints, debian
+from refabric.contrib import blueprints
 
 from . import git
 from . import user

@@ -1,17 +1,18 @@
-from functools import partial
-
 from fabric.decorators import task
 
 from refabric.api import info
 from refabric.context_managers import sudo
-from refabric.contrib import blueprints, debian
+from refabric.contrib import blueprints
+
+from . import debian
+
 
 blueprint = blueprints.get(__name__)
 
-start = task(partial(debian.service, 'elasticsearch', 'start', check_status=False))
-stop = task(partial(debian.service, 'elasticsearch', 'stop', check_status=False))
-restart = task(partial(debian.service, 'elasticsearch', 'restart', check_status=False))
-reload = task(partial(debian.service, 'elasticsearch', 'force-reload', check_status=False))
+start = debian.service_task('elasticsearch', 'start')
+stop = debian.service_task('elasticsearch', 'stop')
+restart = debian.service_task('elasticsearch', 'restart')
+reload = debian.service_task('elasticsearch', 'force-reload')
 
 
 @task

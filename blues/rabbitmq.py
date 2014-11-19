@@ -1,17 +1,18 @@
-from functools import partial
-
 from fabric.decorators import task
 
 from refabric.api import run, info
 from refabric.context_managers import sudo
-from refabric.contrib import blueprints, debian
+from refabric.contrib import blueprints
+
+from . import debian
+
 
 blueprint = blueprints.get(__name__)
 
-start = task(partial(debian.service, 'rabbitmq-server', 'start', check_status=False))
-stop = task(partial(debian.service, 'rabbitmq-server', 'stop', check_status=False))
-restart = task(partial(debian.service, 'rabbitmq-server', 'restart', check_status=False))
-reload = task(partial(debian.service, 'rabbitmq-server', 'reload', check_status=False))
+start = debian.service_task('rabbitmq-server', 'start')
+stop = debian.service_task('rabbitmq-server', 'stop')
+restart = debian.service_task('rabbitmq-server', 'restart')
+reload = debian.service_task('rabbitmq-server', 'reload')
 
 
 @task

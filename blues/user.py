@@ -2,8 +2,11 @@ import os
 
 from fabric.contrib import files
 
-from refabric.contrib import blueprints, debian, templates
+from refabric.contrib import blueprints, templates
 from refabric.context_managers import sudo
+
+from . import debian
+
 
 blueprint = blueprints.get(__name__)
 

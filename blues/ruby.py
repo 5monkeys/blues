@@ -2,7 +2,10 @@ from fabric.decorators import task
 
 from refabric.api import run, info
 from refabric.context_managers import sudo
-from refabric.contrib import blueprints, debian
+from refabric.contrib import blueprints
+
+from . import debian
+
 
 blueprint = blueprints.get(__name__)
 

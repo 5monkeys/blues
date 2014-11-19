@@ -4,14 +4,17 @@ from fabric.decorators import task
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
-from refabric.contrib import blueprints, debian
+from refabric.contrib import blueprints
+
+from . import debian
+
 
 blueprint = blueprints.get(__name__)
 
-start = task(partial(debian.service, 'memcached', 'start', check_status=False))
-stop = task(partial(debian.service, 'memcached', 'stop', check_status=False))
-restart = task(partial(debian.service, 'memcached', 'restart', check_status=False))
-status = task(partial(debian.service, 'memcached', 'status', check_status=False))
+start = debian.service_task('memcached', 'start')
+stop = debian.service_task('memcached', 'stop')
+restart = debian.service_task('memcached', 'restart')
+status = debian.service_task('memcached', 'status')
 
 
 @task

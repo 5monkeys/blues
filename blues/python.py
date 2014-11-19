@@ -2,7 +2,8 @@ from fabric.decorators import task
 
 from refabric.api import run, info
 from refabric.context_managers import sudo
-from refabric.contrib import debian
+
+from . import debian
 
 
 @task
