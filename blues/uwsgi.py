@@ -59,7 +59,7 @@ def upgrade():
 @task
 def top():
     # TODO: fix missing output
-    with hide_prefix():
+    with sudo(), hide_prefix():
         stats_path = os.path.join(tmpfs_path, '{}-stats.sock'.format(blueprint.get('project')))
         run('uwsgitop {}'.format(stats_path))
 
