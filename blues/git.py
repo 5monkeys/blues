@@ -1,4 +1,5 @@
 import os
+import re
 
 from fabric.context_managers import cd
 from fabric.contrib import files
@@ -30,7 +31,6 @@ def upgrade():
 
 
 def clone(url, branch=None, repository_path=None, **kwargs):
-    print url, branch
     repository = parse_url(url, branch=branch)
     name = repository['name']
     branch = repository['branch']
@@ -49,6 +49,11 @@ def clone(url, branch=None, repository_path=None, **kwargs):
 
 
 def reset(branch, repository_path=None, **kwargs):
+    """
+    Fetch, reset, clean and checkout repository branch.
+
+    :return: commit
+    """
     if not repository_path:
         repository_path = debian.pwd()
 
@@ -65,7 +70,57 @@ def reset(branch, repository_path=None, **kwargs):
         with silent():
             output = run(' && '.join(commands))
             output = output.split(os.linesep)[-1].lstrip('HEAD is now at ')
+            commit = output.split()[0]
             info('HEAD is now at: {}', output)
+
+    return commit
+
+
+def get_commit(repository_path=None, short=False):
+    """
+    Get current checked out commit for cloned repository path.
+
+    :param repository_path: Repository path
+    :param short: Format git commit hash in short (7) format
+    :return: Commit hash
+    """
+    if not repository_path:
+        repository_path = debian.pwd()
+
+    with cd(repository_path), silent():
+        output = run('git rev-parse HEAD')
+        commit = output.strip()
+        if short:
+            commit = commit[:7]
+
+    return commit
+
+
+def diff_stat(repository_path=None, commit='HEAD^', path=None):
+    """
+    Get diff stats for path.
+
+    :param repository_path: Repository path
+    :param commit: Commit to diff against, ex 12345..67890
+    :param path: Path or file to diff
+    :return: tuple(num files changed, num insertions, num deletions)
+    """
+    if not repository_path:
+        repository_path = debian.pwd()
+
+    with cd(repository_path), silent():
+        output = run('git diff --shortstat {} {}'.format(commit, path), pty=False)
+
+        # 719 files changed, 104452 insertions(+), 29309 deletions(-)
+        pattern = '.*(\d+) .+, (\d+) .+, (\d+) .+'
+        match = re.match(pattern, output)
+
+        if match:
+            stats = tuple(int(s) for s in match.groups())
+        else:
+            stats = 0, 0, 0
+
+        return stats
 
 
 def parse_url(url, branch=None):
