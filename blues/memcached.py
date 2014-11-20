@@ -6,6 +6,8 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['start', 'stop', 'restart', 'status', 'setup', 'upgrade', 'flush']
+
 
 blueprint = blueprints.get(__name__)
 

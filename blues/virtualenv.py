@@ -5,10 +5,13 @@ from fabric.contrib import files
 from fabric.decorators import task
 
 from refabric.api import run, info
+from refabric.context_managers import sudo
 from refabric.contrib import blueprints
 
 from . import debian
 from . import python
+
+__all__ = ['setup']
 
 
 blueprint = blueprints.get(__name__)
@@ -16,12 +19,11 @@ blueprint = blueprints.get(__name__)
 
 @task
 def setup():
-    install()
-
-
-@task
-def upgrade():
-    raise NotImplementedError
+    """
+    Install virtualenv binary system wide
+    """
+    with sudo():
+        install()
 
 
 def install():

@@ -6,6 +6,8 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'upgrade']
+
 
 blueprint = blueprints.get(__name__)
 
@@ -17,6 +19,9 @@ reload = debian.service_task('elasticsearch', 'force-reload')
 
 @task
 def setup():
+    """
+    Install Elasticsearch
+    """
     install()
     upgrade()
 
@@ -46,6 +51,9 @@ def install():
 
 @task
 def upgrade():
+    """
+    Configure Elasticsearch
+    """
     context = {
         'cluster_name': blueprint.get('cluster_name', 'elasticsearch'),
         'number_of_shards': blueprint.get('number_of_shards', '5'),

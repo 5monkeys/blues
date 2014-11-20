@@ -11,6 +11,8 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'upgrade', 'enable', 'disable']
+
 
 blueprint = blueprints.get(__name__)
 
@@ -26,6 +28,9 @@ reload = debian.service_task('nginx', 'reload')
 
 @task
 def setup():
+    """
+    Install and configure nginx
+    """
     install()
     upgrade()
     restart()
@@ -40,6 +45,9 @@ def install():
 
 @task
 def upgrade():
+    """
+    Configure nginx and enable/disable sites
+    """
     with sudo():
         # Upload templates
         context = {

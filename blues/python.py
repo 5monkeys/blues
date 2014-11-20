@@ -8,12 +8,10 @@ from . import debian
 
 @task
 def setup():
+    """
+    Install python develop tools
+    """
     install()
-
-
-@task
-def upgrade():
-    raise NotImplementedError
 
 
 def install():

@@ -11,18 +11,18 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['setup']
+
 
 blueprint = blueprints.get(__name__)
 
 
 @task
 def setup():
+    """
+    Install Git
+    """
     install()
-
-
-@task
-def upgrade():
-    raise NotImplementedError
 
 
 def install():

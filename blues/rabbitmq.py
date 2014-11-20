@@ -6,6 +6,8 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'upgrade']
+
 
 blueprint = blueprints.get(__name__)
 
@@ -17,6 +19,9 @@ reload = debian.service_task('rabbitmq-server', 'reload')
 
 @task
 def setup():
+    """
+    Install Rabbitmq
+    """
     install()
     upgrade()
 
@@ -39,6 +44,9 @@ def install():
 
 @task
 def upgrade():
+    """
+    Configure Rabbitmq
+    """
     uploads = blueprint.upload('./', '/etc/rabbitmq/')
     if uploads:
         restart()
