@@ -1,3 +1,4 @@
+from functools import partial
 import os
 
 from fabric.context_managers import cd
@@ -6,13 +7,14 @@ from fabric.decorators import task
 from fabric.utils import warn
 
 from refabric.api import run, info
-from refabric.context_managers import sudo, silent
+from refabric.context_managers import sudo, silent, hide_prefix
 from refabric.contrib import blueprints
 
 from . import debian
 from . import python
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'enable', 'disable']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
+           'enable', 'disable', 'ctl']
 
 
 blueprint = blueprints.get(__name__)
@@ -22,11 +24,6 @@ programs_available_path = os.path.join(supervisord_root, 'programs-available')
 programs_enabled_path = os.path.join(supervisord_root, 'programs-enabled')
 log_path = '/var/log/supervisord'
 tmpfs_path = '/run/supervisord'
-
-start = debian.service_task('supervisor', 'start')
-stop = debian.service_task('supervisor', 'stop')
-restart = debian.service_task('supervisor', 'restart')
-reload = debian.service_task('supervisor', 'reload')
 
 
 @task
@@ -144,3 +141,39 @@ def enable(program, do_reload=True):
                         reload()
 
     return enabled
+
+
+@task
+def ctl(command, program=''):
+    """
+    Run supervisorctl :[command],[program]
+
+    :param command: The command to run
+    :param program: The program to run command against
+    """
+    with sudo(), silent():
+        output = run('supervisorctl {} {}'.format(command, program))
+        with hide_prefix():
+            info(output)
+
+
+def service(command, program=None):
+    if not program:
+        debian.service('supervisor', command)
+    else:
+        if command == 'reload':
+            command = 'restart'
+        ctl(command, program)
+
+
+start = task(partial(service, 'start'))
+stop = task(partial(service, 'stop'))
+restart = task(partial(service, 'restart'))
+reload = task(partial(service, 'reload'))
+
+start.__doc__ = 'Start supervisor or start program'
+stop.__doc__ = 'Stop supervisor or stop program'
+restart.__doc__ = 'Restart supervisor or restart program'
+reload.__doc__ = 'Reload supervisor or restart program'
+
+
