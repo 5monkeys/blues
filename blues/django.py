@@ -22,20 +22,15 @@ def manage(cmd=''):
 
 
 @task
-def setup():
-    upgrade()
-
-    if version() < (1, 7):
-        manage('syncdb --noinput')
-
-
-@task
-def upgrade():
-    # Collect static files
-    collectstatic()
-
+def deploy():
+    """
+    Migrate database and collect static files
+    """
     # Migrate database
     migrate()
+
+    # Collect static files
+    collectstatic()
 
 
 @task
