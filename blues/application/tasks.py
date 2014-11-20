@@ -1,35 +1,43 @@
-import os
-
 from fabric.decorators import task
-from fabric.state import env
-from fabric.utils import indent
 
-from refabric.api import info
-from blues import git
-
-from . import blueprint
+from .deploy import *
 from .project import *
-from .providers import get_provider
-from .install import install, update_git, install_requirements
+from .providers import get_providers
 
 
 @task
 def setup():
     """
-    Create project user, paths, system dependencies and run upgrade
+    Install project user, structure, env, source, dependencies and providers
     """
-    install()
-    upgrade()
+    install_project_structure()
+    install_project_user()
+    install_system_dependencies()
+    install_source()
+    install_virtualenv()
+    install_requirements()
+    install_providers()
+    configure_providers()
 
 
 @task
 def upgrade():
     """
-    Reset git to HEAD, install pip requirements, upload web and worker conf
+    Deploy and configure providers
+    """
+    code_changed = deploy(auto_reload=False)
+    providers = configure_providers(force_reload=code_changed)
+
+
+@task
+def deploy(auto_reload=True):
+    """
+    Reset source to configured branch and install requirements, if needed
+
+    :return: Got new source?
     """
     # Reset git repo
-    info('Update source')
-    previous_commit, current_commit = update_git()
+    previous_commit, current_commit = update_source()
     code_changed = previous_commit != current_commit
 
     # Check if requirements has changed
@@ -44,37 +52,56 @@ def upgrade():
     else:
         info(indent('(requirements not changed...skipping)'))
 
-    # Upload web and worker provider config
-    upgrade_providers(force_reload=code_changed)
+    if auto_reload:
+        reload()
+
+    return code_changed
 
 
 @task
-def upgrade_providers(force_reload=False):
+def reload():
+    """
+    Reload all application providers on current host
+    """
+    providers = get_providers(env.host_string)
+    for provider in providers.values():
+        provider.reload()
+
+
+@task
+def configure_providers(force_reload=False):
     """
     Render, upload and reload web & worker config
     """
     with sudo_project():
-        providers = {}
-
-        web_hosts = blueprint.get('web.hosts')
-        web = blueprint.get('web.provider')
-        if web:
-            providers[web] = get_provider(web)
-
-        worker_hosts = blueprint.get('worker.hosts')
-        worker = blueprint.get('worker.provider')
-        if worker:
-            providers[worker] = get_provider(worker)
-
-        if web and (not web_hosts or env.host_string in web_hosts):
-            providers[web].upload_web_config()
-
-        if worker and (not worker_hosts or env.host_string in worker_hosts):
-            providers[worker].upload_worker_config()
+        # providers = {}
+        #
+        # web_hosts = blueprint.get('web.hosts')
+        # web = blueprint.get('web.provider')
+        # if web:
+        #     providers[web] = get_provider(web)
+        #
+        # worker_hosts = blueprint.get('worker.hosts')
+        # worker = blueprint.get('worker.provider')
+        # if worker:
+        #     providers[worker] = get_provider(worker)
+        #
+        # if web and (not web_hosts or env.host_string in web_hosts):
+        #     providers[web].configure_web()
+        #
+        # if worker and (not worker_hosts or env.host_string in worker_hosts):
+        #     providers[worker].configure_worker()
+        providers = get_providers(env.host_string)
+        if 'web' in providers:
+            providers['web'].configure_web()
+        if 'worker' in providers:
+            providers['worker'].configure_worker()
 
     for provider in providers.values():
         if provider.updates or force_reload:
             provider.reload()
+
+    return providers
 
 
 @task

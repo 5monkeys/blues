@@ -16,6 +16,12 @@ from ..project import *
 
 class UWSGIProvider(BaseProvider):
 
+    def install(self):
+        """
+        Install system wide uWSGI and upstart service.
+        """
+        uwsgi.setup()
+
     def get_config_path(self):
         """
         Get or create uWSGI project vassals home dir.
@@ -60,7 +66,7 @@ class UWSGIProvider(BaseProvider):
 
         return context
 
-    def upload_web_config(self):
+    def configure_web(self):
         """
         Render and upload web.ini vassal to <project>.ini.
 
@@ -90,7 +96,7 @@ class UWSGIProvider(BaseProvider):
 
         return self.updates
 
-    def upload_worker_config(self):
+    def configure_worker(self):
         """
         Render and upload celery vassal(s) to projects uWSGI home dir.
 

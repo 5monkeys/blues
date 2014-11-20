@@ -13,6 +13,12 @@ from ..project import *
 
 class SupervisorProvider(BaseProvider):
 
+    def install(self):
+        """
+        Install system wide Supervisor and upstart service.
+        """
+        supervisor.setup()
+
     def get_config_path(self):
         """
         Get or create Supervisor project programs home dir.
@@ -23,7 +29,7 @@ class SupervisorProvider(BaseProvider):
         debian.mkdir(destination)
         return destination
 
-    def upload_web_config(self):
+    def configure_web(self):
         """
         TODO: Render and upload web program to projects Supervisor home dir.
 
@@ -31,7 +37,7 @@ class SupervisorProvider(BaseProvider):
         """
         raise NotImplementedError('Supervisor provider not yet implements web workers.')
 
-    def upload_worker_config(self):
+    def configure_worker(self):
         """
         Render and upload worker program(s) to projects Supervisor home dir.
 

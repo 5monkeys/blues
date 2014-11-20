@@ -10,6 +10,12 @@ class BaseProvider(object):
         self.updates = []
         self.project = blueprint.get('project')
 
+    def install(self):
+        """
+        Install provider.
+        """
+        raise NotImplementedError
+
     def get_config_path(self):
         """
         Get or create remote provider config home dir.
@@ -34,7 +40,7 @@ class BaseProvider(object):
 
         return context
 
-    def upload_web_config(self):
+    def configure_web(self):
         """
         Render and upload provider web config files.
 
@@ -42,7 +48,7 @@ class BaseProvider(object):
         """
         raise NotImplementedError
 
-    def upload_worker_config(self):
+    def configure_worker(self):
         """
         Render and upload provider worker config files.
 
