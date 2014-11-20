@@ -17,6 +17,9 @@ status = debian.service_task('memcached', 'status')
 
 @task
 def setup():
+    """
+    Install memcached
+    """
     install()
     upgrade()
 
@@ -28,6 +31,9 @@ def install():
 
 @task
 def upgrade():
+    """
+    Configure memcached
+    """
     context = {
         'size': blueprint.get('size', 64),
         'bind': blueprint.get('bind', None)

@@ -12,6 +12,8 @@ from refabric.contrib import blueprints
 from . import debian
 from . import python
 
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'upgrade', 'enable', 'disable']
+
 
 blueprint = blueprints.get(__name__)
 
@@ -29,6 +31,9 @@ reload = debian.service_task('supervisor', 'reload')
 
 @task
 def setup():
+    """
+    Install Supervisor and enable/disable configured programs
+    """
     install()
     upgrade()
 
@@ -56,6 +61,9 @@ def install():
 
 @task
 def upgrade():
+    """
+    Enable/disable configured programs
+    """
     with sudo():
         # Upload templates
         uploads = blueprint.upload('init/', '/etc/init/')
@@ -86,6 +94,13 @@ def upgrade():
 
 @task
 def disable(program, do_reload=True):
+    """
+    Disable program.
+
+    :param program: Program to disable
+    :param do_reload: Reload supervisor
+    :return: Got disabled?
+    """
     disabled = False
     program = program if program.endswith('.conf') or program == 'default' else '{}.conf'.format(program)
     with sudo(), cd(programs_enabled_path):
@@ -104,6 +119,13 @@ def disable(program, do_reload=True):
 
 @task
 def enable(program, do_reload=True):
+    """
+    Enable program.
+
+    :param program: Program to enable
+    :param do_reload: Reload supervisor
+    :return: Got enabled?
+    """
     enabled = False
     program = program if program.endswith('.conf') or program == 'default' else '{}.conf'.format(program)
 

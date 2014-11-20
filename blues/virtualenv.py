@@ -26,6 +26,7 @@ def upgrade():
 
 def install():
     python.install()
+    info('Install {}', 'virtualenv')
     debian.apt_get('install', 'python-virtualenv')
 
 

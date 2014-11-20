@@ -9,12 +9,17 @@ from refabric.contrib import blueprints
 from . import virtualenv
 from .application.project import virtualenv_path, python_path, sudo_project
 
+__all__ = ['manage', 'deploy', 'version', 'migrate', 'collectstatic']
+
 
 blueprint = blueprints.get(__name__)
 
 
 @task
 def manage(cmd=''):
+    """
+    Run django management command
+    """
     if not cmd:
         cmd = prompt('Enter django management command:')
     with sudo_project(), cd(python_path()), virtualenv.activate(virtualenv_path()), shell_env():
@@ -35,6 +40,9 @@ def deploy():
 
 @task
 def version():
+    """
+    Get installed version
+    """
     if not hasattr(version, 'version'):
         v = manage('--version')
         version.version = tuple(map(int, v.split('\n')[0].strip().split('.')))
@@ -44,6 +52,9 @@ def version():
 @task
 @runs_once
 def migrate():
+    """
+    Migrate database
+    """
     info('Migrate database')
     if version() >= (1, 7):
         manage('migrate')
@@ -57,5 +68,8 @@ def migrate():
 @task
 @runs_once
 def collectstatic():
+    """
+    Collect static files
+    """
     info('Collect static files')
     manage('collectstatic --noinput')

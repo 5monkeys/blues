@@ -15,11 +15,6 @@ from . import debian
 blueprint = blueprints.get(__name__)
 
 
-def install():
-    with sudo():
-        debian.apt_get('install', 'git')
-
-
 @task
 def setup():
     install()
@@ -28,6 +23,12 @@ def setup():
 @task
 def upgrade():
     raise NotImplementedError
+
+
+def install():
+    with sudo():
+        info('Installing: {}', 'Git')
+        debian.apt_get('install', 'git')
 
 
 def clone(url, branch=None, repository_path=None, **kwargs):

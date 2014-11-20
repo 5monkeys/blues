@@ -9,6 +9,8 @@ from refabric.contrib import blueprints
 from . import debian
 from . import python
 
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'upgrade', 'top']
+
 
 blueprint = blueprints.get(__name__)
 
@@ -23,6 +25,9 @@ reload = debian.service_task('uwsgi', 'reload')
 
 @task
 def setup():
+    """
+    Install uWSGI system wide and upload vassals
+    """
     install()
     upgrade()
 
@@ -51,6 +56,9 @@ def install():
 
 @task
 def upgrade():
+    """
+    Upload vassals
+    """
     with sudo():
         # Upload templates
         blueprint.upload('init/', '/etc/init/')
@@ -58,6 +66,9 @@ def upgrade():
 
 @task
 def top():
+    """
+    Launch uwsgitop for project stats socket
+    """
     # TODO: fix missing output
     with sudo(), hide_prefix():
         stats_path = os.path.join(tmpfs_path, '{}-stats.sock'.format(blueprint.get('project')))

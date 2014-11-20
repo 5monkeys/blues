@@ -18,6 +18,7 @@ def upgrade():
 
 def install():
     with sudo():
+        info('Install python dependencies')
         debian.apt_get('install', 'python-dev', 'python-setuptools')
         run('easy_install -0 pip')
 
