@@ -10,6 +10,8 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['setup', 'configure', 'generate_nginx_conf']
+
 
 blueprint = blueprints.get(__name__)
 
@@ -17,7 +19,7 @@ blueprint = blueprints.get(__name__)
 @task
 def setup():
     install()
-    upgrade()
+    configure()
 
 
 def install():
@@ -37,12 +39,18 @@ def install():
 
 
 @task
-def upgrade():
+def configure():
+    """
+    Configure Kibana
+    """
     blueprint.upload('config.js', '/srv/www/kibana/', user='www-data', group='www-data')
 
 
 @task
 def generate_nginx_conf(role='www'):
+    """
+    Generate nginx config for reverse proxying Kibana application
+    """
     info('Generating kibana config to nginx@{}...'.format(role))
     context = {
         'domain': blueprint.get('domain', '_'),

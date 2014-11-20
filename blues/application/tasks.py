@@ -21,7 +21,7 @@ def setup():
 
 
 @task
-def upgrade():
+def configure():
     """
     Deploy and configure providers
     """

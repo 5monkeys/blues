@@ -20,7 +20,7 @@ blueprint = blueprints.get(__name__)
 @task
 def setup():
     """
-    Install virtualenv binary system wide
+    Install system wide virtualenv binary
     """
     with sudo():
         install()

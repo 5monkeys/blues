@@ -6,17 +6,26 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['setup', 'configure']
+
 
 blueprint = blueprints.get(__name__)
 
 
 @task
 def setup():
+    """
+    Setup Nodejs
+    """
     install()
+    configure()
 
 
 @task
-def upgrade():
+def configure():
+    """
+    Install npm packages
+    """
     install_packages()
 
 
@@ -26,8 +35,6 @@ def install():
         if debian.lbs_release() in ['10.04', '12.04']:  # 12.04 ships with really old nodejs
             debian.add_apt_ppa('chris-lea/node.js', src=True)
         debian.apt_get('install', 'nodejs')
-
-    install_packages()
 
 
 def install_packages():

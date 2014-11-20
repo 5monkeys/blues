@@ -11,7 +11,7 @@ from refabric.contrib import blueprints
 
 from . import debian
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'upgrade', 'enable', 'disable']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'enable', 'disable']
 
 
 blueprint = blueprints.get(__name__)
@@ -32,7 +32,7 @@ def setup():
     Install and configure nginx
     """
     install()
-    upgrade()
+    configure()
     restart()
 
 
@@ -44,7 +44,7 @@ def install():
 
 
 @task
-def upgrade():
+def configure():
     """
     Configure nginx and enable/disable sites
     """
@@ -80,6 +80,13 @@ def upgrade():
 
 @task
 def disable(site, do_reload=True):
+    """
+    Disable site
+
+    :param site: Site to disable
+    :param do_reload: Reload nginx service
+    :return: Got disabled?
+    """
     disabled = False
     site = site if site.endswith('.conf') or site == 'default' else '{}.conf'.format(site)
     with sudo(), cd(sites_enabled_path):
@@ -98,6 +105,13 @@ def disable(site, do_reload=True):
 
 @task
 def enable(site, do_reload=True):
+    """
+    Enable site
+
+    :param site: Site to enable
+    :param do_reload: Reload nginx service
+    :return: Got enabled?
+    """
     enabled = False
     site = site if site.endswith('.conf') or site == 'default' else '{}.conf'.format(site)
 

@@ -12,7 +12,7 @@ from refabric.contrib import blueprints
 from . import debian
 from . import python
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'upgrade', 'enable', 'disable']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'enable', 'disable']
 
 
 blueprint = blueprints.get(__name__)
@@ -35,7 +35,7 @@ def setup():
     Install Supervisor and enable/disable configured programs
     """
     install()
-    upgrade()
+    configure()
 
 
 def install():
@@ -60,7 +60,7 @@ def install():
 
 
 @task
-def upgrade():
+def configure():
     """
     Enable/disable configured programs
     """

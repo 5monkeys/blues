@@ -6,17 +6,26 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['setup', 'configure']
+
 
 blueprint = blueprints.get(__name__)
 
 
 @task
 def setup():
+    """
+    Install Ruby and configured gems
+    """
     install()
+    configure()
 
 
 @task
-def upgrade():
+def configure():
+    """
+    Install configured gems
+    """
     install_gems()
 
 
@@ -27,8 +36,6 @@ def install():
 
     info('Installing Bundler')
     gem('install', 'bundler')
-
-    install_gems()
 
 
 def install_gems():

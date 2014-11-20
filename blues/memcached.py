@@ -6,7 +6,7 @@ from refabric.contrib import blueprints
 
 from . import debian
 
-__all__ = ['start', 'stop', 'restart', 'status', 'setup', 'upgrade', 'flush']
+__all__ = ['start', 'stop', 'restart', 'status', 'setup', 'configure', 'flush']
 
 
 blueprint = blueprints.get(__name__)
@@ -23,7 +23,7 @@ def setup():
     Install memcached
     """
     install()
-    upgrade()
+    configure()
 
 
 def install():
@@ -32,7 +32,7 @@ def install():
 
 
 @task
-def upgrade():
+def configure():
     """
     Configure memcached
     """

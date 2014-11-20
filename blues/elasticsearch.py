@@ -6,7 +6,7 @@ from refabric.contrib import blueprints
 
 from . import debian
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'upgrade']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure']
 
 
 blueprint = blueprints.get(__name__)
@@ -23,7 +23,7 @@ def setup():
     Install Elasticsearch
     """
     install()
-    upgrade()
+    configure()
 
 
 def install():
@@ -50,7 +50,7 @@ def install():
 
 
 @task
-def upgrade():
+def configure():
     """
     Configure Elasticsearch
     """

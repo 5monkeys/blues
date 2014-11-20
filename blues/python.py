@@ -5,6 +5,8 @@ from refabric.context_managers import sudo
 
 from . import debian
 
+__all__ = ['setup']
+
 
 @task
 def setup():

@@ -5,6 +5,8 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['start', 'stop', 'restart', 'setup', 'configure']
+
 
 blueprint = blueprints.get(__name__)
 
@@ -15,7 +17,11 @@ restart = debian.service_task('redis-server', 'restart')
 
 @task
 def setup():
+    """
+    Install and configure Redis
+    """
     install()
+    configure()
 
 
 def install():
@@ -24,7 +30,10 @@ def install():
 
 
 @task
-def upgrade():
+def configure():
+    """
+    Configure Redis
+    """
     context = {
         'bind': blueprint.get('bind', '127.0.0.1')
     }

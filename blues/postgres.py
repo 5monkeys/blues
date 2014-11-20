@@ -12,6 +12,9 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
+           'setup_databases', 'generate_pgtune_conf', 'dump_all']
+
 
 blueprint = blueprints.get(__name__)
 
@@ -35,6 +38,9 @@ def install():
 
 @task
 def setup():
+    """
+    Install, configure Postgresql and create schemas
+    """
     install()
     # Bump shared memory limits
     setup_shared_memory()
@@ -43,14 +49,17 @@ def setup():
     generate_pgtune_conf()
 
     # Upload templates
-    upgrade()
+    configure()
 
     # Create databases and related users
     setup_databases()
 
 
 @task
-def upgrade():
+def configure():
+    """
+    Configure Postgresql
+    """
     updates = blueprint.upload('./', postgres_root)
     if updates:
         restart()
@@ -58,6 +67,11 @@ def upgrade():
 
 @task
 def setup_databases(drop=False):
+    """
+    Create database schemas and grant user permissions
+
+    :param drop: Drop existing schemas before creation
+    """
     databases = blueprint.get('databases', [])
     with sudo('postgres'):
         for database in databases:
@@ -106,6 +120,11 @@ def setup_shared_memory():
 
 @task
 def generate_pgtune_conf(role='db'):
+    """
+    Run pgtune and create pgtune.conf
+
+    :param role: Which fabric role to place local pgtune.conf template under
+    """
     conf_path = os.path.join(postgres_root, 'postgresql.conf')
     with sudo(), silent():
         output = run('pgtune -T Web -i {}'.format(conf_path)).strip()
@@ -138,6 +157,9 @@ def generate_pgtune_conf(role='db'):
 
 @task
 def dump_all():
+    """
+    Dump and download all configured schemas
+    """
     databases = blueprint.get('databases')
 
     if not databases:

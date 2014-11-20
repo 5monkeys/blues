@@ -9,7 +9,7 @@ from refabric.contrib import blueprints
 from . import debian
 from . import python
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'upgrade', 'top']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'top']
 
 
 blueprint = blueprints.get(__name__)
@@ -29,7 +29,7 @@ def setup():
     Install uWSGI system wide and upload vassals
     """
     install()
-    upgrade()
+    configure()
 
 
 def install():
@@ -55,7 +55,7 @@ def install():
 
 
 @task
-def upgrade():
+def configure():
     """
     Upload vassals
     """
@@ -118,4 +118,7 @@ def get_reload_on_rss(gb_memory):
 
 
 def get_limit_as(gb_memory):
+    """
+    Get limit_as setting depending on server memory in GB
+    """
     return gb_memory * 512

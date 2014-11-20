@@ -13,6 +13,8 @@ from refabric.contrib import blueprints
 
 from . import debian
 
+__all__ = ['setup', 'configure', 'enable', 'disable', 'start', 'stop', 'restart']
+
 
 blueprint = blueprints.get(__name__)
 
@@ -25,15 +27,21 @@ is_client = lambda: blueprint.get('forwarder') is not None
 
 @task
 def setup():
+    """
+    Setup Logstash server and/or forwarder
+    """
     if is_server():
         install_server()
     if is_client():
         install_forwarder()
-    upgrade()
+    configure()
 
 
 @task
-def upgrade():
+def configure():
+    """
+    Configure Logstash server and/or forwarder
+    """
     if is_server():
         upgrade_server()
     if is_client():
@@ -42,6 +50,13 @@ def upgrade():
 
 @task
 def disable(conf, do_restart=True):
+    """
+    Disable logstash input/output provider
+
+    :param conf: Input or output provider config file
+    :param do_restart: Restart service
+    :return: Got disabled?
+    """
     disabled = False
     conf = conf if conf.endswith('.conf') else '{}.conf'.format(conf)
     with sudo(), cd(conf_enabled_path):
@@ -60,6 +75,14 @@ def disable(conf, do_restart=True):
 
 @task
 def enable(conf, weight, do_restart=True):
+    """
+    Enable logstash input/output provider
+
+    :param conf: Input or output provider config file
+    :param weight: Weight of provider
+    :param do_restart: Restart service
+    :return: Got enabled?
+    """
     enabled = False
     conf = conf if conf.endswith('.conf') else '{}.conf'.format(conf)
 
