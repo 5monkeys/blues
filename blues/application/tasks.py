@@ -26,7 +26,7 @@ def upgrade():
     Deploy and configure providers
     """
     code_changed = deploy(auto_reload=False)
-    providers = configure_providers(force_reload=code_changed)
+    configure_providers(force_reload=code_changed)
 
 
 @task
@@ -74,23 +74,6 @@ def configure_providers(force_reload=False):
     Render, upload and reload web & worker config
     """
     with sudo_project():
-        # providers = {}
-        #
-        # web_hosts = blueprint.get('web.hosts')
-        # web = blueprint.get('web.provider')
-        # if web:
-        #     providers[web] = get_provider(web)
-        #
-        # worker_hosts = blueprint.get('worker.hosts')
-        # worker = blueprint.get('worker.provider')
-        # if worker:
-        #     providers[worker] = get_provider(worker)
-        #
-        # if web and (not web_hosts or env.host_string in web_hosts):
-        #     providers[web].configure_web()
-        #
-        # if worker and (not worker_hosts or env.host_string in worker_hosts):
-        #     providers[worker].configure_worker()
         providers = get_providers(env.host_string)
         if 'web' in providers:
             providers['web'].configure_web()
