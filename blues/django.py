@@ -49,6 +49,7 @@ def migrate():
         manage('migrate')
     elif blueprint.get('use_south', True):
         manage('migrate --merge')
+        manage('syncdb --noinput')  # TODO: Remove?
     else:
         manage('syncdb --noinput')
 
