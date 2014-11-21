@@ -124,6 +124,21 @@ def diff_stat(repository_path=None, commit='HEAD^', path=None):
         return stats
 
 
+def current_tag(repository_path=None):
+    """
+    Get most recent tag
+    :param repository_path: Repository path
+    :return: The most recent tag
+    """
+    if not repository_path:
+        repository_path = debian.pwd()
+    with cd(repository_path), silent():
+        output = run('git describe --long --tags --dirty --always', pty=False)
+
+        # 20141114.1-306-g72354ae-dirty
+        return output.strip().rsplit('-', 2)[0]
+
+
 def parse_url(url, branch=None):
     egg = None
 
