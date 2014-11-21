@@ -4,7 +4,9 @@ from fabric.context_managers import settings
 from fabric.state import env
 from fabric.utils import indent
 
-from refabric.api import info
+
+from refabric.api import run, info
+from refabric.context_managers import sudo, silent
 
 from blues import debian
 from blues import uwsgi
@@ -46,7 +48,6 @@ class UWSGIProvider(BaseProvider):
         total_memory = blueprint.get('web.max_memory', default=total_memory)
         workers = blueprint.get('web.workers', default=uwsgi.get_worker_count(cpu_count))
         gevent = blueprint.get('web.gevent', default=0)
-
         info('Generating uWSGI conf based on {} core(s), {} GB memory and {} worker(s)',
              cpu_count, total_memory, workers)
 
@@ -75,7 +76,7 @@ class UWSGIProvider(BaseProvider):
         destination = self.get_config_path()
         context = self.get_context()
 
-        ini = '{}.ini'.format(self.project)
+        ini = self.get_web_vassal()
         template = os.path.join('uwsgi', ini)
 
         default_templates = uwsgi.blueprint.get_default_template_root()
@@ -98,7 +99,7 @@ class UWSGIProvider(BaseProvider):
 
     def configure_worker(self):
         """
-        Render and upload celery vassal(s) to projects uWSGI home dir.
+        Render and upload worker vassal(s) to projects uWSGI home dir.
 
         :return: Updated vassals
         """
@@ -106,24 +107,14 @@ class UWSGIProvider(BaseProvider):
         context = super(UWSGIProvider, self).get_context()
         context.update({
             'workers': blueprint.get('worker.workers', debian.nproc()),
+            'queues': blueprint.get('worker.queues'),
         })
 
         # Override context defaults with blueprint settings
         context.update(blueprint.get('worker'))
 
-        # Filter vassal extensions by host
-        vassals = ['celery.ini']
-        extensions = blueprint.get('worker.celery.extensions')
-        if isinstance(extensions, list):
-            for extension in extensions:
-                vassals.append('{}.ini'.format(extension))
-        else:
-            for extension, extension_host in extensions.items():
-                if extension_host in ('*', env.host_string):
-                    vassals.append('{}.ini'.format(extension))
-
         # Upload vassals
-        for vassal in vassals:
+        for vassal in self.list_worker_vassals():
             template = os.path.join('uwsgi', 'default', vassal)
             default_templates = uwsgi.blueprint.get_default_template_root()
             with settings(template_dirs=[default_templates]):
@@ -132,5 +123,49 @@ class UWSGIProvider(BaseProvider):
 
         return self.updates
 
-    def reload(self):
-        uwsgi.reload()
+    def get_web_vassal(self):
+        """
+        Return file name for web vassal
+
+        :return: [project_name].ini
+        """
+        return '{}.ini'.format(self.project)
+
+    def list_worker_vassals(self):
+        """
+        List all valid worker vassals for current host
+
+        :return: Set of vassal.ini file names
+        """
+        vassals = {'celery.ini'}
+        # Filter vassal extensions by host
+        extensions = blueprint.get('worker.extensions')
+        if isinstance(extensions, list):
+            for extension in extensions:
+                vassals.add('{}.ini'.format(extension))
+        elif isinstance(extensions, dict):
+            for extension, extension_host in extensions.items():
+                if extension_host in ('*', env.host_string):
+                    vassals.add('{}.ini'.format(extension))
+        return vassals
+
+    def list_vassals(self):
+        """
+        List all valid vassals for current host
+
+        :return: Set of vassal.ini file names
+        """
+        vassals = self.list_worker_vassals()
+        vassals.add(self.get_web_vassal())
+        return vassals
+
+    def reload(self, vassals=None):
+        """
+        Touch reload specified vassals
+
+        :param vassals: Vassals to reload
+        """
+        for vassal_ini in vassals or self.list_vassals():
+            vassal_ini_path = os.path.join(self.get_config_path(), vassal_ini)
+            with sudo(), silent():
+                run('touch {}'.format(vassal_ini_path))

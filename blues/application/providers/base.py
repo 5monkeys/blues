@@ -1,6 +1,8 @@
+from collections import defaultdict
 from blues import debian
 
 from .. import blueprint
+from fabric.state import env
 from ..project import *
 
 
@@ -32,7 +34,8 @@ class BaseProvider(object):
         """
         context = {
             'chdir': python_path(),
-            'virtualenv': virtualenv_path()
+            'virtualenv': virtualenv_path(),
+            'current_host': env.host_string
         }
 
         owner = debian.get_user(self.project)
@@ -61,3 +64,4 @@ class BaseProvider(object):
         Reload provider configuration
         """
         pass
+
