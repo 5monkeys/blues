@@ -3,13 +3,13 @@ import os
 from fabric.decorators import task
 
 from refabric.api import run, info
-from refabric.context_managers import sudo, hide_prefix
+from refabric.context_managers import sudo, hide_prefix, silent
 from refabric.contrib import blueprints
 
 from . import debian
 from . import python
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'top']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'top', 'fifo']
 
 
 blueprint = blueprints.get(__name__)
@@ -73,6 +73,20 @@ def top():
     with sudo(), hide_prefix():
         stats_path = os.path.join(tmpfs_path, '{}-stats.sock'.format(blueprint.get('project')))
         run('uwsgitop {}'.format(stats_path))
+
+@task
+def fifo(vassal_name, command):
+    """
+    Issue FIFO commands to a vassal.
+
+    :param vassal_name: The vassal to command
+    :param command: The FIFO command to issue
+
+    See: http://uwsgi-docs.readthedocs.org/en/latest/MasterFIFO.html
+    """
+    fifo_file = '/run/uwsgi/fifo-{}'.format(vassal_name)
+    with sudo(), silent():
+        run('echo {} > {}'.format(command, fifo_file))
 
 
 def get_worker_count(cores):
