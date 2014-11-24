@@ -18,7 +18,7 @@ __all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
 
 blueprint = blueprints.get(__name__)
 
-postgres_root = '/etc/postgresql/9.1/main'
+postgres_root = '/etc/postgresql/9.1/main/'
 
 start = debian.service_task('postgresql', 'start')
 stop = debian.service_task('postgresql', 'stop')

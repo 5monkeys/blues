@@ -16,7 +16,7 @@ __all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'enable',
 
 blueprint = blueprints.get(__name__)
 
-nginx_root = '/etc/nginx'
+nginx_root = '/etc/nginx/'
 sites_available_path = os.path.join(nginx_root, 'sites-available')
 sites_enabled_path = os.path.join(nginx_root, 'sites-enabled')
 
