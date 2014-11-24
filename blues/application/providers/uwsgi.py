@@ -30,6 +30,7 @@ class UWSGIProvider(BaseProvider):
 
         :return: Remote config path
         """
+        # Join config path and make sure that it ends with a slash
         destination = os.path.join(project_home(), 'uwsgi.d', '')
         debian.mkdir(destination)
         return destination

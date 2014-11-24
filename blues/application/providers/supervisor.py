@@ -25,6 +25,7 @@ class SupervisorProvider(BaseProvider):
 
         :return: Remote config path
         """
+        # Join config path and make sure that it ends with a slash
         destination = os.path.join(project_home(), 'supervisor.d', '')
         debian.mkdir(destination)
         return destination
