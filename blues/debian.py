@@ -80,7 +80,11 @@ def apt_get(command, *options):
 
 def debconf_set_selections(*selections):
     for selection in selections:
-        run('echo debconf {} | debconf-set-selections'.format(selection))
+        run('echo debconf "{}" | debconf-set-selections'.format(selection))
+
+
+def debconf_communicate(command, package):
+    run('echo {} | debconf-communicate {}'.format(command.upper(), package))
 
 
 def dpkg_query(package):
