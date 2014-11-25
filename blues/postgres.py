@@ -1,10 +1,24 @@
+"""
+Postgres
+
+blueprints:
+  - blues.postgres
+
+settings:
+  postgres:
+    schemas:
+      some_schema_name:    # The schema name
+        user: foo          # Username to connect to schema
+        password: bar      # Password to connect to schema
+
+"""
 import os
 from datetime import datetime
 
 from fabric.contrib import files
 from fabric.decorators import task
+from fabric.operations import prompt
 from fabric.state import env
-from fabric.utils import warn, abort
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
@@ -13,7 +27,7 @@ from refabric.contrib import blueprints
 from . import debian
 
 __all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
-           'setup_databases', 'generate_pgtune_conf', 'dump']
+           'setup_schemas', 'generate_pgtune_conf', 'dump']
 
 
 blueprint = blueprints.get(__name__)
@@ -51,8 +65,8 @@ def setup():
     # Upload templates
     configure()
 
-    # Create databases and related users
-    setup_databases()
+    # Create schemas and related users
+    setup_schemas()
 
 
 @task
@@ -66,16 +80,16 @@ def configure():
 
 
 @task
-def setup_databases(drop=False):
+def setup_schemas(drop=False):
     """
-    Create database schemas and grant user permissions
+    Create database schemas and grant user privileges
 
     :param drop: Drop existing schemas before creation
     """
-    databases = blueprint.get('databases', [])
+    schemas = blueprint.get('schemas', [])
     with sudo('postgres'):
-        for database in databases:
-            user, password, schema = database['user'], database['password'], database['schema']
+        for schema, config in schemas:
+            user, password, schema = config['user'], config['password'], config['schema']
             info('Creating user {}', user)
             _client_exec("CREATE USER %(user)s WITH PASSWORD '%(password)s'",
                          user=user, password=password)
@@ -157,38 +171,39 @@ def generate_pgtune_conf(role='db'):
 
 
 @task
-def dump(schema=None, format='tar', output_file=None):
+def dump(schema=None):
     """
     Dump and download all configured, or given, schemas.
 
     :param schema: Specific shema to dump and download.
-    :param format: Dump output format (Default: tar)
-    :param output_file: Optional remote dump path
     """
-    if schema:
-        schemas = [schema]
-    else:
-        schemas = blueprint.get('databases')
-        if not schemas:
-            abort('No databases to dump found among your templates')
+    if not schema:
+        schemas = blueprint.get('schemas', {}).keys()
+        for i, schema in enumerate(schemas, start=1):
+            print("{i}. {schema}".format(i=i, schema=schema))
+        valid_indices = '[1-{}]+'.format(len(schemas))
+        schema_choice = prompt('Select schema to dump:', default='1', validate=valid_indices)
+        schema = schemas[int(schema_choice)-1]
 
     with sudo('postgres'):
-        for schema in schemas:
-            now = datetime.now().strftime('%Y-%m-%d')
-            output_file = output_file or ('/tmp/%s_%s.backup' % (schema, now))
-            filename = os.path.basename(output_file)
+        now = datetime.now().strftime('%Y-%m-%d')
+        output_file = '/tmp/{}_{}.backup'.format(schema, now)
+        filename = os.path.basename(output_file)
 
-            options = dict(
-                format=format,
-                output_file=output_file,
-                schema=schema
-            )
+        options = dict(
+            format='tar',
+            output_file=output_file,
+            schema=schema
+        )
 
-            info('Dumping schema {}...', schema)
-            run('pg_dump -c -F %(format)s -f %(output_file)s %(schema)s ' % options)
+        info('Dumping schema {}...', schema)
+        run('pg_dump -c -F {format} -f {output_file} {schema}'.format(**options))
 
-            info('Downloading dump...')
-            local_file = '~/%s' % filename
-            files.get(output_file, local_file)
+        info('Downloading dump...')
+        local_file = '~/{}'.format(filename)
+        files.get(output_file, local_file)
 
-            info('New smoking hot dump at {}', local_file)
+    with sudo(), silent():
+        debian.rm(output_file)
+
+    info('New smoking hot dump at {}', local_file)
