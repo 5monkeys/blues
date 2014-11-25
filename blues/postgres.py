@@ -4,7 +4,7 @@ from datetime import datetime
 from fabric.contrib import files
 from fabric.decorators import task
 from fabric.state import env
-from fabric.utils import warn
+from fabric.utils import warn, abort
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
@@ -13,7 +13,7 @@ from refabric.contrib import blueprints
 from . import debian
 
 __all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
-           'setup_databases', 'generate_pgtune_conf', 'dump_all']
+           'setup_databases', 'generate_pgtune_conf', 'dump']
 
 
 blueprint = blueprints.get(__name__)
@@ -155,38 +155,40 @@ def generate_pgtune_conf(role='db'):
         with open(conf_path, 'w+') as f:
             f.write(tune_conf)
 
+
 @task
-def dump_all():
+def dump(schema=None, format='tar', output_file=None):
     """
-    Dump and download all configured schemas
+    Dump and download all configured, or given, schemas.
+
+    :param schema: Specific shema to dump and download.
+    :param format: Dump output format (Default: tar)
+    :param output_file: Optional remote dump path
     """
-    databases = blueprint.get('databases')
-
-    if not databases:
-        warn('No databases to dump found among your templates')
-
+    if schema:
+        schemas = [schema]
     else:
-        for db_conf in databases:
-            dump(db_conf['schema'])
+        schemas = blueprint.get('databases')
+        if not schemas:
+            abort('No databases to dump found among your templates')
 
-
-def dump(schema, format='tar', output_file=None):
     with sudo('postgres'):
-        now = datetime.now().strftime('%Y-%m-%d')
-        output_file = output_file or ('/tmp/%s_%s.backup' % (schema, now))
-        filename = os.path.basename(output_file)
+        for schema in schemas:
+            now = datetime.now().strftime('%Y-%m-%d')
+            output_file = output_file or ('/tmp/%s_%s.backup' % (schema, now))
+            filename = os.path.basename(output_file)
 
-        options = dict(
-            format=format,
-            output_file=output_file,
-            schema=schema
-        )
+            options = dict(
+                format=format,
+                output_file=output_file,
+                schema=schema
+            )
 
-        info('Dumping schema {}...', schema)
-        run('pg_dump -c -F %(format)s -f %(output_file)s %(schema)s ' % options)
+            info('Dumping schema {}...', schema)
+            run('pg_dump -c -F %(format)s -f %(output_file)s %(schema)s ' % options)
 
-        info('Downloading dump...')
-        local_file = '~/%s' % filename
-        files.get(output_file, local_file)
+            info('Downloading dump...')
+            local_file = '~/%s' % filename
+            files.get(output_file, local_file)
 
-        info('New smoking hot dump at {}', local_file)
+            info('New smoking hot dump at {}', local_file)
