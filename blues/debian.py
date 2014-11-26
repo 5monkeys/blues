@@ -45,6 +45,11 @@ def cp(source, destination, force=True, mode=None, owner=None, group=None):
     chmod(destination, mode, owner, group)
 
 
+def mv(source, destination, force=True):
+    force = force and '-f' or ''
+    run('mv %s %s %s' % (force, source, destination))
+
+
 def ln(source, destination, symbolic=True, force=True, mode=None, owner=None, group=None):
     force = force and '-f' or ''
     symbolic = symbolic and '-s' or ''
