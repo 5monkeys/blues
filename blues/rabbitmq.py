@@ -1,4 +1,5 @@
 from fabric.decorators import task
+from fabric.utils import abort
 
 from refabric.api import run, info
 from refabric.context_managers import sudo
@@ -6,7 +7,7 @@ from refabric.contrib import blueprints
 
 from . import debian
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'ctl']
 
 
 blueprint = blueprints.get(__name__)
@@ -22,11 +23,22 @@ def setup():
     """
     Install Rabbitmq
     """
-    install()
+    if debian.lbs_release() < '14.04':
+        install_testing()
+    else:
+        install_stable()
+
     configure()
 
+    enable_plugins('rabbitmq_management')
 
-def install():
+
+def install_stable():
+    with sudo():
+        debian.apt_get('install', 'rabbitmq-server')
+
+
+def install_testing():
     package_name = 'rabbitmq-server'
     debian.debconf_set_selections('%s rabbitmq-server/upgrade_previous note' % package_name)
 
@@ -42,6 +54,14 @@ def install():
         debian.apt_get('install', package_name)
 
 
+def enable_plugins(plugin):
+    with sudo():
+        info('Enable {} plugin', plugin)
+        output = run('rabbitmq-plugins enable {}'.format(plugin))
+        if output.stdout.strip().startswith('The following plugins have been'):
+            restart()
+
+
 @task
 def configure():
     """
@@ -50,3 +70,17 @@ def configure():
     uploads = blueprint.upload('./', '/etc/rabbitmq/')
     if uploads:
         restart()
+
+
+@task
+def ctl(command=None):
+    """
+    Run rabbitmqctl with given command
+    :param command:
+    :return:
+    """
+    if not command:
+        abort('No command given, $ fab rabbitmq.ctl:stop_app')
+
+    with sudo():
+        run('rabbitmqctl {}'.format(command))
