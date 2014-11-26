@@ -32,7 +32,7 @@ def configure():
 def install():
     with sudo():
         info('Installing Node.js')
-        if debian.lbs_release() in ['10.04', '12.04']:  # 12.04 ships with really old nodejs
+        if debian.lbs_release() in ['10.04', '12.04']:  # 12.04 ships with really old nodejs, TODO: 14.04?
             debian.add_apt_ppa('chris-lea/node.js', src=True)
         debian.apt_get('install', 'nodejs')
 

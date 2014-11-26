@@ -28,6 +28,7 @@ def setup():
 
 def install():
     with sudo():
+        # TODO: Change to java.install (openjdk)?
         debian.add_apt_ppa('webupd8team/java')
         debian.debconf_set_selections('shared/accepted-oracle-license-v1-1 select true',
                                       'shared/accepted-oracle-license-v1-1 seen true')
