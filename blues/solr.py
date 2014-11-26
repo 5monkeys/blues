@@ -12,16 +12,17 @@ settings:
 """
 import os
 
-from fabric.context_managers import cd
-from fabric.decorators import task
+from fabric.context_managers import cd, settings
+from fabric.decorators import task, parallel
+from fabric.utils import abort
 
 from refabric.api import info, run
-from refabric.context_managers import sudo, silent
+from refabric.context_managers import sudo, silent, hide_prefix
 from refabric.contrib import blueprints
 
 from . import debian
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure']
+__all__ = ['start', 'stop', 'restart', 'setup', 'configure', 'tail']
 
 
 blueprint = blueprints.get(__name__)
@@ -95,3 +96,13 @@ def configure():
 
     if updated_confs or updated_init:
         restart()
+
+
+@task
+@parallel
+def tail():
+    with sudo('solr'), hide_prefix(), settings():
+        try:
+            run('tail -100f /var/log/solr/solr.log')
+        except KeyboardInterrupt:
+            pass
