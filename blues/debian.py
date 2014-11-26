@@ -1,4 +1,6 @@
 import base64
+from contextlib import contextmanager
+import os
 from functools import partial
 
 import fabric.api
@@ -68,6 +70,30 @@ def mkdir(location, recursive=True, mode=None, owner=None, group=None):
                 chmod(location, owner=owner, group=group)
         else:
             raise Exception('Failed to create directory %s, %s' % (location, result.stdout))
+
+
+def mktemp(directory=False, mode=None):
+    with silent(), sudo():
+        cmd = 'mktemp'
+        if directory:
+            cmd += ' -d'
+        output = run(cmd)
+        path = output.stdout
+        if directory:
+            path += os.path.sep
+        if mode:
+            chmod(path, mode=mode)
+        return path
+
+
+@contextmanager
+def temporary_dir(mode=None):
+    path = mktemp(directory=True, mode=mode)
+    try:
+        yield path
+    finally:
+        rm(path, recursive=True)
+
 
 
 def lbs_release():
