@@ -7,6 +7,8 @@ from refabric.contrib import blueprints
 from refabric.operations import run
 from refabric.utils import info
 
+from blues import debian
+
 __all__ = ['configure']
 
 
@@ -19,14 +21,9 @@ def configure():
     Install crontab per termplate (user)
     """
     with sudo(), silent():
-        temp_dir = run('mktemp -d').stdout + os.path.sep
-        try:
+        with debian.temporary_dir(mode=555) as temp_dir:
             updates = blueprint.upload('./', temp_dir)
-            run('chmod -R a+rx %s' % temp_dir)
-
             for update in updates:
                 user = os.path.basename(update)
                 info('Installing new crontab for {}...', user)
                 run('crontab -u {} {}'.format(user, os.path.join(temp_dir, user)))
-        finally:
-            run('rm -rf {}'.format(temp_dir))
