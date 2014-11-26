@@ -168,31 +168,57 @@ def groupmod(name, gid):
     run("groupmod -g %s '%s'" % (gid, name))
 
 
-def useradd(name, passwd=None, home=None, uid=None, gid=None, groups=None, shell=None,
-            uid_min=None, uid_max=None, encrypted_passwd=False):
+def useradd(name, passwd=None, home=None, create_home=True, skeleton=True, shell=None, user_group=False,
+            uid=None, uid_min=None, uid_max=None, gid=None, groups=None, encrypted_passwd=False):
     user = get_user(name)
+
     if not user:
-        options = ['-m']
+        options = []
+        if not create_home:
+            options.append("-M")
+            skeleton = False
         if home:
             options.append("-d '%s'" % home)
+            if skeleton:
+                options.append("-m")
+            elif create_home:
+                # Create home manually if no skeleton wanted, chown'ed below
+                options.append("-M")
+                if not fabric.contrib.files.exists(home):
+                    mkdir(home)
         if uid:
             options.append("-u '%s'" % uid)
-        #if group exists already but is not specified, useradd fails
-        if not gid and get_group(name):
+        if not gid and get_group(name):  # If group already exists but not specified, useradd fails
             gid = name
         if gid:
             options.append("-g '%s'" % gid)
         if groups:
             options.append("-G '%s'" % ','.join(groups))
+        if user_group:
+            options.append("-U")
         if shell:
             options.append("-s '%s'" % shell)
         if uid_min:
             options.append("-K UID_MIN='%s'" % uid_min)
         if uid_max:
             options.append("-K UID_MAX='%s'" % uid_max)
+
         run("useradd %s '%s'" % (' '.join(options), name))
+
+        # Change owner to manually created skeleton-less home dir
+        if create_home and home and not skeleton:
+            if user_group:
+                group = name
+            elif groups:
+                group = groups[0]
+            else:
+                group = 'nogroup'
+            chmod(home, mode=755, owner=name, group=group)
+
+        # Set password
         if passwd:
             chpasswd(name, passwd, encrypted_passwd)
+
     else:
         usermod(user, passwd=passwd, home=home, uid=uid, gid=gid, groups=groups, shell=shell)
 
