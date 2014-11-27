@@ -69,6 +69,26 @@ def reload():
 
 
 @task
+def start():
+    """
+    Start all application providers on current host
+    """
+    providers = get_providers(env.host_string)
+    for provider in providers.values():
+        provider.start()
+
+
+@task
+def stop():
+    """
+    Stop all application providers on current host
+    """
+    providers = get_providers(env.host_string)
+    for provider in providers.values():
+        provider.stop()
+
+
+@task
 def configure_providers(force_reload=False):
     """
     Render, upload and reload web & worker config
