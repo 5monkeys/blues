@@ -28,11 +28,15 @@ def get_providers(host=None):
     providers = {}
 
     web_hosts = blueprint.get('web.hosts')
+    # Filter out bad values
+    web_hosts = [host for host in web_hosts if host]
     web_provider = blueprint.get('web.provider')
     if web_provider:
         providers[web_provider] = get_provider(web_provider)
 
     worker_hosts = blueprint.get('worker.hosts')
+    # Filter out bad values
+    worker_hosts = [host for host in worker_hosts if host]
     worker_provider = blueprint.get('worker.provider')
     if worker_provider and worker_provider not in providers:
         providers[worker_provider] = get_provider(worker_provider)

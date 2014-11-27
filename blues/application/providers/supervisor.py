@@ -57,9 +57,11 @@ class SupervisorProvider(BaseProvider):
         programs = ['celery.conf']
         extensions = blueprint.get('worker.celery.extensions')
         if isinstance(extensions, list):
+            # Filter of bad values
+            extensions = [extension for extension in extensions if extension]
             for extension in extensions:
                 programs.append('{}.conf'.format(extension))
-        else:
+        elif isinstance(extensions, dict):
             for extension, extension_host in extensions.items():
                 if extension_host in ('*', env.host_string):
                     programs.append('{}.conf'.format(extension))

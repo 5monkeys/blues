@@ -142,6 +142,8 @@ class UWSGIProvider(BaseProvider):
         # Filter vassal extensions by host
         extensions = blueprint.get('worker.extensions')
         if isinstance(extensions, list):
+            # Filter of bad values
+            extensions = [extension for extension in extensions if extension]
             for extension in extensions:
                 vassals.add('{}.ini'.format(extension))
         elif isinstance(extensions, dict):
