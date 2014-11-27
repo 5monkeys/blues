@@ -65,13 +65,16 @@ def configure():
 
 
 @task
-def top():
+def top(vassal_name=None):
     """
-    Launch uwsgitop for project stats socket
+    Launch uwsgitop for vassal stats socket
+
+    :param vassal_name: The vassal to show stats for (Default: project setting)
     """
     # TODO: fix missing output
     with sudo(), hide_prefix():
-        stats_path = os.path.join(tmpfs_path, '{}-stats.sock'.format(blueprint.get('project')))
+        vassal = vassal_name or blueprint.get('project')
+        stats_path = os.path.join(tmpfs_path, '{}-stats.sock'.format(vassal))
         run('uwsgitop {}'.format(stats_path))
 
 @task
