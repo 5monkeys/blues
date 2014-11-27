@@ -123,9 +123,9 @@ def generate_nginx_conf(role='www'):
     context = {
         'name': name,
         'sockets': sockets,
-        'domain': blueprint.get('wsgi.domain', default='_'),
-        'ssl': blueprint.get('wsgi.ssl', False),
-        'ip_hash': blueprint.get('wsgi.ip_hash', False)
+        'domain': blueprint.get('web.domain', default='_'),
+        'ssl': blueprint.get('web.ssl', False),
+        'ip_hash': blueprint.get('web.ip_hash', False)
     }
     template = 'nginx/site.conf'
     daemon = blueprint.get('wsgi.daemon')
