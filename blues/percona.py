@@ -129,7 +129,8 @@ def configure():
     """
     Configure Percona
     """
-    uploads = blueprint.upload('my.cnf', '/etc/mysql/my.cnf')
+    context = {'bind': blueprint.get('bind')}
+    uploads = blueprint.upload('my.cnf', '/etc/mysql/my.cnf', context=context)
     if uploads:
         warn('The mysql config has changed!')
         answer = prompt('Type "yes" to restart, or "no" to skip:',
