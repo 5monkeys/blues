@@ -1,3 +1,12 @@
+"""
+Git Blueprint
+
+Installs git and contains useful git commands for other blueprints to use.
+
+blueprints:
+  - blues.git
+
+"""
 import os
 import re
 

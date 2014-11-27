@@ -1,3 +1,10 @@
+"""
+RabbitMQ Blueprint
+
+blueprints:
+  - blues.rabbitmq
+
+"""
 from fabric.decorators import task
 from fabric.utils import abort
 

@@ -1,13 +1,13 @@
 """
-Solr
+Solr Blueprint
 
 blueprints:
   - blues.solr
 
 settings:
   solr:
-    version: 4.10.2          # Solr version to install (Required)
-    memory: 1024m            # Specify minimum and maximum heap size in mb (Default: 512m)
+    version: 4.10.2  # Solr version to install (Required)
+    # memory: 1024m  # Specify minimum and maximum heap size in mb (Default: 512m)
 
 """
 import os

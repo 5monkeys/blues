@@ -1,3 +1,15 @@
+"""
+Ruby Blueprint
+
+blueprints:
+  - blues.ruby
+
+settings:
+  ruby:
+    gems:     # List of ruby gems to install (Optional)
+      - sass
+
+"""
 from fabric.decorators import task
 
 from refabric.api import run, info

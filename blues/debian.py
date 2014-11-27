@@ -1,3 +1,8 @@
+"""
+Debian Utils
+
+Useful debian commands for other blueprints to use.
+"""
 import base64
 from contextlib import contextmanager
 import os

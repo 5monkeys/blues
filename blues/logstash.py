@@ -1,3 +1,14 @@
+"""
+Logstash Blueprint
+
+blueprints:
+  - blues.logstash
+
+settings:
+  logstash:
+
+
+"""
 import json
 import os.path
 from functools import partial

@@ -1,3 +1,13 @@
+"""
+Python Blueprint
+
+Does not install python itself, only develop and setup tools.
+Contains pip helper for other blueprints to use.
+
+blueprints:
+  - blues.python
+
+"""
 from fabric.decorators import task
 
 from refabric.api import run, info

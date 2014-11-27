@@ -1,3 +1,13 @@
+"""
+Cron Blueprint
+
+This blueprint has no settings.
+Templates are handled as crontab's and should be named to related user.
+
+blueprints:
+  - blues.cron
+
+"""
 import os
 
 from fabric.decorators import task

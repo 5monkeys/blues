@@ -1,3 +1,15 @@
+"""
+Node.js Blueprint
+
+blueprints:
+  - blues.node
+
+settings:
+  node:
+    packages:          # List of npm packages to install (Optional)
+      - coffee-script
+
+"""
 from fabric.decorators import task
 
 from refabric.api import run, info

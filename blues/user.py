@@ -1,14 +1,16 @@
+"""
+User Utils
+
+Debian user helpers for other blueprints to use.
+"""
 import os
 
 from fabric.contrib import files
 
-from refabric.contrib import blueprints, templates
+from refabric.contrib import templates
 from refabric.context_managers import sudo
 
 from . import debian
-
-
-blueprint = blueprints.get(__name__)
 
 
 def create(name, home=None, groups=None):

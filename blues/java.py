@@ -1,3 +1,12 @@
+"""
+Java
+
+Installs Java, currently restricted to version 7.
+
+blueprints:
+  - blues.java
+
+"""
 from fabric.decorators import task
 
 from refabric.api import run, info

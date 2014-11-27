@@ -1,3 +1,10 @@
+"""
+Kibana Blueprint
+
+blueprints:
+  - blues.kibana
+
+"""
 import os.path
 
 from fabric.decorators import task

@@ -1,5 +1,5 @@
 """
-Percona
+Percona (MySQL) Blueprint
 
 blueprints:
   - blues.percona
@@ -10,7 +10,8 @@ settings:
       some_schema_name:    # The schema name
         user: foo          # Username to connect to schema
         password: bar      # Password to connect to schema
-        host: 11.22.33.%s  # Allowed hosts to connect from (Default: localhost)
+        host: 11.22.33.%s  # Allowed host mask to connect from (Default: 127.0.0.1)
+    # bind: 0.0.0.0        # Set the bind address specifically (Default: 127.0.0.1)
 
 """
 import ConfigParser

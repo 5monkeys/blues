@@ -1,5 +1,5 @@
 """
-Postgres
+Postgres Blueprint
 
 blueprints:
   - blues.postgres

@@ -1,3 +1,12 @@
+"""
+Django Blueprint
+
+Management helper blueprint.
+
+blueprints:
+  - blues.django
+
+"""
 from fabric.context_managers import cd
 from fabric.decorators import task, runs_once
 from fabric.operations import prompt
