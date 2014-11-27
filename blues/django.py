@@ -3,13 +3,13 @@ from fabric.decorators import task, runs_once
 from fabric.operations import prompt
 
 from refabric.api import run, info
-from refabric.context_managers import shell_env
+from refabric.context_managers import shell_env, hide_prefix
 from refabric.contrib import blueprints
 
 from . import virtualenv
 from .application.project import virtualenv_path, python_path, sudo_project
 
-__all__ = ['manage', 'deploy', 'version', 'migrate', 'collectstatic']
+__all__ = ['manage', 'deploy', 'version', 'migrate', 'collectstatic', 'syncdb']
 
 
 blueprint = blueprints.get(__name__)
@@ -22,7 +22,7 @@ def manage(cmd=''):
     """
     if not cmd:
         cmd = prompt('Enter django management command:')
-    with sudo_project(), cd(python_path()), virtualenv.activate(virtualenv_path()), shell_env():
+    with sudo_project(), cd(python_path()), virtualenv.activate(virtualenv_path()), shell_env(), hide_prefix():
         return run('python manage.py {cmd}'.format(cmd=cmd))
 
 
@@ -73,3 +73,13 @@ def collectstatic():
     """
     info('Collect static files')
     manage('collectstatic --noinput')
+
+
+@task
+@runs_once
+def syncdb():
+    """
+    Runs manage.py syncdb
+    """
+    info('Collect static files')
+    manage('syncdb')
