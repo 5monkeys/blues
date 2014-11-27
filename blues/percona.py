@@ -13,13 +13,16 @@ settings:
         host: 11.22.33.%s  # Allowed hosts to connect from (Default: localhost)
 
 """
+import ConfigParser
 import random
 from itertools import imap
 from string import ascii_lowercase, digits
 from datetime import datetime
+from StringIO import StringIO
 
+import fabric.contrib.files
+import fabric.operations
 from fabric.context_managers import settings
-from fabric.contrib import files
 from fabric.decorators import task
 from fabric.operations import prompt, os
 from fabric.utils import warn
@@ -49,9 +52,19 @@ def generate_password(length=8):
 def install():
     with sudo():
         # Generate a root password and save it in root home
-        root_pw = generate_password()
-        blueprint.upload('root_my.cnf', '/root/.my.cnf', {'password': root_pw})
-        debian.chmod('/root/.my.cnf', mode=600)
+        root_conf_path = '/root/.my.cnf'
+        if not fabric.contrib.files.exists(root_conf_path):
+            root_pw = generate_password()
+            blueprint.upload('root_my.cnf', '/root/.my.cnf', {'password': root_pw})
+            debian.chmod('/root/.my.cnf', mode=600)
+        else:
+            # TODO: use fabric.operations.get instead of cat when up to date with upstream
+            with silent():
+                output = run('cat {}'.format(root_conf_path))
+            fd = StringIO(output)
+            config_parser = ConfigParser.RawConfigParser()
+            config_parser.readfp(fd)
+            root_pw = config_parser.get('client', 'password')
 
         # Install external PPA
         info('Adding apt key for {}', __name__)
