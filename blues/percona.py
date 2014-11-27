@@ -122,7 +122,7 @@ def configure():
         answer = prompt('Type "yes" to restart, or "no" to skip:',
                         default='no', validate='yes|no')
         if answer == 'yes':
-            reload()
+            restart()
 
 
 @task
