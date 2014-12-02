@@ -1,0 +1,4 @@
+.. automodule:: blues.application.providers.uwsgi
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,19 @@
+blues.application.providers package
+===================================
+
+Submodules
+----------
+
+.. toctree::
+
+   blues.application.providers.base
+   blues.application.providers.supervisor
+   blues.application.providers.uwsgi
+
+Module contents
+---------------
+
+.. automodule:: blues.application.providers
+    :members:
+    :undoc-members:
+    :show-inheritance:

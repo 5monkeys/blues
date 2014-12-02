@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>blues.application package &mdash; Blues 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a></li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="blues-application-package">
+<h1>blues.application package<a class="headerlink" href="#blues-application-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-blues.application">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-blues.application" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="application-blueprint">
+<h3>Application Blueprint<a class="headerlink" href="#application-blueprint" title="Permalink to this headline">¶</a></h3>
+<p><strong>Fabric environment:</strong></p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">blueprints</span><span class="p-Indicator">:</span>
+  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">blues.application</span>
+
+<span class="l-Scalar-Plain">settings</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">application</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">git_url</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">git@github.com:foo/bar.git[@branch]</span>  <span class="c1"># Git repository to clone</span>
+    <span class="c1"># git_branch: master                          # Branch to clone, if not specified in `git_url` setting</span>
+    <span class="c1"># git_source: ./                              # Relative path within repository added to python path (Default: src/)</span>
+
+    <span class="c1"># requirements: requirements/live.txt         # Pip requirements file to install (Default: requirements.txt)</span>
+    <span class="c1"># system_dependencies:                        # List of debian packages to install</span>
+    <span class="c1">#   - build-essential  # gcc</span>
+    <span class="c1">#   - zlib1g-dev       # PIL, png</span>
+    <span class="c1">#   - libjpeg62-dev    # PIL, jpeg</span>
+
+    <span class="l-Scalar-Plain">web</span><span class="p-Indicator">:</span>                                          <span class="c1"># Enable web workers</span>
+      <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">uwsgi</span>                             <span class="c1"># Set web provider</span>
+      <span class="c1"># module: foobar.wsgi                       # Set wsgi module (Default: django.core.handlers.wsgi:WSGIHandler())</span>
+      <span class="c1"># hosts:                                    # Optional host list restricting web provider installation</span>
+      <span class="c1">#   - 10.0.0.10</span>
+      <span class="c1">#   - 10.0.0.11</span>
+      <span class="c1">#   - 10.0.0.12</span>
+
+    <span class="l-Scalar-Plain">worker</span><span class="p-Indicator">:</span>                                       <span class="c1"># Enable async workers</span>
+      <span class="l-Scalar-Plain">provider</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">supervisor</span>                        <span class="c1"># Set worker provider (uwsgi or supervisor)</span>
+      <span class="l-Scalar-Plain">module</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">foobar.celery</span>                       <span class="c1"># Set worker module to load</span>
+      <span class="c1"># extensions:                               # Optional Worker framework specific extension configuration</span>
+      <span class="c1">#   beat: 10.0.0.12                         # Celery: Restrict beat service to specific host</span>
+      <span class="c1">#   flower: 10.0.0.12                       # Celery: Restrict flower service to specific host</span>
+      <span class="c1"># hosts:                                    # Optional host list restricting worker provider installation</span>
+      <span class="c1">#   - 10.0.0.10</span>
+      <span class="c1">#   - 10.0.0.11</span>
+      <span class="c1">#   - 10.0.0.12</span>
+      <span class="c1"># queues:                                   # Optional queue definitions</span>
+      <span class="c1">#   index:                                  # Queue name</span>
+      <span class="c1">#     workers: 2                            # Number of queue workers</span>
+            <span class="c1"># hosts:                              # Optional host list restriction for queue</span>
+            <span class="c1">#   - 10.0.0.11</span>
+
+  <span class="c1"># Do not forget to configure the providers properly</span>
+  <span class="c1"># uwsgi:</span>
+  <span class="c1">#   version: 1.3</span>
+  <span class="c1"># supervisor:</span>
+  <span class="c1">#   version: 3.1.3</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="blues.application.setup">
+<tt class="descclassname">blues.application.</tt><tt class="descname">setup</tt><a class="headerlink" href="#blues.application.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install project user, structure, env, source, dependencies and providers</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.application.configure">
+<tt class="descclassname">blues.application.</tt><tt class="descname">configure</tt><a class="headerlink" href="#blues.application.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deploy and configure providers</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.application.deploy">
+<tt class="descclassname">blues.application.</tt><tt class="descname">deploy</tt><a class="headerlink" href="#blues.application.deploy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset source to configured branch and install requirements, if needed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Got new source?</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.application.reload">
+<tt class="descclassname">blues.application.</tt><tt class="descname">reload</tt><a class="headerlink" href="#blues.application.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload all application providers on current host</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.application.configure_providers">
+<tt class="descclassname">blues.application.</tt><tt class="descname">configure_providers</tt><a class="headerlink" href="#blues.application.configure_providers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render, upload and reload web &amp; worker config</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.application.generate_nginx_conf">
+<tt class="descclassname">blues.application.</tt><tt class="descname">generate_nginx_conf</tt><a class="headerlink" href="#blues.application.generate_nginx_conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Genereate nginx site config for web daemon</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">blues.application package</a><ul>
+<li><a class="reference internal" href="#module-blues.application">Module contents</a><ul>
+<li><a class="reference internal" href="#application-blueprint">Application Blueprint</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/blues.application.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a></li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonas Lundberg.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Postgres Blueprint &mdash; Blues 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a></li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="module-blues.postgres"></span><div class="section" id="postgres-blueprint">
+<h1>Postgres Blueprint<a class="headerlink" href="#postgres-blueprint" title="Permalink to this headline">¶</a></h1>
+<p><strong>Fabric environment:</strong></p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">blueprints</span><span class="p-Indicator">:</span>
+  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">blues.postgres</span>
+
+<span class="l-Scalar-Plain">settings</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">postgres</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">schemas</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">some_schema_name</span><span class="p-Indicator">:</span>    <span class="c1"># The schema name</span>
+        <span class="l-Scalar-Plain">user</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">foo</span>          <span class="c1"># Username to connect to schema</span>
+        <span class="l-Scalar-Plain">password</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">bar</span>      <span class="c1"># Password to connect to schema</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="blues.postgres.setup">
+<tt class="descclassname">blues.postgres.</tt><tt class="descname">setup</tt><a class="headerlink" href="#blues.postgres.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install, configure Postgresql and create schemas</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.postgres.configure">
+<tt class="descclassname">blues.postgres.</tt><tt class="descname">configure</tt><a class="headerlink" href="#blues.postgres.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure Postgresql</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.postgres.setup_schemas">
+<tt class="descclassname">blues.postgres.</tt><tt class="descname">setup_schemas</tt><a class="headerlink" href="#blues.postgres.setup_schemas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create database schemas and grant user privileges</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>drop</strong> &#8211; Drop existing schemas before creation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.postgres.generate_pgtune_conf">
+<tt class="descclassname">blues.postgres.</tt><tt class="descname">generate_pgtune_conf</tt><a class="headerlink" href="#blues.postgres.generate_pgtune_conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run pgtune and create pgtune.conf</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>role</strong> &#8211; Which fabric role to place local pgtune.conf template under</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.postgres.dump">
+<tt class="descclassname">blues.postgres.</tt><tt class="descname">dump</tt><a class="headerlink" href="#blues.postgres.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump and download all configured, or given, schemas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>schema</strong> &#8211; Specific shema to dump and download.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/blues.postgres.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a></li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonas Lundberg.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

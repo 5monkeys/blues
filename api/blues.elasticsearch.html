@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Elasticsearch Blueprint &mdash; Blues 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a></li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="module-blues.elasticsearch"></span><div class="section" id="elasticsearch-blueprint">
+<h1>Elasticsearch Blueprint<a class="headerlink" href="#elasticsearch-blueprint" title="Permalink to this headline">¶</a></h1>
+<p><strong>Fabric environment:</strong></p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">blueprints</span><span class="p-Indicator">:</span>
+  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">blues.elasticsearch</span>
+
+<span class="l-Scalar-Plain">settings</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">elasticsearch</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">version</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1.3</span>                       <span class="c1"># Version of elasticsearch to install (Required)</span>
+    <span class="l-Scalar-Plain">cluster_name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">foobar</span>               <span class="c1"># Name of the cluster (Default: elasticsearch)</span>
+    <span class="c1"># number_of_shards: 5              # Number of shards (Default: 5)</span>
+    <span class="c1"># number_of_replicas: 0            # Number of replicas (Default: 0)</span>
+    <span class="c1"># network_bind_host: 127.0.0.1     # Set the bind address specifically, IPv4 or IPv6 (Default: 0.0.0.0)</span>
+    <span class="c1"># network_publish_host: 127.0.0.1  # Set the address other nodes will use to communicate with this node (Optional)</span>
+    <span class="c1"># network_host: 127.0.0.1          # Set both `network_bind_host` and `network_publish_host` (Optional)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="blues.elasticsearch.setup">
+<tt class="descclassname">blues.elasticsearch.</tt><tt class="descname">setup</tt><a class="headerlink" href="#blues.elasticsearch.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install Elasticsearch</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.elasticsearch.configure">
+<tt class="descclassname">blues.elasticsearch.</tt><tt class="descname">configure</tt><a class="headerlink" href="#blues.elasticsearch.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure Elasticsearch</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/blues.elasticsearch.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a></li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonas Lundberg.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,4 @@
+.. automodule:: blues.application.tasks
+    :members:
+    :undoc-members:
+    :show-inheritance:

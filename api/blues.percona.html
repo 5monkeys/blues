@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Percona (MySQL) Blueprint &mdash; Blues 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a></li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="module-blues.percona"></span><div class="section" id="percona-mysql-blueprint">
+<h1>Percona (MySQL) Blueprint<a class="headerlink" href="#percona-mysql-blueprint" title="Permalink to this headline">¶</a></h1>
+<p><strong>Fabric environment:</strong></p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">blueprints</span><span class="p-Indicator">:</span>
+  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">blues.percona</span>
+
+<span class="l-Scalar-Plain">settings</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">percona</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">schemas</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">some_schema_name</span><span class="p-Indicator">:</span>    <span class="c1"># The schema name</span>
+        <span class="l-Scalar-Plain">user</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">foo</span>          <span class="c1"># Username to connect to schema</span>
+        <span class="l-Scalar-Plain">password</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">bar</span>      <span class="c1"># Password to connect to schema</span>
+        <span class="l-Scalar-Plain">host</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">11.22.33.%s</span>  <span class="c1"># Allowed host mask to connect from (Default: 127.0.0.1)</span>
+    <span class="c1"># bind: 0.0.0.0        # Set the bind address specifically (Default: 127.0.0.1)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="blues.percona.configure">
+<tt class="descclassname">blues.percona.</tt><tt class="descname">configure</tt><a class="headerlink" href="#blues.percona.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure Percona</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.percona.dump">
+<tt class="descclassname">blues.percona.</tt><tt class="descname">dump</tt><a class="headerlink" href="#blues.percona.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump and download a schema.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>schema</strong> &#8211; Specific shema to dump and download.</li>
+<li><strong>ignore_tables</strong> &#8211; Tables to skip, separated by | (pipe)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="blues.percona.generate_password">
+<tt class="descclassname">blues.percona.</tt><tt class="descname">generate_password</tt><big>(</big><em>length=8</em><big>)</big><a class="headerlink" href="#blues.percona.generate_password" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="blues.percona.grant">
+<tt class="descclassname">blues.percona.</tt><tt class="descname">grant</tt><big>(</big><em>schema</em>, <em>user</em>, <em>password</em>, <em>privs='ALL'</em>, <em>host='localhost'</em><big>)</big><a class="headerlink" href="#blues.percona.grant" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="blues.percona.install">
+<tt class="descclassname">blues.percona.</tt><tt class="descname">install</tt><big>(</big><big>)</big><a class="headerlink" href="#blues.percona.install" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="blues.percona.mysqltuner">
+<tt class="descclassname">blues.percona.</tt><tt class="descname">mysqltuner</tt><a class="headerlink" href="#blues.percona.mysqltuner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run mysqltuner</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.percona.setup">
+<tt class="descclassname">blues.percona.</tt><tt class="descname">setup</tt><a class="headerlink" href="#blues.percona.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install, configure percona server and create schemas</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.percona.setup_schemas">
+<tt class="descclassname">blues.percona.</tt><tt class="descname">setup_schemas</tt><a class="headerlink" href="#blues.percona.setup_schemas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create database schemas and grant user permissions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>drop</strong> &#8211; Drop existing schemas before creation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/blues.percona.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a></li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonas Lundberg.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
