@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 version = __import__('blues').__version__
 
 setup(
-    name='blues',
+    name='Blues',
     version=version,
     description='Blueprints for fabric',
     long_description=codecs.open(
@@ -23,7 +23,7 @@ setup(
     keywords=['fabric', 'blueprints', 'deploy', 'build'],
     license='BSD',
     packages=find_packages(exclude='tests'),
-    install_requires=['cuisine'],
+    install_requires=['ghp-import'],
     include_package_data=False,
     zip_safe=False,
     classifiers=[
