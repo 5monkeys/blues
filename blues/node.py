@@ -34,7 +34,9 @@ def install():
         info('Installing Node.js')
         if debian.lbs_release() in ['10.04', '12.04']:  # 12.04 ships with really old nodejs, TODO: 14.04?
             debian.add_apt_ppa('chris-lea/node.js', src=True)
-        debian.apt_get('install', 'nodejs')
+        debian.apt_get('install', 'nodejs', 'npm')
+        if debian.lbs_release() == '14.04':
+            debian.ln('/usr/bin/nodejs', '/usr/bin/node')
 
 
 def install_packages():
