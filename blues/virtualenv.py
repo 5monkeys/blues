@@ -1,10 +1,15 @@
 """
 Virtualenv Blueprint
+====================
 
 Installs virtualenv and contains useful virtualenv commands for other blueprints to use.
 
-blueprints:
-  - blues.virtualenv
+**Fabric environment:**
+
+.. code-block:: yaml
+
+    blueprints:
+      - blues.virtualenv
 
 """
 from contextlib import contextmanager

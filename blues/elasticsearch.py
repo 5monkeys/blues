@@ -1,18 +1,23 @@
 """
 Elasticsearch Blueprint
+=======================
 
-blueprints:
-  - blues.elasticsearch
+**Fabric environment:**
 
-settings:
-  elasticsearch:
-    version: 1.3                       # Version of elasticsearch to install (Required)
-    cluster_name: foobar               # Name of the cluster (Default: elasticsearch)
-    # number_of_shards: 5              # Number of shards (Default: 5)
-    # number_of_replicas: 0            # Number of replicas (Default: 0)
-    # network_bind_host: 127.0.0.1     # Set the bind address specifically, IPv4 or IPv6 (Default: 0.0.0.0)
-    # network_publish_host: 127.0.0.1  # Set the address other nodes will use to communicate with this node (Optional)
-    # network_host: 127.0.0.1          # Set both `network_bind_host` and `network_publish_host` (Optional)
+.. code-block:: yaml
+
+    blueprints:
+      - blues.elasticsearch
+
+    settings:
+      elasticsearch:
+        version: 1.3                       # Version of elasticsearch to install (Required)
+        cluster_name: foobar               # Name of the cluster (Default: elasticsearch)
+        # number_of_shards: 5              # Number of shards (Default: 5)
+        # number_of_replicas: 0            # Number of replicas (Default: 0)
+        # network_bind_host: 127.0.0.1     # Set the bind address specifically, IPv4 or IPv6 (Default: 0.0.0.0)
+        # network_publish_host: 127.0.0.1  # Set the address other nodes will use to communicate with this node (Optional)
+        # network_host: 127.0.0.1          # Set both `network_bind_host` and `network_publish_host` (Optional)
 
 """
 from fabric.decorators import task

@@ -1,8 +1,13 @@
 """
 Kibana Blueprint
+================
 
-blueprints:
-  - blues.kibana
+**Fabric environment:**
+
+.. code-block:: yaml
+
+    blueprints:
+      - blues.kibana
 
 """
 import os.path

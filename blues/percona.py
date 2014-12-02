@@ -1,17 +1,22 @@
 """
 Percona (MySQL) Blueprint
+=========================
 
-blueprints:
-  - blues.percona
+**Fabric environment:**
 
-settings:
-  percona:
-    schemas:
-      some_schema_name:    # The schema name
-        user: foo          # Username to connect to schema
-        password: bar      # Password to connect to schema
-        host: 11.22.33.%s  # Allowed host mask to connect from (Default: 127.0.0.1)
-    # bind: 0.0.0.0        # Set the bind address specifically (Default: 127.0.0.1)
+.. code-block:: yaml
+
+    blueprints:
+      - blues.percona
+
+    settings:
+      percona:
+        schemas:
+          some_schema_name:    # The schema name
+            user: foo          # Username to connect to schema
+            password: bar      # Password to connect to schema
+            host: 11.22.33.%s  # Allowed host mask to connect from (Default: 127.0.0.1)
+        # bind: 0.0.0.0        # Set the bind address specifically (Default: 127.0.0.1)
 
 """
 import ConfigParser

@@ -1,20 +1,25 @@
 """
 Supervisor Blueprint
+====================
 
 Can be used as a provider to the application blueprint,
 or used standalone by adding program templates under a `programs-available`
 and enable them manually with the `programs` setting.
 
-blueprints:
-  - blues.supervisor
+**Fabric environment:**
 
-settings:
-  supervisor:
-    version: 3.1.3                 # Version of supervisor to install (Required)
-    # programs:                    # List of programs/templates in `programs-available` folder to enable (Optional)
-    #   - foo                      # Template name, with or without .conf extension
-    #   - bar
-    # auto_disable_programs: true  # Auto disable programs not specified in `programs` setting (Default: true)
+.. code-block:: yaml
+
+    blueprints:
+      - blues.supervisor
+
+    settings:
+      supervisor:
+        version: 3.1.3                 # Version of supervisor to install (Required)
+        # programs:                    # List of programs/templates in `programs-available` folder to enable (Optional)
+        #   - foo                      # Template name, with or without .conf extension
+        #   - bar
+        # auto_disable_programs: true  # Auto disable programs not specified in `programs` setting (Default: true)
 
 """
 from functools import partial

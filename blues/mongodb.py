@@ -1,12 +1,17 @@
 """
 MongoDB Blueprint
+=================
 
-blueprints:
-  - blues.mongodb
+**Fabric environment:**
 
-settings:
-  mongodb:
-    # bind: 0.0.0.0  # Set the bind address specifically (Default: 127.0.0.1)
+.. code-block:: yaml
+
+    blueprints:
+      - blues.mongodb
+
+    settings:
+      mongodb:
+        # bind: 0.0.0.0  # Set the bind address specifically (Default: 127.0.0.1)
 
 """
 from fabric.decorators import task

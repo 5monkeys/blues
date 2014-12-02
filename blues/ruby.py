@@ -1,13 +1,18 @@
 """
 Ruby Blueprint
+==============
 
-blueprints:
-  - blues.ruby
+**Fabric environment:**
 
-settings:
-  ruby:
-    gems:     # List of ruby gems to install (Optional)
-      - sass
+.. code-block:: yaml
+
+    blueprints:
+      - blues.ruby
+
+    settings:
+      ruby:
+        gems:       # List of ruby gems to install (Optional)
+          # - sass
 
 """
 from fabric.decorators import task

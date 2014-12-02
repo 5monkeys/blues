@@ -1,11 +1,16 @@
 """
 Cron Blueprint
+==============
 
 This blueprint has no settings.
 Templates are handled as crontab's and should be named to related user.
 
-blueprints:
-  - blues.cron
+**Fabric environment:**
+
+.. code-block:: yaml
+
+    blueprints:
+      - blues.cron
 
 """
 import os

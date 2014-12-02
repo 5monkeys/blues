@@ -1,10 +1,15 @@
 """
 Java
+====
 
 Installs Java, currently restricted to version 7.
 
-blueprints:
-  - blues.java
+**Fabric environment:**
+
+.. code-block:: yaml
+
+    blueprints:
+      - blues.java
 
 """
 from fabric.decorators import task

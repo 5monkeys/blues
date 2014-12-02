@@ -1,11 +1,16 @@
 """
 Logstash Blueprint
+==================
 
-blueprints:
-  - blues.logstash
+**Fabric environment:**
 
-settings:
-  logstash:
+.. code-block:: yaml
+
+    blueprints:
+      - blues.logstash
+
+    settings:
+      logstash: # TODO
 
 
 """

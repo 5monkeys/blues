@@ -1,15 +1,20 @@
 """
 Nginx Blueprint
+===============
 
-blueprints:
-  - blues.nginx
+**Fabric environment:**
 
-settings:
-  nginx:
-    sites:                      # List of sites/templates in `sites-available` folder to enable (Optional)
-      - foo                     # Template name, with or without .conf extension
-      - bar
-    # auto_disable_sites: true  # Auto disable sites not specified in `sites` setting (Default: true)
+.. code-block:: yaml
+
+    blueprints:
+      - blues.nginx
+
+    settings:
+      nginx:
+        sites:                      # List of sites/templates in `sites-available` folder to enable (Optional)
+          - foo                     # Template name, with or without .conf extension
+          - bar
+        # auto_disable_sites: true  # Auto disable sites not specified in `sites` setting (Default: true)
 
 """
 import os

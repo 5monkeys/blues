@@ -1,8 +1,13 @@
 """
 RabbitMQ Blueprint
+==================
 
-blueprints:
-  - blues.rabbitmq
+**Fabric environment:**
+
+.. code-block:: yaml
+
+    blueprints:
+      - blues.rabbitmq
 
 """
 from fabric.decorators import task

@@ -4,6 +4,8 @@ from .deploy import *
 from .project import *
 from .providers import get_providers
 
+__all__ = ['setup', 'configure', 'deploy', 'reload', 'start', 'stop', 'configure_providers', 'generate_nginx_conf']
+
 
 @task
 def setup():

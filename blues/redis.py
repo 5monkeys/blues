@@ -1,12 +1,17 @@
 """
 Redis Blueprint
+===============
 
-blueprints:
-  - blues.redis
+**Fabric environment:**
 
-settings:
-  redis:
-    # bind: 0.0.0.0  # Set the bind address specifically (Default: 127.0.0.1)
+.. code-block:: yaml
+
+    blueprints:
+      - blues.redis
+
+    settings:
+      redis:
+        # bind: 0.0.0.0  # Set the bind address specifically (Default: 127.0.0.1)
 
 """
 from fabric.decorators import task

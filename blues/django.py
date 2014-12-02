@@ -1,10 +1,15 @@
 """
 Django Blueprint
+================
 
 Management helper blueprint.
 
-blueprints:
-  - blues.django
+**Fabric environment:**
+
+.. code-block:: yaml
+
+    blueprints:
+      - blues.django
 
 """
 from fabric.context_managers import cd

@@ -1,15 +1,20 @@
 """
 uWSGI Blueprint
+===============
 
 Installs uWSGI and contains service tasks and other useful helpers for other blueprints to use.
 Currently only acts as a provider for the application blueprint and can not be used standalone to deploy vassals.
 
-blueprints:
-  - blues.uwsgi
+**Fabric environment:**
 
-settings:
-  uwsgi:
-    version: 1.3  # Version of uWSGI to install (Required)
+.. code-block:: yaml
+
+    blueprints:
+      - blues.uwsgi
+
+    settings:
+      uwsgi:
+        version: 1.3  # Version of uWSGI to install (Required)
 
 """
 import os

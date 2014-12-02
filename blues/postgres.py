@@ -1,15 +1,20 @@
 """
 Postgres Blueprint
+==================
 
-blueprints:
-  - blues.postgres
+**Fabric environment:**
 
-settings:
-  postgres:
-    schemas:
-      some_schema_name:    # The schema name
-        user: foo          # Username to connect to schema
-        password: bar      # Password to connect to schema
+.. code-block:: yaml
+
+    blueprints:
+      - blues.postgres
+
+    settings:
+      postgres:
+        schemas:
+          some_schema_name:    # The schema name
+            user: foo          # Username to connect to schema
+            password: bar      # Password to connect to schema
 
 """
 import os

@@ -1,13 +1,18 @@
 """
 Solr Blueprint
+==============
 
-blueprints:
-  - blues.solr
+**Fabric environment:**
 
-settings:
-  solr:
-    version: 4.10.2  # Solr version to install (Required)
-    # memory: 1024m  # Specify minimum and maximum heap size in mb (Default: 512m)
+.. code-block:: yaml
+
+    blueprints:
+      - blues.solr
+
+    settings:
+      solr:
+        version: 4.10.2  # Solr version to install (Required)
+        # memory: 1024m  # Specify minimum and maximum heap size in mb (Default: 512m)
 
 """
 import os

@@ -1,11 +1,16 @@
 """
 Python Blueprint
+================
 
 Does not install python itself, only develop and setup tools.
 Contains pip helper for other blueprints to use.
 
-blueprints:
-  - blues.python
+**Fabric environment:**
+
+.. code-block:: yaml
+
+    blueprints:
+      - blues.python
 
 """
 from fabric.decorators import task

@@ -1,13 +1,18 @@
 """
 Memcached Blueprint
+===================
 
-blueprints:
-  - blues.memcached
+**Fabric environment:**
 
-settings:
-  memcached:
-    # size: 256          # Cache size in mb (Default: 64)
-    # bind: 127.0.0.1  # Set the bind address specifically (Default: listen to all)
+.. code-block:: yaml
+
+    blueprints:
+      - blues.memcached
+
+    settings:
+      memcached:
+        # size: 256        # Cache size in mb (Default: 64)
+        # bind: 127.0.0.1  # Set the bind address specifically (Default: listen to all)
 
 """
 from fabric.decorators import task
