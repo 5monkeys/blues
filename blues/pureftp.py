@@ -20,7 +20,7 @@ from fabric.context_managers import settings
 from fabric.contrib import files
 from fabric.decorators import task
 
-from refabric.context_managers import sudo
+from refabric.context_managers import sudo, silent
 from refabric.contrib import blueprints
 
 from . import debian
@@ -36,14 +36,14 @@ stop = debian.service_task('pure-ftpd', 'stop')
 restart = debian.service_task('pure-ftpd', 'restart')
 
 ftp_home = '/srv/ftp'
-ftp_user = 'ftp-data'
-ftp_group = 'ftp-data'
+ftp_user = 'ftp'
+ftp_group = 'www-data'
 
 
 @task
 def setup():
     """
-    Install and configure ProFTPD
+    Install and configure PureFTP
     """
     install()
     configure()
@@ -56,14 +56,12 @@ def install():
         debian.groupadd(ftp_group)
         # TODO: Use --system
         debian.useradd(ftp_user, home='/dev/null', create_home=False, skeleton=False,
-                       groups=[ftp_group], shell='/etc')
+                       groups=[ftp_group], shell='/bin/false')
         debian.mkdir(ftp_home, owner=ftp_user, group=ftp_group)
-        # Create user database
-        run('pure-pw mkdb')
+
         # Set up symlinks
-        debian.ln('/etc/pure-ftpd/pureftpd.passwd', '/etc/pureftpd.passwd')
-        debian.ln('/etc/pure-ftpd/pureftpd.pdb', '/etc/pureftpd.pdb')
         debian.ln('/etc/pure-ftpd/conf/PureDB', '/etc/pure-ftpd/auth/PureDB')
+
         # Enable TLS
         run('echo 1 > /etc/pure-ftpd/conf/TLS')
         key_path = '/etc/ssl/private/pure-ftpd.pem'
@@ -81,15 +79,21 @@ def install():
                 run('openssl req -x509 -nodes -newkey rsa:2048 -keyout {0} -out {0}'.format(
                     key_path))
             debian.chmod(key_path, 600)
+
+
 @task
 def configure():
     """
-    Configure ProFTPD
+    Configure PureFTP
     """
     with sudo():
+        # Echo configurations
+        setup_config()
+
         for user in blueprint.get('users'):
             username, password = user['username'], user['password']
-            if run('pure-pw show {}'.format(username)).return_code == 0:
+            passwd_path = '/etc/pure-ftpd/pureftpd.passwd'
+            if files.exists(passwd_path) and run('pure-pw show {}'.format(username)).return_code == 0:
                 continue
             user_home = os.path.join(ftp_home, username)
             debian.mkdir(user_home, owner=ftp_user, group=ftp_group)
@@ -98,6 +102,50 @@ def configure():
                 'Enter it again: ': password
             }
             with settings(prompts=prompts):
-                run('pure-pw useradd {} -u {} -d {}'.format(username, ftp_user, user_home))
+                run('pure-pw useradd {} -u {} -g {} -d {}'.format(username, ftp_user, ftp_group,
+                                                                  user_home))
         run('pure-pw mkdb')
     restart()
+
+
+config_defaults = {
+    'ChrootEveryone': 'yes',  # Cage in every user in his home directory
+    'BrokenClientsCompatibility': 'yes',  # Turn on compatibility hacks for broken clients
+    'MaxClientsNumber': '50',  # Maximum number of simultaneous users
+    'MaxClientsPerIP': '5',  # Maximum number of sim clients with the same IP address
+    'Daemonize': 'yes',  # Fork in background
+    'VerboseLog': 'yes',  # Turn off verbose logging
+    'DisplayDotFiles': 'yes',  # List dot-files even when the client doesn't send "-a".
+    'ProhibitDotFilesWrite': 'yes',  # Users can't delete/write files beginning with a dot ('.')
+    'NoChmod': 'yes',  # Disallow the CHMOD command. Users can't change perms of their files.
+    'AnonymousOnly': 'no',  # Don't allow authenticated users - have a public anonymous FTP only.
+    'NoAnonymous': 'yes',  # Don't allow authenticated users - have a public anonymous FTP only.
+    'PAMAuthentication': 'no',  # Disable PAM authentication
+    'UnixAuthentication': 'no',  # Disable /etc/passwd (UNIX) authentication
+    'DontResolve': 'yes',  # Don't resolve host names in log files.
+    'MaxIdleTime': '15',  # Maximum idle time in minutes (default = 15 minutes)
+    'LimitRecursion': '2000 8',  # 'ls' recursion limits.
+    'AntiWarez': 'yes',  # Disallow downloading of files owned by "ftp"
+    'AnonymousCanCreateDirs': 'no',  # Are anonymous users allowed to create new directories ?
+    'MaxLoad': '6',  # If the system is more loaded than the following value, disallow download.
+    'AllowUserFXP': 'no',  # Disallow FXP transfers for authenticated users.
+    'AllowAnonymousFXP': 'no',  # Disallow anonymous FXP for anonymous and non-anonymous users.
+    'AutoRename': 'no',  # Turn off autorenaming of conflicting filenames
+    'AnonymousCantUpload': 'yes',  # Disallow anonymous users to upload new files (no = upload is allowed)
+    'NoChmod': 'yes',  # Disallow the CHMOD command. Users can't change perms of their files.
+    'MaxDiskUsage': '80',  # When the partition is more that X percent full, new uploads are disallowed.
+    'CustomerProof': 'yes',  # Workaround against common customer mistakes like chmod 0 public_html
+    'PureDB': '/etc/pure-ftpd/pureftpd.pdb'  # User database
+}
+
+
+def set_pureftp_config_value(**kwargs):
+    for key, value in kwargs.iteritems():
+        run("echo '{}' > /etc/pure-ftpd/conf/{}".format(value, key))
+
+
+def setup_config():
+    with silent():
+        config = config_defaults.copy()
+        config.update(blueprint.get(''))
+        set_pureftp_config_value(**config_defaults)
