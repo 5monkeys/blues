@@ -21,6 +21,7 @@ def create(name, home=None, groups=None):
     for group in groups:
         debian.groupadd(group, gid_min=10000)
     with sudo(user='root'):
+        # TODO: Use --system
         debian.useradd(name, home=home, uid_min=10000, shell='/bin/bash', groups=groups)
         create_ssh_path(name)
 
