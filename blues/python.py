@@ -23,6 +23,9 @@ from . import debian
 __all__ = ['setup']
 
 
+pip_log_file = '/tmp/pip.log'
+
+
 @task
 def setup():
     """
@@ -36,8 +39,10 @@ def install():
         info('Install python dependencies')
         debian.apt_get('install', 'python-dev', 'python-setuptools')
         run('easy_install -0 pip')
+        run('touch {}'.format(pip_log_file))
+        debian.chmod(pip_log_file, mode=777)
 
 
 def pip(command, *options):
     info('Running pip {}', command)
-    run('pip {} {} -v --log=/tmp/pip.log --log-file=/tmp/pip.log'.format(command, ' '.join(options)))
+    run('pip {0} {1} -v --log={2} --log-file={2}'.format(command, ' '.join(options), pip_log_file))
