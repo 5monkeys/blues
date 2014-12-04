@@ -62,7 +62,9 @@ def install():
 
 def install_user():
     with sudo():
-        user.create('solr', home=solr_home, service=True)
+        debian.mkdir(solr_home)
+        user.create('solr', home=solr_home, groups=['solr'], service=True)
+
         debian.mkdir('/var/lib/solr', mode=755, owner='solr', group='solr')
         debian.mkdir('/var/log/solr', mode=755, owner='solr', group='solr')
 

@@ -38,7 +38,6 @@ def create(name, home=None, groups=None, system=True, service=False):
 
     with sudo(user='root'):
         for group in groups or []:
-            print 'join group', group
             debian.groupadd(group, gid_min=id_min, gid_max=id_max)
 
         debian.useradd(name, system=system, home=home, create_home=create_home,
