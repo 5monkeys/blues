@@ -24,6 +24,7 @@ from refabric.context_managers import sudo, silent
 from refabric.contrib import blueprints
 
 from . import debian
+from . import user
 from refabric.operations import run
 
 __all__ = ['start', 'stop', 'restart', 'setup', 'configure']
@@ -35,7 +36,7 @@ start = debian.service_task('pure-ftpd', 'start')
 stop = debian.service_task('pure-ftpd', 'stop')
 restart = debian.service_task('pure-ftpd', 'restart')
 
-ftp_home = '/srv/ftp'
+ftp_root = '/srv/ftp'
 ftp_user = 'ftp'
 ftp_group = 'www-data'
 
@@ -52,12 +53,9 @@ def setup():
 def install():
     with sudo():
         debian.apt_get('install', 'pure-ftpd', 'openssl')
-        # TODO: Use --system
-        debian.groupadd(ftp_group)
-        # TODO: Use --system
-        debian.useradd(ftp_user, home='/dev/null', create_home=False, skeleton=False,
-                       groups=[ftp_group], shell='/bin/false')
-        debian.mkdir(ftp_home, owner=ftp_user, group=ftp_group)
+        user.create(ftp_user, groups=[ftp_group], service=True)
+
+        debian.mkdir(ftp_root, mode=1770, owner=ftp_user, group=ftp_group)
 
         # Set up symlinks
         debian.ln('/etc/pure-ftpd/conf/PureDB', '/etc/pure-ftpd/auth/PureDB')
@@ -95,7 +93,7 @@ def configure():
             passwd_path = '/etc/pure-ftpd/pureftpd.passwd'
             if files.exists(passwd_path) and run('pure-pw show {}'.format(username)).return_code == 0:
                 continue
-            user_home = os.path.join(ftp_home, username)
+            user_home = os.path.join(ftp_root, username)
             debian.mkdir(user_home, owner=ftp_user, group=ftp_group)
             prompts = {
                 'Password: ': password,

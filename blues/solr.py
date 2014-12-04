@@ -19,12 +19,12 @@ import os
 
 from fabric.context_managers import cd, settings
 from fabric.decorators import task, parallel
-from fabric.utils import abort
 
 from refabric.api import info, run
 from refabric.context_managers import sudo, silent, hide_prefix
 from refabric.contrib import blueprints
 
+from . import user
 from . import debian
 
 __all__ = ['start', 'stop', 'restart', 'setup', 'configure', 'tail']
@@ -62,8 +62,7 @@ def install():
 
 def install_user():
     with sudo():
-        # TODO: Use --system
-        debian.useradd('solr', user_group=True, home=solr_home, create_home=False, shell='/bin/false')
+        user.create('solr', home=solr_home, service=True)
         debian.mkdir('/var/lib/solr', mode=755, owner='solr', group='solr')
         debian.mkdir('/var/log/solr', mode=755, owner='solr', group='solr')
 
