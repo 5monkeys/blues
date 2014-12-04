@@ -158,12 +158,12 @@ def setup_schemas(drop=False):
         host = config.get('host', 'localhost')
         if drop:
             info('Dropping schema {}', schema)
-            _client_exec('DROP DATABASE IF EXISTS {name}', name=schema)
+            client_exec('DROP DATABASE IF EXISTS {name}', name=schema)
 
         info('Creating schema {}', schema)
         create_db_cmd = 'CREATE DATABASE IF NOT EXISTS {name} ' \
                         'CHARACTER SET UTF8 COLLATE UTF8_UNICODE_CI;'
-        _client_exec(create_db_cmd, name=schema)
+        client_exec(create_db_cmd, name=schema)
 
         grant(schema, user, password, host=host)
 
@@ -173,10 +173,10 @@ def grant(schema, user, password, privs='ALL', host='localhost'):
         schema = "%s.*" % schema
     info('Granting user {} @ {} to schema {}'.format(user, host, schema))
     grant_cmd = "GRANT {privs} ON {schema} TO '{user}'@'{host}' IDENTIFIED BY '{password}';"
-    _client_exec(grant_cmd, privs=privs, schema=schema, user=user, host=host, password=password)
+    client_exec(grant_cmd, privs=privs, schema=schema, user=user, host=host, password=password)
 
 
-def _client_exec(cmd, **kwargs):
+def client_exec(cmd, **kwargs):
     return run('sudo su root -c "mysql -e \\"{}\\""'.format(cmd.format(**kwargs)), shell=False)
 
 
@@ -219,7 +219,7 @@ def dump(schema=None, ignore_tables=''):
     run('sudo su root -c "{}"'.format(dump_cmd))
     info('Downloading dump...')
     local_file = '~/%s' % filename
-    files.get(output_file, local_file)
+    fabric.contrib.files.get(output_file, local_file)
 
     with sudo(), silent():
         debian.rm(output_file)
