@@ -205,8 +205,9 @@ def groupmod(name, gid):
     run("groupmod -g %s '%s'" % (gid, name))
 
 
-def useradd(name, passwd=None, home=None, create_home=True, skeleton=True, shell=None, user_group=False,
-            uid=None, uid_min=None, uid_max=None, gid=None, groups=None, encrypted_passwd=False):
+def useradd(name, passwd=None, home=None, create_home=True, skeleton=True, shell=None,
+            user_group=False, uid=None, uid_min=None, uid_max=None, gid=None, groups=None,
+            encrypted_passwd=False, system=False):
     user = get_user(name)
 
     if not user:
@@ -223,6 +224,8 @@ def useradd(name, passwd=None, home=None, create_home=True, skeleton=True, shell
                 options.append("-M")
                 if not fabric.contrib.files.exists(home):
                     mkdir(home)
+        if system:
+            options.append('-r')
         if uid:
             options.append("-u '%s'" % uid)
         if not gid and get_group(name):  # If group already exists but not specified, useradd fails
@@ -233,12 +236,18 @@ def useradd(name, passwd=None, home=None, create_home=True, skeleton=True, shell
             options.append("-G '%s'" % ','.join(groups))
         if user_group:
             options.append("-U")
+        else:
+            options.append("-N")
         if shell:
             options.append("-s '%s'" % shell)
         if uid_min:
             options.append("-K UID_MIN='%s'" % uid_min)
+            if user_group:
+                options.append("-K GID_MIN='%s'" % uid_min)
         if uid_max:
             options.append("-K UID_MAX='%s'" % uid_max)
+            if user_group:
+                options.append("-K GID_MAX='%s'" % uid_max)
 
         run("useradd %s '%s'" % (' '.join(options), name))
 
