@@ -14,16 +14,37 @@ from refabric.context_managers import sudo
 from . import debian
 
 
-def create(name, home=None, groups=None):
+def create(name, home=None, groups=None, system=True, service=False):
     """
     Create a system user
     """
-    for group in groups:
-        debian.groupadd(group, gid_min=10000)
+    shell = '/bin/bash'
+    create_home = True
+    id_min = None
+    id_max = None
+
+    if not home:
+        home = '/dev/null'
+
+    if not system:
+        service = True
+
+    if service:
+        shell = '/bin/false'
+        create_home = False
+        id_min = 100
+        id_max = 499
+        system = False
+
     with sudo(user='root'):
-        # TODO: Use --system
-        debian.useradd(name, home=home, uid_min=10000, shell='/bin/bash', groups=groups)
-        create_ssh_path(name)
+        for group in groups or []:
+            print 'join group', group
+            debian.groupadd(group, gid_min=id_min, gid_max=id_max)
+
+        debian.useradd(name, system=system, home=home, create_home=create_home,
+                       uid_min=id_min, uid_max=id_max, shell=shell, groups=groups)
+        if system:
+            create_ssh_path(name)
 
 
 def create_ssh_path(username):
