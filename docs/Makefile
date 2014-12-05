@@ -179,7 +179,8 @@ pseudoxml:
 	@echo "Build finished. The pseudo-XML files are in $(BUILDDIR)/pseudoxml."
 
 modules:
-	$(SPHINXAPIDOC) -E -f -e -o source/api $(PACKAGEDIR) $(PACKAGEDIR)/application/providers $(PACKAGEDIR)/application/deploy.py $(PACKAGEDIR)/application/project.py $(PACKAGEDIR)/application/tasks.py
+	rm -rf source/api
+	$(SPHINXAPIDOC) --no-headings --no-toc --separate --output-dir=source/api $(PACKAGEDIR) $(PACKAGEDIR)/application
 	@echo
 	@echo "Build finished. The module files are in source/api."
 
