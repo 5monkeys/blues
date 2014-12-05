@@ -1,9 +1,9 @@
-from collections import defaultdict
-from blues import debian
+from fabric.state import env
 
 from .. import blueprint
-from fabric.state import env
 from ..project import *
+
+from ... import debian
 
 
 class BaseProvider(object):

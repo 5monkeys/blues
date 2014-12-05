@@ -17,6 +17,9 @@ from .. import user
 from .. import python
 from .. import virtualenv
 
+__all__ = ['install_project_user', 'install_project_structure', 'install_system_dependencies', 'install_virtualenv',
+           'install_requirements', 'install_source', 'update_source', 'install_providers']
+
 
 def install_project_user():
     """

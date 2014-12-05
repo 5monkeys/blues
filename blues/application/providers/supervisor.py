@@ -3,12 +3,12 @@ import os
 from fabric.context_managers import settings
 from fabric.state import env
 
-from blues import debian
-from blues import supervisor
-
 from .base import BaseProvider
 from .. import blueprint
 from ..project import *
+
+from ... import debian
+from ... import supervisor
 
 
 class SupervisorProvider(BaseProvider):

@@ -8,12 +8,12 @@ from fabric.utils import indent
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
 
-from blues import debian
-from blues import uwsgi
-
 from .base import BaseProvider
 from .. import blueprint
 from ..project import *
+
+from ... import debian
+from ... import uwsgi
 
 
 class UWSGIProvider(BaseProvider):
