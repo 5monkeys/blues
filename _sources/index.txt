@@ -11,6 +11,10 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+.. toctree::
+   :maxdepth: 3
+
+   api/blues
 
 
 Indices and tables
@@ -18,4 +22,3 @@ Indices and tables
 
 * :ref:`modindex`
 * :ref:`search`
-

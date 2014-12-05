@@ -23,46 +23,56 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" /> 
+    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" />
+    <link rel="up" title="blues package" href="blues.html" />
+    <link rel="next" title="uWSGI Blueprint" href="blues.uwsgi.html" />
+    <link rel="prev" title="Supervisor Blueprint" href="blues.supervisor.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a></li>
-        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="blues.uwsgi.html" title="uWSGI Blueprint"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="blues.supervisor.html" title="Supervisor Blueprint"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="blues.html" accesskey="U">blues package</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <span class="target" id="module-blues.user"></span><div class="section" id="user-utils">
 <h1>User Utils<a class="headerlink" href="#user-utils" title="Permalink to this headline">¶</a></h1>
 <p>Debian user helpers for other blueprints to use.</p>
 <dl class="function">
 <dt id="blues.user.create">
-<tt class="descclassname">blues.user.</tt><tt class="descname">create</tt><big>(</big><em>name</em>, <em>home=None</em>, <em>groups=None</em><big>)</big><a class="headerlink" href="#blues.user.create" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create</code><span class="sig-paren">(</span><em>name</em>, <em>home=None</em>, <em>groups=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.user.create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a system user</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="blues.user.create_ssh_path">
-<tt class="descclassname">blues.user.</tt><tt class="descname">create_ssh_path</tt><big>(</big><em>username</em><big>)</big><a class="headerlink" href="#blues.user.create_ssh_path" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_ssh_path</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.user.create_ssh_path" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.user.set_strict_host_checking">
-<tt class="descclassname">blues.user.</tt><tt class="descname">set_strict_host_checking</tt><big>(</big><em>username</em>, <em>host</em>, <em>check=False</em><big>)</big><a class="headerlink" href="#blues.user.set_strict_host_checking" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_strict_host_checking</code><span class="sig-paren">(</span><em>username</em>, <em>host</em>, <em>check=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.user.set_strict_host_checking" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.user.upload_ssh_keys">
-<tt class="descclassname">blues.user.</tt><tt class="descname">upload_ssh_keys</tt><big>(</big><em>username</em>, <em>key_pair_path</em><big>)</big><a class="headerlink" href="#blues.user.upload_ssh_keys" title="Permalink to this definition">¶</a></dt>
+<code class="descname">upload_ssh_keys</code><span class="sig-paren">(</span><em>username</em>, <em>key_pair_path</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.user.upload_ssh_keys" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -71,14 +81,15 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/api/blues.user.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="blues.supervisor.html"
+                        title="previous chapter">Supervisor Blueprint</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="blues.uwsgi.html"
+                        title="next chapter">uWSGI Blueprint</a></p>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -95,18 +106,25 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a></li>
-        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="blues.uwsgi.html" title="uWSGI Blueprint"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="blues.supervisor.html" title="Supervisor Blueprint"
+             >previous</a> |</li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="blues.html" >blues package</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Jonas Lundberg.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b1.
     </div>
   </body>
 </html>

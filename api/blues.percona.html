@@ -23,23 +23,33 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" /> 
+    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" />
+    <link rel="up" title="blues package" href="blues.html" />
+    <link rel="next" title="Postgres Blueprint" href="blues.postgres.html" />
+    <link rel="prev" title="Node.js Blueprint" href="blues.node.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a></li>
-        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="blues.postgres.html" title="Postgres Blueprint"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="blues.node.html" title="Node.js Blueprint"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="blues.html" accesskey="U">blues package</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <span class="target" id="module-blues.percona"></span><div class="section" id="percona-mysql-blueprint">
 <h1>Percona (MySQL) Blueprint<a class="headerlink" href="#percona-mysql-blueprint" title="Permalink to this headline">¶</a></h1>
@@ -59,13 +69,13 @@
 </div>
 <dl class="attribute">
 <dt id="blues.percona.configure">
-<tt class="descclassname">blues.percona.</tt><tt class="descname">configure</tt><a class="headerlink" href="#blues.percona.configure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">configure</code><a class="headerlink" href="#blues.percona.configure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure Percona</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="blues.percona.dump">
-<tt class="descclassname">blues.percona.</tt><tt class="descname">dump</tt><a class="headerlink" href="#blues.percona.dump" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dump</code><a class="headerlink" href="#blues.percona.dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dump and download a schema.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -83,34 +93,34 @@
 
 <dl class="function">
 <dt id="blues.percona.generate_password">
-<tt class="descclassname">blues.percona.</tt><tt class="descname">generate_password</tt><big>(</big><em>length=8</em><big>)</big><a class="headerlink" href="#blues.percona.generate_password" title="Permalink to this definition">¶</a></dt>
+<code class="descname">generate_password</code><span class="sig-paren">(</span><em>length=8</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.percona.generate_password" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.percona.grant">
-<tt class="descclassname">blues.percona.</tt><tt class="descname">grant</tt><big>(</big><em>schema</em>, <em>user</em>, <em>password</em>, <em>privs='ALL'</em>, <em>host='localhost'</em><big>)</big><a class="headerlink" href="#blues.percona.grant" title="Permalink to this definition">¶</a></dt>
+<code class="descname">grant</code><span class="sig-paren">(</span><em>schema</em>, <em>user</em>, <em>password</em>, <em>privs='ALL'</em>, <em>host='localhost'</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.percona.grant" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.percona.install">
-<tt class="descclassname">blues.percona.</tt><tt class="descname">install</tt><big>(</big><big>)</big><a class="headerlink" href="#blues.percona.install" title="Permalink to this definition">¶</a></dt>
+<code class="descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blues.percona.install" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="blues.percona.mysqltuner">
-<tt class="descclassname">blues.percona.</tt><tt class="descname">mysqltuner</tt><a class="headerlink" href="#blues.percona.mysqltuner" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mysqltuner</code><a class="headerlink" href="#blues.percona.mysqltuner" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run mysqltuner</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="blues.percona.setup">
-<tt class="descclassname">blues.percona.</tt><tt class="descname">setup</tt><a class="headerlink" href="#blues.percona.setup" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setup</code><a class="headerlink" href="#blues.percona.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Install, configure percona server and create schemas</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="blues.percona.setup_schemas">
-<tt class="descclassname">blues.percona.</tt><tt class="descname">setup_schemas</tt><a class="headerlink" href="#blues.percona.setup_schemas" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setup_schemas</code><a class="headerlink" href="#blues.percona.setup_schemas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create database schemas and grant user permissions</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -128,14 +138,15 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/api/blues.percona.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="blues.node.html"
+                        title="previous chapter">Node.js Blueprint</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="blues.postgres.html"
+                        title="next chapter">Postgres Blueprint</a></p>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -152,18 +163,25 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a></li>
-        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="blues.postgres.html" title="Postgres Blueprint"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="blues.node.html" title="Node.js Blueprint"
+             >previous</a> |</li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="blues.html" >blues package</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Jonas Lundberg.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b1.
     </div>
   </body>
 </html>

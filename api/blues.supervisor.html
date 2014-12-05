@@ -23,23 +23,33 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" /> 
+    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" />
+    <link rel="up" title="blues package" href="blues.html" />
+    <link rel="next" title="User Utils" href="blues.user.html" />
+    <link rel="prev" title="Solr Blueprint" href="blues.solr.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a></li>
-        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="blues.user.html" title="User Utils"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="blues.solr.html" title="Solr Blueprint"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="blues.html" accesskey="U">blues package</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <span class="target" id="module-blues.supervisor"></span><div class="section" id="supervisor-blueprint">
 <h1>Supervisor Blueprint<a class="headerlink" href="#supervisor-blueprint" title="Permalink to this headline">¶</a></h1>
@@ -61,19 +71,19 @@ and enable them manually with the <cite>programs</cite> setting.</p>
 </div>
 <dl class="attribute">
 <dt id="blues.supervisor.setup">
-<tt class="descclassname">blues.supervisor.</tt><tt class="descname">setup</tt><a class="headerlink" href="#blues.supervisor.setup" title="Permalink to this definition">¶</a></dt>
+<code class="descname">setup</code><a class="headerlink" href="#blues.supervisor.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Install Supervisor and enable/disable configured programs</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="blues.supervisor.configure">
-<tt class="descclassname">blues.supervisor.</tt><tt class="descname">configure</tt><a class="headerlink" href="#blues.supervisor.configure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">configure</code><a class="headerlink" href="#blues.supervisor.configure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enable/disable configured programs</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="blues.supervisor.enable">
-<tt class="descclassname">blues.supervisor.</tt><tt class="descname">enable</tt><a class="headerlink" href="#blues.supervisor.enable" title="Permalink to this definition">¶</a></dt>
+<code class="descname">enable</code><a class="headerlink" href="#blues.supervisor.enable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enable program.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -94,7 +104,7 @@ and enable them manually with the <cite>programs</cite> setting.</p>
 
 <dl class="attribute">
 <dt id="blues.supervisor.disable">
-<tt class="descclassname">blues.supervisor.</tt><tt class="descname">disable</tt><a class="headerlink" href="#blues.supervisor.disable" title="Permalink to this definition">¶</a></dt>
+<code class="descname">disable</code><a class="headerlink" href="#blues.supervisor.disable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disable program.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -115,7 +125,7 @@ and enable them manually with the <cite>programs</cite> setting.</p>
 
 <dl class="attribute">
 <dt id="blues.supervisor.ctl">
-<tt class="descclassname">blues.supervisor.</tt><tt class="descname">ctl</tt><a class="headerlink" href="#blues.supervisor.ctl" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ctl</code><a class="headerlink" href="#blues.supervisor.ctl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run supervisorctl :[command],[program]</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -137,14 +147,15 @@ and enable them manually with the <cite>programs</cite> setting.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/api/blues.supervisor.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="blues.solr.html"
+                        title="previous chapter">Solr Blueprint</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="blues.user.html"
+                        title="next chapter">User Utils</a></p>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -161,18 +172,25 @@ and enable them manually with the <cite>programs</cite> setting.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a></li>
-        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="blues.user.html" title="User Utils"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="blues.solr.html" title="Solr Blueprint"
+             >previous</a> |</li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="blues.html" >blues package</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Jonas Lundberg.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b1.
     </div>
   </body>
 </html>

@@ -1,18 +1,12 @@
 blues package
 =============
 
-Subpackages
------------
-
-.. toctree::
-
-    blues.application
-
 Submodules
 ----------
 
 .. toctree::
 
+   blues.app
    blues.cron
    blues.debian
    blues.django

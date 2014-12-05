@@ -23,193 +23,203 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" /> 
+    <link rel="top" title="Blues 1.0.0 documentation" href="../index.html" />
+    <link rel="up" title="blues package" href="blues.html" />
+    <link rel="next" title="Django Blueprint" href="blues.django.html" />
+    <link rel="prev" title="Cron Blueprint" href="blues.cron.html" /> 
   </head>
-  <body>
-    <div class="related">
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a></li>
-        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="blues.django.html" title="Django Blueprint"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="blues.cron.html" title="Cron Blueprint"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="blues.html" accesskey="U">blues package</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <span class="target" id="module-blues.debian"></span><div class="section" id="debian-utils">
 <h1>Debian Utils<a class="headerlink" href="#debian-utils" title="Permalink to this headline">¶</a></h1>
 <p>Useful debian commands for other blueprints to use.</p>
 <dl class="function">
 <dt id="blues.debian.add_apt_key">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">add_apt_key</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#blues.debian.add_apt_key" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_apt_key</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.add_apt_key" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.add_apt_ppa">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">add_apt_ppa</tt><big>(</big><em>name</em>, <em>accept=True</em>, <em>src=False</em><big>)</big><a class="headerlink" href="#blues.debian.add_apt_ppa" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_apt_ppa</code><span class="sig-paren">(</span><em>name</em>, <em>accept=True</em>, <em>src=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.add_apt_ppa" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.add_apt_repository">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">add_apt_repository</tt><big>(</big><em>repository</em>, <em>accept=True</em>, <em>src=False</em><big>)</big><a class="headerlink" href="#blues.debian.add_apt_repository" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_apt_repository</code><span class="sig-paren">(</span><em>repository</em>, <em>accept=True</em>, <em>src=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.add_apt_repository" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.add_rc_service">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">add_rc_service</tt><big>(</big><em>name</em>, <em>priorities='defaults'</em><big>)</big><a class="headerlink" href="#blues.debian.add_rc_service" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_rc_service</code><span class="sig-paren">(</span><em>name</em>, <em>priorities='defaults'</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.add_rc_service" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.apt_get">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">apt_get</tt><big>(</big><em>command</em>, <em>*options</em><big>)</big><a class="headerlink" href="#blues.debian.apt_get" title="Permalink to this definition">¶</a></dt>
+<code class="descname">apt_get</code><span class="sig-paren">(</span><em>command</em>, <em>*options</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.apt_get" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.chgrp">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">chgrp</tt><big>(</big><em>location</em>, <em>group</em>, <em>recursive=False</em><big>)</big><a class="headerlink" href="#blues.debian.chgrp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">chgrp</code><span class="sig-paren">(</span><em>location</em>, <em>group</em>, <em>recursive=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.chgrp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.chmod">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">chmod</tt><big>(</big><em>location</em>, <em>mode=None</em>, <em>owner=None</em>, <em>group=None</em>, <em>recursive=False</em><big>)</big><a class="headerlink" href="#blues.debian.chmod" title="Permalink to this definition">¶</a></dt>
+<code class="descname">chmod</code><span class="sig-paren">(</span><em>location</em>, <em>mode=None</em>, <em>owner=None</em>, <em>group=None</em>, <em>recursive=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.chmod" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.chown">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">chown</tt><big>(</big><em>location</em>, <em>owner</em>, <em>group=None</em>, <em>recursive=False</em><big>)</big><a class="headerlink" href="#blues.debian.chown" title="Permalink to this definition">¶</a></dt>
+<code class="descname">chown</code><span class="sig-paren">(</span><em>location</em>, <em>owner</em>, <em>group=None</em>, <em>recursive=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.chown" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.chpasswd">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">chpasswd</tt><big>(</big><em>name</em>, <em>passwd</em>, <em>encrypted_passwd=False</em><big>)</big><a class="headerlink" href="#blues.debian.chpasswd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">chpasswd</code><span class="sig-paren">(</span><em>name</em>, <em>passwd</em>, <em>encrypted_passwd=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.chpasswd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.command_exists">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">command_exists</tt><big>(</big><em>*command</em><big>)</big><a class="headerlink" href="#blues.debian.command_exists" title="Permalink to this definition">¶</a></dt>
+<code class="descname">command_exists</code><span class="sig-paren">(</span><em>*command</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.command_exists" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.cp">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">cp</tt><big>(</big><em>source</em>, <em>destination</em>, <em>force=True</em>, <em>mode=None</em>, <em>owner=None</em>, <em>group=None</em><big>)</big><a class="headerlink" href="#blues.debian.cp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cp</code><span class="sig-paren">(</span><em>source</em>, <em>destination</em>, <em>force=True</em>, <em>mode=None</em>, <em>owner=None</em>, <em>group=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.cp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.debconf_communicate">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">debconf_communicate</tt><big>(</big><em>command</em>, <em>package</em><big>)</big><a class="headerlink" href="#blues.debian.debconf_communicate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">debconf_communicate</code><span class="sig-paren">(</span><em>command</em>, <em>package</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.debconf_communicate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.debconf_set_selections">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">debconf_set_selections</tt><big>(</big><em>*selections</em><big>)</big><a class="headerlink" href="#blues.debian.debconf_set_selections" title="Permalink to this definition">¶</a></dt>
+<code class="descname">debconf_set_selections</code><span class="sig-paren">(</span><em>*selections</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.debconf_set_selections" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.dpkg_query">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">dpkg_query</tt><big>(</big><em>package</em><big>)</big><a class="headerlink" href="#blues.debian.dpkg_query" title="Permalink to this definition">¶</a></dt>
+<code class="descname">dpkg_query</code><span class="sig-paren">(</span><em>package</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.dpkg_query" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.get_group">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">get_group</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#blues.debian.get_group" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_group</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.get_group" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.get_user">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">get_user</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#blues.debian.get_user" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_user</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.get_user" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.groupadd">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">groupadd</tt><big>(</big><em>name</em>, <em>gid=None</em>, <em>gid_min=None</em>, <em>gid_max=None</em><big>)</big><a class="headerlink" href="#blues.debian.groupadd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupadd</code><span class="sig-paren">(</span><em>name</em>, <em>gid=None</em>, <em>gid_min=None</em>, <em>gid_max=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.groupadd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.groupmod">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">groupmod</tt><big>(</big><em>name</em>, <em>gid</em><big>)</big><a class="headerlink" href="#blues.debian.groupmod" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupmod</code><span class="sig-paren">(</span><em>name</em>, <em>gid</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.groupmod" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.lbs_codename">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">lbs_codename</tt><big>(</big><big>)</big><a class="headerlink" href="#blues.debian.lbs_codename" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lbs_codename</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.lbs_codename" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.lbs_release">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">lbs_release</tt><big>(</big><big>)</big><a class="headerlink" href="#blues.debian.lbs_release" title="Permalink to this definition">¶</a></dt>
+<code class="descname">lbs_release</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.lbs_release" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.ln">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">ln</tt><big>(</big><em>source</em>, <em>destination</em>, <em>symbolic=True</em>, <em>force=True</em>, <em>mode=None</em>, <em>owner=None</em>, <em>group=None</em><big>)</big><a class="headerlink" href="#blues.debian.ln" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ln</code><span class="sig-paren">(</span><em>source</em>, <em>destination</em>, <em>symbolic=True</em>, <em>force=True</em>, <em>mode=None</em>, <em>owner=None</em>, <em>group=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.ln" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.mkdir">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">mkdir</tt><big>(</big><em>location</em>, <em>recursive=True</em>, <em>mode=None</em>, <em>owner=None</em>, <em>group=None</em><big>)</big><a class="headerlink" href="#blues.debian.mkdir" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mkdir</code><span class="sig-paren">(</span><em>location</em>, <em>recursive=True</em>, <em>mode=None</em>, <em>owner=None</em>, <em>group=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.mkdir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.mktemp">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">mktemp</tt><big>(</big><em>directory=False</em>, <em>mode=None</em><big>)</big><a class="headerlink" href="#blues.debian.mktemp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mktemp</code><span class="sig-paren">(</span><em>directory=False</em>, <em>mode=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.mktemp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.mv">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">mv</tt><big>(</big><em>source</em>, <em>destination</em>, <em>force=True</em><big>)</big><a class="headerlink" href="#blues.debian.mv" title="Permalink to this definition">¶</a></dt>
+<code class="descname">mv</code><span class="sig-paren">(</span><em>source</em>, <em>destination</em>, <em>force=True</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.mv" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.nproc">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">nproc</tt><big>(</big><big>)</big><a class="headerlink" href="#blues.debian.nproc" title="Permalink to this definition">¶</a></dt>
+<code class="descname">nproc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.nproc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of CPU cores.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.page_size">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">page_size</tt><big>(</big><big>)</big><a class="headerlink" href="#blues.debian.page_size" title="Permalink to this definition">¶</a></dt>
+<code class="descname">page_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.page_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get PAGE_SIZE</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.phys_pages">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">phys_pages</tt><big>(</big><big>)</big><a class="headerlink" href="#blues.debian.phys_pages" title="Permalink to this definition">¶</a></dt>
+<code class="descname">phys_pages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.phys_pages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get _PHYS_PAGES</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.pwd">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">pwd</tt><big>(</big><big>)</big><a class="headerlink" href="#blues.debian.pwd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">pwd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.pwd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.remove_rc_service">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">remove_rc_service</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#blues.debian.remove_rc_service" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_rc_service</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.remove_rc_service" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.rm">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">rm</tt><big>(</big><em>location</em>, <em>recursive=False</em>, <em>force=True</em><big>)</big><a class="headerlink" href="#blues.debian.rm" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rm</code><span class="sig-paren">(</span><em>location</em>, <em>recursive=False</em>, <em>force=True</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.rm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.service">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">service</tt><big>(</big><em>name</em>, <em>action</em>, <em>check_status=True</em><big>)</big><a class="headerlink" href="#blues.debian.service" title="Permalink to this definition">¶</a></dt>
+<code class="descname">service</code><span class="sig-paren">(</span><em>name</em>, <em>action</em>, <em>check_status=True</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.service" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.service_task">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">service_task</tt><big>(</big><em>name</em>, <em>action</em>, <em>check_status=False</em><big>)</big><a class="headerlink" href="#blues.debian.service_task" title="Permalink to this definition">¶</a></dt>
+<code class="descname">service_task</code><span class="sig-paren">(</span><em>name</em>, <em>action</em>, <em>check_status=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.service_task" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.set_timezone">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">set_timezone</tt><big>(</big><em>timezone</em><big>)</big><a class="headerlink" href="#blues.debian.set_timezone" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_timezone</code><span class="sig-paren">(</span><em>timezone</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.set_timezone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set OS timezone</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -223,28 +233,28 @@
 
 <dl class="function">
 <dt id="blues.debian.temporary_dir">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">temporary_dir</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#blues.debian.temporary_dir" title="Permalink to this definition">¶</a></dt>
+<code class="descname">temporary_dir</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwds</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.temporary_dir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.total_memory">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">total_memory</tt><big>(</big><big>)</big><a class="headerlink" href="#blues.debian.total_memory" title="Permalink to this definition">¶</a></dt>
+<code class="descname">total_memory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.total_memory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get total memory in bytes</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.update_rc">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">update_rc</tt><big>(</big><em>basename</em>, <em>priorities</em>, <em>force=False</em><big>)</big><a class="headerlink" href="#blues.debian.update_rc" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_rc</code><span class="sig-paren">(</span><em>basename</em>, <em>priorities</em>, <em>force=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.update_rc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.useradd">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">useradd</tt><big>(</big><em>name</em>, <em>passwd=None</em>, <em>home=None</em>, <em>create_home=True</em>, <em>skeleton=True</em>, <em>shell=None</em>, <em>user_group=False</em>, <em>uid=None</em>, <em>uid_min=None</em>, <em>uid_max=None</em>, <em>gid=None</em>, <em>groups=None</em>, <em>encrypted_passwd=False</em><big>)</big><a class="headerlink" href="#blues.debian.useradd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">useradd</code><span class="sig-paren">(</span><em>name</em>, <em>passwd=None</em>, <em>home=None</em>, <em>create_home=True</em>, <em>skeleton=True</em>, <em>shell=None</em>, <em>user_group=False</em>, <em>uid=None</em>, <em>uid_min=None</em>, <em>uid_max=None</em>, <em>gid=None</em>, <em>groups=None</em>, <em>encrypted_passwd=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.useradd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.usermod">
-<tt class="descclassname">blues.debian.</tt><tt class="descname">usermod</tt><big>(</big><em>user</em>, <em>passwd=None</em>, <em>home=None</em>, <em>uid=None</em>, <em>gid=None</em>, <em>groups=None</em>, <em>shell=None</em><big>)</big><a class="headerlink" href="#blues.debian.usermod" title="Permalink to this definition">¶</a></dt>
+<code class="descname">usermod</code><span class="sig-paren">(</span><em>user</em>, <em>passwd=None</em>, <em>home=None</em>, <em>uid=None</em>, <em>gid=None</em>, <em>groups=None</em>, <em>shell=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.usermod" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -253,14 +263,15 @@
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="../_sources/api/blues.debian.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="blues.cron.html"
+                        title="previous chapter">Cron Blueprint</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="blues.django.html"
+                        title="next chapter">Django Blueprint</a></p>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
@@ -277,18 +288,25 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a></li>
-        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="blues.django.html" title="Django Blueprint"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="blues.cron.html" title="Cron Blueprint"
+             >previous</a> |</li>
+        <li><a href="../index.html">Blues 1.0.0 documentation</a> &raquo;</li>
+          <li><a href="blues.html" >blues package</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2014, Jonas Lundberg.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b1.
     </div>
   </body>
 </html>
