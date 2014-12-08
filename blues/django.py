@@ -17,7 +17,7 @@ from fabric.decorators import task, runs_once
 from fabric.operations import prompt
 
 from refabric.api import run, info
-from refabric.context_managers import shell_env, hide_prefix
+from refabric.context_managers import hide_prefix
 from refabric.contrib import blueprints
 
 from . import virtualenv
@@ -36,7 +36,7 @@ def manage(cmd=''):
     """
     if not cmd:
         cmd = prompt('Enter django management command:')
-    with sudo_project(), cd(python_path()), virtualenv.activate(virtualenv_path()), shell_env(), hide_prefix():
+    with sudo_project(), cd(python_path()), virtualenv.activate(virtualenv_path()), hide_prefix():
         return run('python manage.py {cmd}'.format(cmd=cmd))
 
 
