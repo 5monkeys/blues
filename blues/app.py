@@ -53,4 +53,5 @@ Application Blueprint
 
 """
 from .application.tasks import *
+from .application.deploy import update_source
 __all__ = ['setup', 'configure', 'deploy', 'reload', 'configure_providers', 'generate_nginx_conf']
