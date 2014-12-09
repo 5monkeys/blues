@@ -51,20 +51,21 @@ def deploy(auto_reload=True):
     previous_commit, current_commit = update_source()
     code_changed = previous_commit != current_commit
 
-    # Check if requirements has changed
-    requirements = blueprint.get('requirements', 'requirements.txt')
-    commit_range = '{}..{}'.format(previous_commit, current_commit)
-    requirements_changed, _, _ = git.diff_stat(git_repository_path(), commit_range, requirements)
+    if code_changed:
+        # Check if requirements has changed
+        requirements = blueprint.get('requirements', 'requirements.txt')
+        commit_range = '{}..{}'.format(previous_commit, current_commit)
+        requirements_changed, _, _ = git.diff_stat(git_repository_path(), commit_range, requirements)
 
-    # Install repo requirements.txt
-    info('Install requirements')
-    if requirements_changed:
-        install_requirements()
-    else:
-        info(indent('(requirements not changed...skipping)'))
+        # Install repo requirements.txt
+        info('Install requirements')
+        if requirements_changed:
+            install_requirements()
+        else:
+            info(indent('(requirements not changed...skipping)'))
 
-    if auto_reload:
-        reload()
+        if auto_reload:
+            reload()
 
     return code_changed
 
