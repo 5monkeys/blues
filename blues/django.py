@@ -15,6 +15,7 @@ Management helper blueprint.
 from fabric.context_managers import cd
 from fabric.decorators import task, runs_once
 from fabric.operations import prompt
+from fabric.state import env
 
 from refabric.api import run, info
 from refabric.context_managers import hide_prefix
@@ -70,10 +71,13 @@ def migrate():
     Migrate database
     """
     info('Migrate database')
+
+    options = env.get('django__migrate', '')
+
     if version() >= (1, 7):
-        manage('migrate')
+        manage('migrate ' + options)
     elif blueprint.get('use_south', True):
-        manage('migrate --merge')
+        manage('migrate --merge ' + options)  # TODO: Remove --merge?
         manage('syncdb --noinput')  # TODO: Remove?
     else:
         manage('syncdb --noinput')
