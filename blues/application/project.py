@@ -3,8 +3,8 @@ from contextlib import contextmanager
 
 from refabric.context_managers import sudo
 
-from . import blueprint
 from .. import git
+from ..app import blueprint
 
 __all__ = [
     'app_root', 'project_home', 'git_root', 'virtualenv_path', 'git_repository',

@@ -7,7 +7,6 @@ from fabric.utils import indent
 from refabric.context_managers import sudo
 from refabric.utils import info
 
-from . import blueprint
 from .project import *
 from .providers import get_providers
 
@@ -16,6 +15,7 @@ from .. import git
 from .. import user
 from .. import python
 from .. import virtualenv
+from ..app import blueprint
 
 __all__ = ['install_project_user', 'install_project_structure', 'install_system_dependencies', 'install_virtualenv',
            'install_requirements', 'install_source', 'update_source', 'install_providers']

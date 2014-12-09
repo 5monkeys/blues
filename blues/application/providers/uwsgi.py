@@ -9,11 +9,11 @@ from refabric.api import run, info
 from refabric.context_managers import sudo, silent
 
 from .base import BaseProvider
-from .. import blueprint
 from ..project import *
 
 from ... import debian
 from ... import uwsgi
+from ...app import blueprint
 
 
 class UWSGIProvider(BaseProvider):

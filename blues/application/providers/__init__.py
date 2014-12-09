@@ -1,6 +1,6 @@
 from .uwsgi import UWSGIProvider
 from .supervisor import SupervisorProvider
-from .. import blueprint
+from ...app import blueprint
 
 
 def get_provider(name):

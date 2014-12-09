@@ -4,11 +4,11 @@ from fabric.context_managers import settings
 from fabric.state import env
 
 from .base import BaseProvider
-from .. import blueprint
 from ..project import *
 
 from ... import debian
 from ... import supervisor
+from ...app import blueprint
 
 
 class SupervisorProvider(BaseProvider):

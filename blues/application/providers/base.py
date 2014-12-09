@@ -1,9 +1,9 @@
 from fabric.state import env
 
-from .. import blueprint
 from ..project import *
 
 from ... import debian
+from ...app import blueprint
 
 
 class BaseProvider(object):

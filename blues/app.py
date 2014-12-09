@@ -52,6 +52,12 @@ Application Blueprint
       #   version: 3.1.3
 
 """
+from refabric.contrib import blueprints
+blueprint = blueprints.get(__name__)
+
 from .application.tasks import *
 from .application.deploy import update_source
+
 __all__ = ['setup', 'configure', 'deploy', 'reload', 'configure_providers', 'generate_nginx_conf']
+
+

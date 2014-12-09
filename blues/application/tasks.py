@@ -6,12 +6,12 @@ from fabric.utils import indent
 
 from refabric.utils import info
 
-from . import blueprint
 from .deploy import *
 from .project import *
 from .providers import get_providers
 
 from .. import git
+from ..app import blueprint
 
 __all__ = ['setup', 'configure', 'deploy', 'reload', 'start', 'stop', 'configure_providers', 'generate_nginx_conf']
 
