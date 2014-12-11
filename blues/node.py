@@ -48,11 +48,18 @@ def configure():
 
 def install():
     with sudo():
-        info('Installing Node.js')
-        if debian.lbs_release() in ['10.04', '12.04']:  # 12.04 ships with really old nodejs, TODO: 14.04?
+        lbs_release = debian.lbs_release()
+
+        if lbs_release in ['10.04', '12.04']:  # 12.04 ships with really old nodejs, TODO: 14.04?
+            info('Adding ppa...')
             debian.add_apt_ppa('chris-lea/node.js', src=True)
-        debian.apt_get('install', 'nodejs', 'npm')
-        if debian.lbs_release() == '14.04':
+
+        info('Installing Node.js')
+        debian.apt_get('install', 'nodejs')
+
+        if lbs_release == '14.04':
+            info('Installing NPM')
+            debian.apt_get('install', 'npm')
             debian.ln('/usr/bin/nodejs', '/usr/bin/node')
 
 
