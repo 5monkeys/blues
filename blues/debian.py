@@ -5,18 +5,18 @@ Debian Utils
 Useful debian commands for other blueprints to use.
 """
 import base64
-from contextlib import contextmanager
 import os
+from contextlib import contextmanager
 from functools import partial
 
 import fabric.api
-from fabric.decorators import task
 import fabric.operations
 import fabric.contrib.files
 import fabric.contrib.project
 import fabric.context_managers
 from fabric.colors import magenta
-from fabric.utils import puts, indent
+from fabric.decorators import task
+from fabric.utils import abort, puts, indent, warn
 
 from refabric.context_managers import silent, sudo
 from refabric.operations import run
@@ -390,3 +390,26 @@ def set_timezone(timezone):
     """
     with silent():
         run('ln -sf /usr/share/zoneinfo/{} /etc/localtime'.format(timezone))
+
+
+def pkill(sig, pattern):
+    with sudo():
+        with silent('warnings'):
+            output = run('pkill -{} {}'.format(sig, pattern))
+        if output.return_code != 0:
+            warn('No process got {} signal'.format(sig))
+        else:
+            info('Successfully sent {} signal to {}', sig, pattern)
+
+
+@task
+def sighup(process=None):
+    """
+    Send SIGHUP signal to process
+
+    :param process: Name (pattern) of process
+    """
+    if not process:
+        abort('Missing process argument, sighup:<process-name>')
+
+    pkill('HUP', process)
