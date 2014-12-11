@@ -392,14 +392,18 @@ def set_timezone(timezone):
         run('ln -sf /usr/share/zoneinfo/{} /etc/localtime'.format(timezone))
 
 
-def pkill(sig, pattern):
+def kill(sig, process, use_pkill=False):
     with sudo():
         with silent('warnings'):
-            output = run('pkill -{} {}'.format(sig, pattern))
+            if use_pkill:
+                output = run('pkill -{} {}'.format(sig, process))
+            else:
+                output = run('kill -{} {}'.format(sig, process))
+
         if output.return_code != 0:
             warn('No process got {} signal'.format(sig))
         else:
-            info('Successfully sent {} signal to {}', sig, pattern)
+            info('Successfully sent {} signal to {}', sig, process)
 
 
 @task
@@ -407,9 +411,9 @@ def sighup(process=None):
     """
     Send SIGHUP signal to process
 
-    :param process: Name (pattern) of process
+    :param process: PID of process
     """
     if not process:
-        abort('Missing process argument, sighup:<process-name>')
+        abort('Missing process argument, sighup:<process>')
 
-    pkill('HUP', process)
+    kill('HUP', process)
