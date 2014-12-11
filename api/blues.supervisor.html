@@ -124,6 +124,20 @@ and enable them manually with the <cite>programs</cite> setting.</p>
 </pre></div>
 </div>
 <dl class="attribute">
+<dt id="blues.supervisor.reload">
+<code class="descname">reload</code><a class="headerlink" href="#blues.supervisor.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload supervisor or reload program(s), via SIGHUP</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>program</strong> &#8211; The program to reload (all|exact|pattern). If not given, supervisor service will reload</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="blues.supervisor.setup">
 <code class="descname">setup</code><a class="headerlink" href="#blues.supervisor.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Install Supervisor and enable/disable configured programs</p>
@@ -190,6 +204,20 @@ and enable them manually with the <cite>programs</cite> setting.</p>
 <li><strong>program</strong> &#8211; The program to run command against</li>
 </ul>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="blues.supervisor.status">
+<code class="descname">status</code><a class="headerlink" href="#blues.supervisor.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show program(s) status, shortcut to supervisorctl status</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>program</strong> &#8211; Optional program to query status</td>
 </tr>
 </tbody>
 </table>
