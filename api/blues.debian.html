@@ -150,7 +150,7 @@
 
 <dl class="function">
 <dt id="blues.debian.chpasswd">
-<code class="descname">chpasswd</code><span class="sig-paren">(</span><em>name</em>, <em>passwd</em>, <em>encrypted_passwd=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.chpasswd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">chpasswd</code><span class="sig-paren">(</span><em>name</em>, <em>password</em>, <em>encrypted_passwd=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.chpasswd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -190,7 +190,7 @@
 
 <dl class="function">
 <dt id="blues.debian.groupadd">
-<code class="descname">groupadd</code><span class="sig-paren">(</span><em>name</em>, <em>gid=None</em>, <em>gid_min=None</em>, <em>gid_max=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.groupadd" title="Permalink to this definition">¶</a></dt>
+<code class="descname">groupadd</code><span class="sig-paren">(</span><em>name</em>, <em>gid=None</em>, <em>gid_min=None</em>, <em>gid_max=None</em>, <em>system=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.groupadd" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -322,12 +322,35 @@
 
 <dl class="function">
 <dt id="blues.debian.useradd">
-<code class="descname">useradd</code><span class="sig-paren">(</span><em>name</em>, <em>passwd=None</em>, <em>home=None</em>, <em>create_home=True</em>, <em>skeleton=True</em>, <em>shell=None</em>, <em>user_group=False</em>, <em>uid=None</em>, <em>uid_min=None</em>, <em>uid_max=None</em>, <em>gid=None</em>, <em>groups=None</em>, <em>encrypted_passwd=False</em>, <em>system=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.useradd" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">useradd</code><span class="sig-paren">(</span><em>name</em>, <em>home=None</em>, <em>create_home=False</em>, <em>shell=None</em>, <em>uid=None</em>, <em>uid_min=None</em>, <em>uid_max=None</em>, <em>user_group=False</em>, <em>gid=None</em>, <em>groups=None</em>, <em>system=False</em>, <em>password=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.useradd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new user or update default new user information</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; The username</li>
+<li><strong>home</strong> &#8211; Home directory of the new account. Will not create dir. <em>(Optional)</em></li>
+<li><strong>create_home</strong> &#8211; Create the user&#8217;s home directory <em>(Default: False)</em></li>
+<li><strong>shell</strong> &#8211; Login shell of the new account <em>(Optional)</em></li>
+<li><strong>user_group</strong> &#8211; Create a group with the same name as the user <em>(Default: False)</em></li>
+<li><strong>uid</strong> &#8211; User ID of the new account <em>(Optional)</em></li>
+<li><strong>uid_min</strong> &#8211; Min value for automatic user/group ID selection <em>(Optional)</em></li>
+<li><strong>uid_max</strong> &#8211; Max value for automatic user/group ID selection <em>(Optional)</em></li>
+<li><strong>gid</strong> &#8211; Name or ID of the primary group of the new account <em>(Optional)</em></li>
+<li><strong>groups</strong> &#8211; List of supplementary groups of the new account <em>(Optional)</em></li>
+<li><strong>system</strong> &#8211; Create a system account <em>(Optional)</em></li>
+<li><strong>password</strong> &#8211; Encrypted password of the new account <em>(Optional)</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.usermod">
-<code class="descname">usermod</code><span class="sig-paren">(</span><em>user</em>, <em>passwd=None</em>, <em>home=None</em>, <em>uid=None</em>, <em>gid=None</em>, <em>groups=None</em>, <em>shell=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.usermod" title="Permalink to this definition">¶</a></dt>
+<code class="descname">usermod</code><span class="sig-paren">(</span><em>user</em>, <em>password=None</em>, <em>home=None</em>, <em>uid=None</em>, <em>gid=None</em>, <em>groups=None</em>, <em>shell=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.usermod" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

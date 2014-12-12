@@ -109,15 +109,49 @@
 <h1>User Utils<a class="headerlink" href="#user-utils" title="Permalink to this headline">¶</a></h1>
 <p>Debian user helpers for other blueprints to use.</p>
 <dl class="function">
-<dt id="blues.user.create">
-<code class="descname">create</code><span class="sig-paren">(</span><em>name</em>, <em>home=None</em>, <em>groups=None</em>, <em>system=True</em>, <em>service=False</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.user.create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a system user</p>
+<dt id="blues.user.create_service_user">
+<code class="descname">create_service_user</code><span class="sig-paren">(</span><em>name</em>, <em>groups=None</em>, <em>home=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.user.create_service_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a service user/group with a low UID, starting at 100 and counting upwards.
+Home dir and extra groups to join will not be created.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; Username</li>
+<li><strong>home</strong> &#8211; Home dir path (will not be created) <em>(Optional)</em></li>
+<li><strong>groups</strong> &#8211; Existing extra groups to join <em>(Optional)</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="blues.user.create_ssh_path">
 <code class="descname">create_ssh_path</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.user.create_ssh_path" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="blues.user.create_system_user">
+<code class="descname">create_system_user</code><span class="sig-paren">(</span><em>name</em>, <em>groups=None</em>, <em>home=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.user.create_system_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a system user/group with a low UID, starting at 999 and counting downwards.
+Extra groups to join will not be created.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; Username</li>
+<li><strong>home</strong> &#8211; Home dir path to set and create <em>(Optional)</em></li>
+<li><strong>groups</strong> &#8211; Existing extra groups to join <em>(Optional)</em></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="blues.user.set_strict_host_checking">
