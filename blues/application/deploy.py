@@ -26,6 +26,7 @@ def install_project_user():
     Create project user and groups.
     Create user home dir.
     Disable ssh host checking.
+    Create log dir.
     """
     with sudo():
         info('Install application user')
@@ -37,6 +38,10 @@ def install_project_user():
 
         # Configure ssh for github
         user.set_strict_host_checking(username, 'github.com')
+
+        # Create application log path
+        application_log_path = os.path.join('/var', 'log', username)
+        debian.mkdir(application_log_path, group='app-data', mode=1775)
 
 
 def install_project_structure():
@@ -57,10 +62,6 @@ def install_project_structure():
         media_path = os.path.join(static_base, 'media')
         debian.mkdir(static_path, group='www-data', mode=1775)
         debian.mkdir(media_path, group='www-data', mode=1775)
-
-        # Create application log path
-        application_log_path = os.path.join('/var', 'log', project_name)
-        debian.mkdir(application_log_path, group='app-data', mode=1775)
 
 
 def install_system_dependencies():
