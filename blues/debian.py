@@ -185,7 +185,7 @@ def get_group(name):
         return None
 
 
-def groupadd(name, gid=None, gid_min=None, gid_max=None):
+def groupadd(name, gid=None, gid_min=None, gid_max=None, system=False):
     group = get_group(name)
     if not group:
         options = []
@@ -195,6 +195,8 @@ def groupadd(name, gid=None, gid_min=None, gid_max=None):
             options.append("-K GID_MIN='%s'" % gid_min)
         if gid_max:
             options.append("-K GID_MAX='%s'" % gid_max)
+        if system:
+            options.append('-r')
         run("groupadd %s '%s'" % (' '.join(options), name))
     else:
         if gid is not None and group.get('gid') != gid:
