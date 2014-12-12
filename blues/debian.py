@@ -25,7 +25,7 @@ from refabric.utils import info
 
 def chmod(location, mode=None, owner=None, group=None, recursive=False):
     if mode:
-        run('chmod %s %s "%s"' % (recursive and '-R ' or '', mode,  location))
+        run('chmod %s %s %s' % (recursive and '-R ' or '', mode,  location))
     if owner:
         chown(location, owner=owner, group=group, recursive=recursive)
     elif group:
@@ -34,11 +34,11 @@ def chmod(location, mode=None, owner=None, group=None, recursive=False):
 
 def chown(location, owner, group=None, recursive=False):
     owner = '{}:{}'.format(owner, group) if group else owner
-    run('chown {} {} "{}"'.format(recursive and '-R ' or '', owner, location))
+    run('chown {} {} {}'.format(recursive and '-R ' or '', owner, location))
 
 
 def chgrp(location, group, recursive=False):
-    run('chgrp %s %s "%s"' % (recursive and '-R ' or '', group, location))
+    run('chgrp %s %s %s' % (recursive and '-R ' or '', group, location))
 
 
 def rm(location, recursive=False, force=True):
