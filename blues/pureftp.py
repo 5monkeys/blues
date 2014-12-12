@@ -53,8 +53,11 @@ def setup():
 def install():
     with sudo():
         debian.apt_get('install', 'pure-ftpd', 'openssl')
-        user.create(ftp_user, groups=[ftp_group], service=True)
 
+        # Create ftp user
+        user.create_service_user(ftp_user, groups=[ftp_group])
+
+        # Create ftp root dir
         debian.mkdir(ftp_root, mode=1770, owner=ftp_user, group=ftp_group)
 
         # Set up symlinks

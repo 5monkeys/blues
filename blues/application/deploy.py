@@ -34,7 +34,7 @@ def install_project_user():
         home_path = project_home()
 
         # Get UID for project user
-        user.create(username, home_path, groups=[username, 'app-data', 'www-data'])
+        user.create_system_user(username, groups=['app-data', 'www-data'], home=home_path)
 
         # Configure ssh for github
         user.set_strict_host_checking(username, 'github.com')

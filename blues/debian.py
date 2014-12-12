@@ -207,71 +207,79 @@ def groupmod(name, gid):
     run("groupmod -g %s '%s'" % (gid, name))
 
 
-def useradd(name, passwd=None, home=None, create_home=True, skeleton=True, shell=None,
-            user_group=False, uid=None, uid_min=None, uid_max=None, gid=None, groups=None,
-            encrypted_passwd=False, system=False):
+def useradd(name, home=None, create_home=False, shell=None, uid=None, uid_min=None, uid_max=None,
+            user_group=False, gid=None, groups=None, system=False, password=None):
+    """
+    Create a new user or update default new user information
+
+    :param name: The username
+    :param home: Home directory of the new account. Will not create dir. *(Optional)*
+    :param create_home: Create the user's home directory *(Default: False)*
+    :param shell: Login shell of the new account *(Optional)*
+    :param user_group: Create a group with the same name as the user *(Default: False)*
+    :param uid: User ID of the new account *(Optional)*
+    :param uid_min: Min value for automatic user/group ID selection *(Optional)*
+    :param uid_max: Max value for automatic user/group ID selection *(Optional)*
+    :param gid: Name or ID of the primary group of the new account *(Optional)*
+    :param groups: List of supplementary groups of the new account *(Optional)*
+    :param system: Create a system account *(Optional)*
+    :param password: Encrypted password of the new account *(Optional)*
+    """
     user = get_user(name)
 
     if not user:
         options = []
-        if not create_home:
-            options.append("-M")
-            skeleton = False
         if home:
-            options.append("-d '%s'" % home)
-            if skeleton:
-                options.append("-m")
-            elif create_home:
-                # Create home manually if no skeleton wanted, chown'ed below
-                options.append("-M")
-                if not fabric.contrib.files.exists(home):
-                    mkdir(home)
-        if system:
-            options.append('-r')
-        if uid:
-            options.append("-u '%s'" % uid)
-        if not gid and get_group(name):  # If group already exists but not specified, useradd fails
-            gid = name
-        if gid:
-            options.append("-g '%s'" % gid)
-        if groups:
-            options.append("-G '%s'" % ','.join(groups))
-        if user_group:
-            options.append("-U")
+            options.append("-d '%s'" % home)  # home directory of the new account (will not create)
+
+        if create_home:
+            options.append('-m')  # create the user's home directory
         else:
-            options.append("-N")
+            options.append("-M")  # do not create the user's home directory
+
+        if system:
+            options.append('-r')  # create a system account
+
+        if uid:
+            options.append("-u '%s'" % uid)  # user ID of the new account
+
+        if groups:
+            options.append("-G '%s'" % ','.join(groups))  # list of supplementary groups of the new account
+
+        if user_group:
+            options.append("-U")  # create a group with the same name as the user
+            if not gid and get_group(name):
+                gid = name  # Automatically set gid to user name if the group already exists, otherwise useradd fails.
+        else:
+            options.append("-N")  # do not create a group with the same name as the user
+
+        if gid:
+            options.append("-g '%s'" % gid)  # name or ID of the primary group of the new account
+
         if shell:
-            options.append("-s '%s'" % shell)
+            options.append("-s '%s'" % shell)  # login shell of the new account
+
         if uid_min:
-            options.append("-K UID_MIN='%s'" % uid_min)
+            options.append("-K UID_MIN='%s'" % uid_min)  # Min value for automatic user ID selection
             if user_group:
-                options.append("-K GID_MIN='%s'" % uid_min)
+                options.append("-K GID_MIN='%s'" % uid_min)  # Min value for automatic group ID selection
+
         if uid_max:
-            options.append("-K UID_MAX='%s'" % uid_max)
+            options.append("-K UID_MAX='%s'" % uid_max)  # Max value for automatic user ID selection
             if user_group:
-                options.append("-K GID_MAX='%s'" % uid_max)
+                options.append("-K GID_MAX='%s'" % uid_max)  # Max value for automatic group ID selection
 
-        run("useradd %s '%s'" % (' '.join(options), name))
+        if password:
+            options.append("-p %s" % password)  # encrypted password of the new account
 
-        # Change owner to manually created skeleton-less home dir
-        if create_home and home and not skeleton:
-            if user_group:
-                group = name
-            elif groups:
-                group = groups[0]
-            else:
-                group = 'nogroup'
-            chmod(home, mode=755, owner=name, group=group)
-
-        # Set password
-        if passwd:
-            chpasswd(name, passwd, encrypted_passwd)
+        # Create the user
+        run("useradd {options} '{username}'".format(options=' '.join(options), username=name))
 
     else:
-        usermod(user, passwd=passwd, home=home, uid=uid, gid=gid, groups=groups, shell=shell)
+        usermod(user, password=password, home=home, uid=uid, gid=gid, groups=groups, shell=shell)
 
 
-def usermod(user, passwd=None, home=None, uid=None, gid=None, groups=None, shell=None):
+def usermod(user, password=None, home=None, uid=None, gid=None, groups=None, shell=None):
     if isinstance(user, basestring):
         user = get_user(user)
 
@@ -288,13 +296,13 @@ def usermod(user, passwd=None, home=None, uid=None, gid=None, groups=None, shell
         options.append("-s '%s'" % shell)
     if options:
         run("usermod %s '%s'" % (' '.join(options), user['name']))
-    if passwd:
-        chpasswd(user['name'], passwd)
+    if password:
+        chpasswd(user['name'], password)
 
 
-def chpasswd(name, passwd, encrypted_passwd=False):
+def chpasswd(name, password, encrypted_passwd=False):
     with silent():
-        encoded_password = base64.b64encode('%s:%s' % (name, passwd))
+        encoded_password = base64.b64encode('%s:%s' % (name, password))
         encryption = ' -e' if encrypted_passwd else ''
         run('echo %s | base64 --decode | chpasswd%s' % encoded_password, encryption)
 

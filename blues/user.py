@@ -14,36 +14,37 @@ from refabric.context_managers import sudo
 from . import debian
 
 
-def create(name, home=None, groups=None, system=True, service=False):
+def create_system_user(name, groups=None, home=None):
     """
-    Create a system user
+    Create a system user/group with a low UID, starting at 999 and counting downwards.
+    Extra groups to join will not be created.
+
+    :param name: Username
+    :param home: Home dir path to set and create *(Optional)*
+    :param groups: Existing extra groups to join *(Optional)*
     """
-    shell = '/bin/bash'
-    create_home = True
-    id_min = None
-    id_max = None
+    with sudo():
+        # Create user, not home dir
+        debian.useradd(name, home=home or '/dev/null', create_home=bool(home), shell='/bin/bash',
+                       user_group=True, groups=groups, system=True)
 
-    if not home:
-        home = '/dev/null'
+        # Create ~/.ssh dir
+        create_ssh_path(name)
 
-    if not system:
-        service = True
 
-    if service:
-        shell = '/bin/false'
-        create_home = False
-        id_min = 100
-        id_max = 499
-        system = False
+def create_service_user(name, groups=None, home=None):
+    """
+    Create a service user/group with a low UID, starting at 100 and counting upwards.
+    Home dir and extra groups to join will not be created.
 
-    with sudo(user='root'):
-        for group in groups or []:
-            debian.groupadd(group, gid_min=id_min, gid_max=id_max)
-
-        debian.useradd(name, system=system, home=home, create_home=create_home,
-                       uid_min=id_min, uid_max=id_max, shell=shell, groups=groups)
-        if system:
-            create_ssh_path(name)
+    :param name: Username
+    :param home: Home dir path (will not be created) *(Optional)*
+    :param groups: Existing extra groups to join *(Optional)*
+    """
+    with sudo():
+        # Create user, not home dir
+        debian.useradd(name, home=home or '/dev/null', shell='/bin/false',
+                       user_group=True, groups=groups, uid_min=100, uid_max=499)
 
 
 def create_ssh_path(username):
