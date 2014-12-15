@@ -41,7 +41,7 @@ def install():
         run('easy_install -0 pip')
         run('touch {}'.format(pip_log_file))
         debian.chmod(pip_log_file, mode=777)
-
+        pip('install', 'setuptools', '--upgrade')
 
 def pip(command, *options):
     info('Running pip {}', command)
