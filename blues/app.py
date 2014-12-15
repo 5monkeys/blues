@@ -11,6 +11,7 @@ Application Blueprint
 
     settings:
       app:
+        project: project_name                         # Name of project/application
         git_url: git@github.com:foo/bar.git[@branch]  # Git repository to clone
         # git_branch: master                          # Branch to clone, if not specified in `git_url` setting
         # git_source: ./                              # Relative path within repository added to python path (Default: src/)

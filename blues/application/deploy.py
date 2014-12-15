@@ -33,8 +33,13 @@ def install_project_user():
         username = blueprint.get('project')
         home_path = project_home()
 
+        # Setup groups for project user
+        project_user_groups = ['app-data', 'www-data']
+        for group in project_user_groups:
+            debian.groupadd(group, gid_min=10000)
+
         # Get UID for project user
-        user.create_system_user(username, groups=['app-data', 'www-data'], home=home_path)
+        user.create_system_user(username, groups=project_user_groups, home=home_path)
 
         # Configure ssh for github
         user.set_strict_host_checking(username, 'github.com')
