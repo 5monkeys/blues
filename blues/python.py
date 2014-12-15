@@ -38,7 +38,7 @@ def install():
     with sudo():
         info('Install python dependencies')
         debian.apt_get('install', 'python-dev', 'python-setuptools')
-        run('easy_install -0 pip')
+        run('easy_install pip')
         run('touch {}'.format(pip_log_file))
         debian.chmod(pip_log_file, mode=777)
         pip('install', 'setuptools', '--upgrade')
