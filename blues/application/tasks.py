@@ -13,7 +13,7 @@ from .providers import get_providers
 from .. import git
 from ..app import blueprint
 
-__all__ = ['setup', 'configure', 'deploy', 'reload', 'start', 'stop', 'configure_providers', 'generate_nginx_conf']
+__all__ = []
 
 
 @task
@@ -71,16 +71,6 @@ def deploy(auto_reload=True):
 
 
 @task
-def reload():
-    """
-    Reload all application providers on current host
-    """
-    providers = get_providers(env.host_string)
-    for provider in providers.values():
-        provider.reload()
-
-
-@task
 def start():
     """
     Start all application providers on current host
@@ -98,6 +88,16 @@ def stop():
     providers = get_providers(env.host_string)
     for provider in providers.values():
         provider.stop()
+
+
+@task
+def reload():
+    """
+    Reload all application providers on current host
+    """
+    providers = get_providers(env.host_string)
+    for provider in providers.values():
+        provider.reload()
 
 
 @task
