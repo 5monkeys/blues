@@ -48,7 +48,7 @@ Application Blueprint
 
       # Do not forget to configure the providers properly
       # uwsgi:
-      #   version: 1.3
+      #   version: 2.0.8
       # supervisor:
       #   version: 3.1.3
 

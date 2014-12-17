@@ -14,7 +14,7 @@ Currently only acts as a provider for the application blueprint and can not be u
 
     settings:
       uwsgi:
-        version: 1.3  # Version of uWSGI to install (Required)
+        version: 2.0.8  # Version of uWSGI to install (Required)
 
 """
 import os
