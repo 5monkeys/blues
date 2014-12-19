@@ -38,7 +38,7 @@ def manage(cmd=''):
     if not cmd:
         cmd = prompt('Enter django management command:')
     with sudo_project(), cd(python_path()), virtualenv.activate(virtualenv_path()), hide_prefix():
-        return run('python manage.py {cmd}'.format(cmd=cmd))
+        return run('python {manage} {cmd}'.format(cmd=cmd, manage=blueprint.get('manage', 'manage.py')))
 
 
 @task
