@@ -58,11 +58,11 @@ def deploy(auto_reload=True):
         requirements_changed, _, _ = git.diff_stat(git_repository_path(), commit_range, requirements)
 
         # Install repo requirements.txt
-        info('Install requirements')
+        info('Install requirements {}', requirements)
         if requirements_changed:
             install_requirements()
         else:
-            info(indent('(requirements not changed...skipping)'))
+            info(indent('(requirements not changed in {}...skipping)'), commit_range)
 
         if auto_reload:
             reload()
