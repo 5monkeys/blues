@@ -44,7 +44,7 @@ restart = debian.service_task('postgresql', 'restart')
 reload = debian.service_task('postgresql', 'reload')
 
 version = lambda: blueprint.get('version', '9.1')
-postgres_root = lambda: '/etc/postgresql/{}/main/'.format(version())
+postgres_root = lambda *a: os.path.join('/etc/postgresql/{}/main/'.format(version()), *a)
 
 
 def install():
@@ -81,9 +81,10 @@ def configure():
     """
     Configure Postgresql
     """
-    updates = blueprint.upload(os.path.join('.', 'postgresql-{}.conf'.format(version())),
-                               os.path.join(postgres_root(), 'postgresql.conf'))
-    if updates:
+    updates = [blueprint.upload(os.path.join('.', 'pgtune.conf'), postgres_root()),
+               blueprint.upload(os.path.join('.', 'postgresql-{}.conf'.format(version())),
+                                postgres_root('postgresql.conf'))]
+    if any(updates):
         restart()
 
 
@@ -150,7 +151,7 @@ def generate_pgtune_conf(role='db'):
 
     :param role: Which fabric role to place local pgtune.conf template under
     """
-    conf_path = os.path.join(postgres_root(), 'postgresql.conf')
+    conf_path = postgres_root('postgresql.conf')
     with sudo(), silent():
         output = run('pgtune -T Web -i {}'.format(conf_path)).strip()
 
