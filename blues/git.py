@@ -124,18 +124,29 @@ def diff_stat(repository_path=None, commit='HEAD^', path=None):
         repository_path = debian.pwd()
 
     with cd(repository_path), silent():
-        output = run('git diff --shortstat {} {}'.format(commit, path), pty=False)
 
-        # 719 files changed, 104452 insertions(+), 29309 deletions(-)
-        pattern = '.*(\d+) .+, (\d+) .+, (\d+) .+'
-        match = re.match(pattern, output)
+        # Example output (note leading space):
+        #    719 files changed, 104452 insertions(+), 29309 deletions(-)
+        #    1 file changed, 1 insertion(+)
+        output = run('git diff --shortstat {} -- {}'.format(commit, path), pty=False)
+        parts = output.strip().split(', ') if output else []
+        changed, insertions, deletions = 0, 0, 0
 
-        if match:
-            stats = tuple(int(s) for s in match.groups())
-        else:
-            stats = 0, 0, 0
+        for part in parts:
+            match = re.match(r'^\s*(\d+)\s+(.+)$', part)
+            if not match:
+                raise ValueError('no regex match for {!r} in {!r}'.format(part, output))
+            n, label = match.groups()
+            if label.endswith('(+)'):
+                insertions = int(n)
+            elif label.endswith('(-)'):
+                deletions = int(n)
+            elif label.endswith('changed'):
+                changed = int(n)
+            else:
+                raise ValueError('unexpected git output')
 
-        return stats
+        return changed, insertions, deletions
 
 
 def current_tag(repository_path=None):
