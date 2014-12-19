@@ -11,10 +11,11 @@ Postgres Blueprint
 
     settings:
       postgres:
+        version: 9.3           # PostgreSQL version (required)
         schemas:
           some_schema_name:    # The schema name
             user: foo          # Username to connect to schema
-            password: bar      # Password to connect to schema
+            password: bar      # Password to connect to schema (optional)
 
 """
 import os
@@ -37,21 +38,22 @@ __all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
 
 blueprint = blueprints.get(__name__)
 
-postgres_root = '/etc/postgresql/9.1/main/'
-
 start = debian.service_task('postgresql', 'start')
 stop = debian.service_task('postgresql', 'stop')
 restart = debian.service_task('postgresql', 'restart')
 reload = debian.service_task('postgresql', 'reload')
+
+version = lambda: blueprint.get('version', '9.1')
+postgres_root = lambda *a: os.path.join('/etc/postgresql/{}/main/'.format(version()), *a)
 
 
 def install():
     with sudo():
         debian.apt_get('install',
                        'postgresql',
-                       'postgresql-server-dev-9.1',
+                       'postgresql-server-dev-{}'.format(version()),
                        'libpq-dev',
-                       'postgresql-contrib-9.1',
+                       'postgresql-contrib-{}'.format(version()),
                        'pgtune')
 
 
@@ -79,8 +81,10 @@ def configure():
     """
     Configure Postgresql
     """
-    updates = blueprint.upload('./', postgres_root)
-    if updates:
+    updates = [blueprint.upload(os.path.join('.', 'pgtune.conf'), postgres_root()),
+               blueprint.upload(os.path.join('.', 'postgresql-{}.conf'.format(version())),
+                                postgres_root('postgresql.conf'))]
+    if any(updates):
         restart()
 
 
@@ -91,13 +95,16 @@ def setup_schemas(drop=False):
 
     :param drop: Drop existing schemas before creation
     """
-    schemas = blueprint.get('schemas', [])
+    schemas = blueprint.get('schemas', {})
     with sudo('postgres'):
-        for schema, config in schemas:
-            user, password, schema = config['user'], config['password'], config['schema']
+        for schema, config in schemas.iteritems():
+            user, password = config['user'], config.get('password')
             info('Creating user {}', user)
-            _client_exec("CREATE USER %(user)s WITH PASSWORD '%(password)s'",
-                         user=user, password=password)
+            if password:
+                _client_exec("CREATE ROLE %(user)s WITH PASSWORD '%(password)s' LOGIN",
+                             user=user, password=password)
+            else:
+                _client_exec("CREATE ROLE %(user)s LOGIN", user=user)
             if drop:
                 info('Droping schema {}', schema)
                 _client_exec('DROP DATABASE %(name)s', name=schema)
@@ -144,7 +151,7 @@ def generate_pgtune_conf(role='db'):
 
     :param role: Which fabric role to place local pgtune.conf template under
     """
-    conf_path = os.path.join(postgres_root, 'postgresql.conf')
+    conf_path = postgres_root('postgresql.conf')
     with sudo(), silent():
         output = run('pgtune -T Web -i {}'.format(conf_path)).strip()
 
