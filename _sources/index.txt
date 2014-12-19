@@ -11,7 +11,7 @@ Dependencies
 
 `fabric` https://github.com/5monkeys/fabric/tree/develop
 `refabric` https://github.com/5monkeys/refabric/tree/develop
-`blues` https://github.com/5monkeys/blues
+`blues` https://github.com/5monkeys/blues  
 
 *Fabric fork is not needed when v1.11 is released.*
 
