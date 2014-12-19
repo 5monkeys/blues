@@ -81,8 +81,8 @@ def configure():
     """
     Configure Postgresql
     """
-    updates = blueprint.upload('./', postgres_root(),
-                               context={'version': version()})
+    updates = blueprint.upload(os.path.join('.', 'postgresql-{}.conf'.format(version())),
+                               os.path.join(postgres_root(), 'postgresql.conf'))
     if updates:
         restart()
 
