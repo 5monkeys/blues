@@ -15,7 +15,7 @@ Postgres Blueprint
         schemas:
           some_schema_name:    # The schema name
             user: foo          # Username to connect to schema
-            password: bar      # Password to connect to schema
+            password: bar      # Password to connect to schema (optional)
 
 """
 import os
@@ -81,7 +81,8 @@ def configure():
     """
     Configure Postgresql
     """
-    updates = blueprint.upload('./', postgres_root())
+    updates = blueprint.upload('./', postgres_root(),
+                               context={'version': version()})
     if updates:
         restart()
 
@@ -93,13 +94,16 @@ def setup_schemas(drop=False):
 
     :param drop: Drop existing schemas before creation
     """
-    schemas = blueprint.get('schemas', [])
+    schemas = blueprint.get('schemas', {})
     with sudo('postgres'):
-        for schema, config in schemas:
-            user, password, schema = config['user'], config['password'], config['schema']
+        for schema, config in schemas.iteritems():
+            user, password = config['user'], config.get('password')
             info('Creating user {}', user)
-            _client_exec("CREATE USER %(user)s WITH PASSWORD '%(password)s'",
-                         user=user, password=password)
+            if password:
+                _client_exec("CREATE ROLE %(user)s WITH PASSWORD '%(password)s'",
+                             user=user, password=password)
+            else:
+                _client_exec("CREATE ROLE %(user)s", user=user)
             if drop:
                 info('Droping schema {}', schema)
                 _client_exec('DROP DATABASE %(name)s', name=schema)
