@@ -50,6 +50,7 @@ def get_providers(host=None):
     # Remove provider name keys
     provider_name_keys = {worker_provider, web_provider}
     for provider_name in provider_name_keys:
-        providers.pop(provider_name)
+        if provider_name:
+            providers.pop(provider_name)
 
     return providers
