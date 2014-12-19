@@ -11,6 +11,7 @@ Postgres Blueprint
 
     settings:
       postgres:
+        version: 9.3           # PostgreSQL version (required)
         schemas:
           some_schema_name:    # The schema name
             user: foo          # Username to connect to schema
@@ -37,21 +38,22 @@ __all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
 
 blueprint = blueprints.get(__name__)
 
-postgres_root = '/etc/postgresql/9.1/main/'
-
 start = debian.service_task('postgresql', 'start')
 stop = debian.service_task('postgresql', 'stop')
 restart = debian.service_task('postgresql', 'restart')
 reload = debian.service_task('postgresql', 'reload')
+
+version = lambda: blueprint.get('version', '9.1')
+postgres_root = lambda: '/etc/postgresql/{}/main/'.format(version())
 
 
 def install():
     with sudo():
         debian.apt_get('install',
                        'postgresql',
-                       'postgresql-server-dev-9.1',
+                       'postgresql-server-dev-{}'.format(version()),
                        'libpq-dev',
-                       'postgresql-contrib-9.1',
+                       'postgresql-contrib-{}'.format(version()),
                        'pgtune')
 
 
@@ -79,7 +81,7 @@ def configure():
     """
     Configure Postgresql
     """
-    updates = blueprint.upload('./', postgres_root)
+    updates = blueprint.upload('./', postgres_root())
     if updates:
         restart()
 
@@ -144,7 +146,7 @@ def generate_pgtune_conf(role='db'):
 
     :param role: Which fabric role to place local pgtune.conf template under
     """
-    conf_path = os.path.join(postgres_root, 'postgresql.conf')
+    conf_path = os.path.join(postgres_root(), 'postgresql.conf')
     with sudo(), silent():
         output = run('pgtune -T Web -i {}'.format(conf_path)).strip()
 
