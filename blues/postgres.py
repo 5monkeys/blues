@@ -101,10 +101,10 @@ def setup_schemas(drop=False):
             user, password = config['user'], config.get('password')
             info('Creating user {}', user)
             if password:
-                _client_exec("CREATE ROLE %(user)s WITH PASSWORD '%(password)s'",
+                _client_exec("CREATE ROLE %(user)s WITH PASSWORD '%(password)s' LOGIN",
                              user=user, password=password)
             else:
-                _client_exec("CREATE ROLE %(user)s", user=user)
+                _client_exec("CREATE ROLE %(user)s LOGIN", user=user)
             if drop:
                 info('Droping schema {}', schema)
                 _client_exec('DROP DATABASE %(name)s', name=schema)
