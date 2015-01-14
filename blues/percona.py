@@ -28,7 +28,7 @@ from StringIO import StringIO
 
 import fabric.contrib.files
 import fabric.operations
-from fabric.context_managers import settings
+from fabric.context_managers import settings, shell_env
 from fabric.decorators import task
 from fabric.operations import prompt, os
 from fabric.utils import warn
@@ -177,7 +177,8 @@ def grant(schema, user, password, privs='ALL', host='localhost'):
 
 
 def client_exec(cmd, **kwargs):
-    return run('sudo su root -c "mysql -e \\"{}\\""'.format(cmd.format(**kwargs)), shell=False)
+    with shell_env():
+        return run('sudo su root -c "mysql -e \\"{}\\""'.format(cmd.format(**kwargs)), shell=False)
 
 
 @task
