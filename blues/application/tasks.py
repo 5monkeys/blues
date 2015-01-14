@@ -41,7 +41,7 @@ def configure():
 
 
 @task
-def deploy(auto_reload=True):
+def deploy(auto_reload=True, force=False):
     """
     Reset source to configured branch and install requirements, if needed
 
@@ -51,15 +51,18 @@ def deploy(auto_reload=True):
     previous_commit, current_commit = update_source()
     code_changed = previous_commit != current_commit
 
-    if code_changed:
-        # Check if requirements has changed
+    if code_changed or force:
         requirements = blueprint.get('requirements', 'requirements.txt')
-        commit_range = '{}..{}'.format(previous_commit, current_commit)
-        requirements_changed, _, _ = git.diff_stat(git_repository_path(), commit_range, requirements)
+        requirements_changed = False
+
+        if not force:
+            # Check if requirements has changed
+            commit_range = '{}..{}'.format(previous_commit, current_commit)
+            requirements_changed, _, _ = git.diff_stat(git_repository_path(), commit_range, requirements)
 
         # Install repo requirements.txt
         info('Install requirements {}', requirements)
-        if requirements_changed:
+        if requirements_changed or force:
             install_requirements()
         else:
             info(indent('(requirements not changed in {}...skipping)'), commit_range)
