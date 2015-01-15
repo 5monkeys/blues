@@ -46,9 +46,19 @@ def install():
 
 
 def clone(url, branch=None, repository_path=None, **kwargs):
+    """
+    Clone repository and branch.
+
+    :param url: Git url to clone
+    :param branch: Branch to checkout
+    :param repository_path: Destination
+    :param kwargs: Not used but here for easier kwarg passing
+    :return: (destination, got_cloned bool)
+    """
     repository = parse_url(url, branch=branch)
     name = repository['name']
     branch = repository['branch']
+    cloned = False
 
     if not repository_path:
         repository_path = os.path.join('.', name)
@@ -57,10 +67,11 @@ def clone(url, branch=None, repository_path=None, **kwargs):
         info('Cloning {}@{} into {}', url, branch, repository_path)
         cmd = 'git clone -b {branch} {remote} {name}'.format(branch=branch, remote=url, name=name)
         run(cmd)
+        cloned = True
     else:
         info('Git repository already cloned: {}', name)
 
-    return repository_path
+    return repository_path, cloned
 
 
 def reset(branch, repository_path=None, **kwargs):
