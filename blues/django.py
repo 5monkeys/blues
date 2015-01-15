@@ -77,8 +77,8 @@ def migrate():
     if version() >= (1, 7):
         manage('migrate ' + options)
     elif blueprint.get('use_south', True):
-        manage('migrate --merge ' + options)  # TODO: Remove --merge?
         manage('syncdb --noinput')  # TODO: Remove?
+        manage('migrate --merge ' + options)  # TODO: Remove --merge?
     else:
         manage('syncdb --noinput')
 
