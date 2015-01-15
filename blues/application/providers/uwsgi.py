@@ -2,8 +2,7 @@ import os
 
 from fabric.context_managers import settings
 from fabric.state import env
-from fabric.utils import indent
-
+from fabric.utils import indent, warn
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
@@ -30,9 +29,20 @@ class UWSGIProvider(BaseProvider):
 
         :return: Remote config path
         """
-        # Join config path and make sure that it ends with a slash
-        destination = os.path.join(project_home(), 'uwsgi.d', '')
+        destination = uwsgi.blueprint.get('emperor')
+
+        if '*' in destination:
+            # Destination can not be wildcard based
+            warn('uWsgi emperor vassals dir contains wildcard, skipping')
+            destination = None
+
+        if not destination:
+            # Join config path and make sure that it ends with a slash
+            destination = os.path.join(project_home(), 'uwsgi.d', '')
+
+        # Ensure destination exists
         debian.mkdir(destination)
+
         return destination
 
     def get_context(self):
@@ -104,6 +114,7 @@ class UWSGIProvider(BaseProvider):
 
         :return: Updated vassals
         """
+        # TODO: destination could be global (uwsgi.emperor setting) and therefore contain same vassal names (celery.ini)
         destination = self.get_config_path()
         context = super(UWSGIProvider, self).get_context()
         context.update({
