@@ -18,7 +18,7 @@ from .. import virtualenv
 from ..app import blueprint
 
 __all__ = ['install_project_user', 'install_project_structure', 'install_system_dependencies', 'install_virtualenv',
-           'install_requirements', 'install_source', 'update_source', 'install_providers']
+           'install_requirements', 'install_or_update_source', 'install_source', 'update_source', 'install_providers']
 
 
 def install_project_user():
@@ -103,6 +103,15 @@ def install_requirements():
             python.pip('install', '-r', requirements)
 
 
+def install_or_update_source():
+    """
+    Try to install source, if already installed then update.
+    """
+    new_install = install_source()
+    if not new_install:
+        update_source()
+
+
 def install_source():
     """
     Install git and clone application repository.
@@ -115,8 +124,9 @@ def install_source():
         debian.mkdir(path, owner=project, group=project)
         with cd(path):
             repository = git_repository()
-            git.clone(repository['url'], branch=repository['branch'])
+            path, cloned = git.clone(repository['url'], branch=repository['branch'])
 
+    return cloned
 
 def update_source():
     """

@@ -24,7 +24,7 @@ def setup():
     install_project_structure()
     install_project_user()
     install_system_dependencies()
-    install_source()
+    install_or_update_source()
     install_virtualenv()
     install_requirements()
     install_providers()
