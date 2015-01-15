@@ -80,7 +80,9 @@ def configure():
     """
     with sudo():
         # Upload templates
-        blueprint.upload('init/', '/etc/init/')
+        blueprint.upload('init/', '/etc/init/', context={
+            'emperor': blueprint.get('emperor')
+        })
 
 
 @task
