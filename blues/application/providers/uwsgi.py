@@ -138,7 +138,11 @@ class UWSGIProvider(BaseProvider):
 
         :return: Set of vassal.ini file names
         """
-        vassals = {'celery.ini'}
+        vassals = set()
+
+        if blueprint.get('worker'):
+            vassals.add('celery.ini')
+
         # Filter vassal extensions by host
         extensions = blueprint.get('worker.extensions')
         if isinstance(extensions, list):
@@ -150,6 +154,7 @@ class UWSGIProvider(BaseProvider):
             for extension, extension_host in extensions.items():
                 if extension_host in ('*', env.host_string):
                     vassals.add('{}.ini'.format(extension))
+
         return vassals
 
     def list_vassals(self):
