@@ -40,7 +40,7 @@ class UWSGIProvider(BaseProvider):
             # Join config path and make sure that it ends with a slash
             destination = os.path.join(project_home(), 'uwsgi.d', '')
 
-        with sudo():
+        with sudo('root'):
             # Ensure destination exists
             debian.mkdir(destination)
 
