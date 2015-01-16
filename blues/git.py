@@ -95,7 +95,7 @@ def reset(branch, repository_path=None, **kwargs):
         ]
         with silent():
             output = run(' && '.join(commands))
-            output = output.split(os.linesep)[-1].lstrip('HEAD is now at ')
+            output = output.split(os.linesep)[-1][len('HEAD is now at '):]
             commit = output.split()[0]
             info('HEAD is now at: {}', output)
 
