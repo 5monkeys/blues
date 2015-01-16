@@ -143,8 +143,8 @@ def generate_nginx_conf(role='www'):
         'ip_hash': blueprint.get('web.ip_hash', False)
     }
     template = 'nginx/site.conf'
-    daemon = blueprint.get('wsgi.daemon')
-    if daemon and daemon == 'uwsgi':
+    web_provider = blueprint.get('web.provider')
+    if web_provider and web_provider == 'uwsgi':
         template = 'nginx/uwsgi_site.conf'
     conf = blueprint.render_template(template, context)
     conf_dir = os.path.join(os.path.dirname(env['real_fabfile']), 'templates', role, 'nginx',
