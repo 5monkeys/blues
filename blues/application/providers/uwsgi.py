@@ -31,7 +31,7 @@ class UWSGIProvider(BaseProvider):
         """
         destination = uwsgi.blueprint.get('emperor')
 
-        if '*' in destination:
+        if destination and '*' in destination:
             # Destination can not be wildcard based
             warn('uWsgi emperor vassals dir contains wildcard, skipping')
             destination = None
