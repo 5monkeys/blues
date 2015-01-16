@@ -128,10 +128,15 @@ def generate_nginx_conf(role='www'):
     Genereate nginx site config for web daemon
     """
     name = blueprint.get('project')
-    socket = blueprint.get('wsgi.socket', default='0.0.0.0:3030')
+    socket = blueprint.get('web.socket', default='0.0.0.0:3030')
     host, _, port = socket.partition(':')
     if port:
-        sockets = ['{}:{}'.format(host, port) for host in env.hosts]
+        if len(env.hosts) > 1:
+            # Multiple hosts -> Bind upstream to each host:port
+            sockets = ['{}:{}'.format(host, port) for host in env.hosts]
+        else:
+            # Single host -> Bind upstream to unique configured socket
+            sockets = [socket]
     else:
         sockets = ['unix:{}'.format(socket)]
 
