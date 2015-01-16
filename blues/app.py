@@ -25,6 +25,7 @@ Application Blueprint
         web:                                          # Enable web workers
           provider: uwsgi                             # Set web provider
           # module: foobar.wsgi                       # Set wsgi module (Default: django.core.handlers.wsgi:WSGIHandler())
+          # socket: 127.0.0.1:3031                    # Set vassal socket (Default: 0.0.0.0:3030)
           # hosts:                                    # Optional host list restricting web provider installation
           #   - 10.0.0.10
           #   - 10.0.0.11

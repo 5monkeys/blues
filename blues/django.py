@@ -11,6 +11,9 @@ Management helper blueprint.
     blueprints:
       - blues.django
 
+    settings:
+        # manage: ../manage.py  # Manage module relative to python path; ./src (Default: manage.py)
+
 """
 from fabric.context_managers import cd
 from fabric.decorators import task, runs_once
