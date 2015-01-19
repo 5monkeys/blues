@@ -18,6 +18,7 @@ Solr Blueprint
 import os
 
 from fabric.context_managers import cd, settings
+from fabric.contrib import files
 from fabric.decorators import task, parallel
 
 from refabric.api import info, run
@@ -63,8 +64,8 @@ def install():
 def install_user():
     with sudo():
         user.create_service_user('solr', home=solr_home)
+        # Home dir will be created by solr installation (symbolic link)
 
-        debian.mkdir(solr_home, mode=755, owner='solr', group='solr')
         debian.mkdir('/var/lib/solr', mode=755, owner='solr', group='solr')
         debian.mkdir('/var/log/solr', mode=755, owner='solr', group='solr')
 
@@ -86,8 +87,14 @@ def install_solr():
             info('Extracting archive...')
             with silent():
                 run('tar xzf {}'.format(archive))
-                debian.mv(os.path.splitext(archive)[0], solr_home)
-                debian.chmod(solr_home, 755, 'solr', 'solr', recursive=True)
+                solr_version_dir = os.path.splitext(archive)[0]
+                solr_version_path = os.path.join('/usr', 'share', solr_version_dir)
+                debian.chmod(solr_version_path, 755, 'solr', 'solr', recursive=True)
+                if files.exists(solr_version_path):
+                    info('Found same existing version, removing it...')
+                    debian.rm(solr_version_path, recursive=True)
+                debian.mv(solr_version_dir, '/usr/share/')
+                debian.ln(solr_version_path, solr_home)
                 debian.rm(archive)
 
 
