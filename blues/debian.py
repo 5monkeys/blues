@@ -60,7 +60,7 @@ def mv(source, destination, force=True):
 
 def ln(source, destination, symbolic=True, force=True, mode=None, owner=None, group=None):
     force = force and '-f' or ''
-    symbolic = symbolic and '-s' or ''
+    symbolic = symbolic and '-sn' or ''
     run('ln %s %s "%s" "%s"' % (symbolic, force, source, destination))
     chmod(destination, mode, owner, group)
 
