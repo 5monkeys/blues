@@ -436,9 +436,9 @@ def get_mount(mount_point):
     :param str mount_point: Name of mount point to reslve
     :return str: Mounted file system
     """
-    with silent():
+    with silent('warnings'):
         output = run('egrep ".+ {} .+" /proc/mounts'.format(mount_point))
-        if output:
+        if output.return_code == 0:
             file_system = output.stdout.split()[0]
             return file_system
 
@@ -471,8 +471,9 @@ def mount(mount_point, owner=None, group=None, **fstab):
             # Ensure mount point dir exists
             mkdir(mount_point, owner=owner, group=group, mode=755)
 
-            info('Mounting {}', mount_point)
-            run('mount {}'.format(mount_point))
+            with silent():
+                info('Mounting {}', mount_point)
+                run('mount {}'.format(mount_point))
 
 
 def unmount(mount_point):
@@ -481,7 +482,8 @@ def unmount(mount_point):
 
     :param str mount_point: Name of mount point to unmount
     """
-    with sudo():
+    with sudo(), silent():
+        info('Unmounting {}', mount_point)
         run('umount {}'.format(mount_point))
 
 
@@ -497,7 +499,7 @@ def add_fstab(filesystem=None, mount_point=None, type='auto', options='rw', dump
     :param str dump: Used by the dump utility to decide when to make a backup, 0|1 (Default: 0)
     :param str pazz: Used by fsck to decide which order filesystems are to be checked (Default: 0)
     """
-    with sudo(), fabric.context_managers.cd('/etc'):
+    with sudo():
         fstab_line = '{fs} {mount} {type} {options} {dump} {pazz}'.format(
             fs=filesystem,
             mount=mount_point,
@@ -508,12 +510,14 @@ def add_fstab(filesystem=None, mount_point=None, type='auto', options='rw', dump
         )
 
         # Add mount to /etc/fstab if not already there (?)
-        if not fabric.contrib.files.contains('fstab', fstab_line, use_sudo=True, exact=True, escape=True):
-            info('Adding fstab: {} on {}', filesystem, mount_point)
-            fabric.contrib.files.append('fstab', fstab_line, use_sudo=True)
+        with silent():
+            output = run('cat /etc/fstab')
+            fstab = output.stdout
+            if fstab_line not in fstab.split('\n'):  # TODO: Handle comments
+                info('Adding fstab: {} on {}', filesystem, mount_point)
+                fabric.contrib.files.append('/etc/fstab', fstab_line, use_sudo=True)
 
         # Unmount any previous mismatching mount point
         mounted_file_system = get_mount(mount_point)
         if mounted_file_system and mounted_file_system != filesystem:
-            info('Unmounting {} from {}', mount_point, mounted_file_system)
             unmount(mount_point)
