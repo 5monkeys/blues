@@ -18,6 +18,7 @@ import re
 from fabric.context_managers import cd
 from fabric.contrib import files
 from fabric.decorators import task
+from fabric.utils import warn
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
@@ -66,8 +67,13 @@ def clone(url, branch=None, repository_path=None, **kwargs):
     if not files.exists(os.path.join(repository_path, '.git')):
         info('Cloning {}@{} into {}', url, branch, repository_path)
         cmd = 'git clone -b {branch} {remote} {name}'.format(branch=branch, remote=url, name=name)
-        run(cmd)
-        cloned = True
+        with silent():
+            output = run(cmd)
+            if output.return_code != 0:
+                warn('Failed to clone repository "{}", probably permission denied!'.format(name))
+                cloned = None
+            else:
+                cloned = True
     else:
         info('Git repository already cloned: {}', name)
 
@@ -80,6 +86,8 @@ def reset(branch, repository_path=None, **kwargs):
 
     :return: commit
     """
+    commit = None
+
     if not repository_path:
         repository_path = debian.pwd()
 
@@ -95,9 +103,12 @@ def reset(branch, repository_path=None, **kwargs):
         ]
         with silent():
             output = run(' && '.join(commands))
-            output = output.split(os.linesep)[-1][len('HEAD is now at '):]
-            commit = output.split()[0]
-            info('HEAD is now at: {}', output)
+            if output.return_code != 0:
+                warn('Failed to reset repository "{}", probably permission denied!'.format(name))
+            else:
+                output = output.split(os.linesep)[-1][len('HEAD is now at '):]
+                commit = output.split()[0]
+                info('HEAD is now at: {}', output)
 
     return commit
 
