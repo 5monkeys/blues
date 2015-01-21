@@ -49,7 +49,7 @@ def deploy(auto_reload=True, force=False):
     """
     # Reset git repo
     previous_commit, current_commit = update_source()
-    code_changed = previous_commit != current_commit
+    code_changed = current_commit is not None and previous_commit != current_commit
 
     if code_changed or force:
         requirements = blueprint.get('requirements', 'requirements.txt')
