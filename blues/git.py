@@ -66,14 +66,14 @@ def clone(url, branch=None, repository_path=None, **kwargs):
 
     if not files.exists(os.path.join(repository_path, '.git')):
         info('Cloning {}@{} into {}', url, branch, repository_path)
-        cmd = 'git clone -b {branch} {remote} {name}'.format(branch=branch, remote=url, name=name)
-        with silent():
+        with silent('warnings'):
+            cmd = 'git clone -b {branch} {remote} {name}'.format(branch=branch, remote=url, name=name)
             output = run(cmd)
-            if output.return_code != 0:
-                warn('Failed to clone repository "{}", probably permission denied!'.format(name))
-                cloned = None
-            else:
-                cloned = True
+        if output.return_code != 0:
+            warn('Failed to clone repository "{}", probably permission denied!'.format(name))
+            cloned = None
+        else:
+            cloned = True
     else:
         info('Git repository already cloned: {}', name)
 
@@ -94,21 +94,23 @@ def reset(branch, repository_path=None, **kwargs):
     with cd(repository_path):
         name = os.path.basename(repository_path)
         info('Resetting git repository: {}@{}', name, branch)
-        commands = [
-            'git fetch origin',  # Fetch branches and tags
-            'git reset --hard HEAD',  # Make hard reset to HEAD
-            'git clean -fdx',  # Remove untracked files pyc, xxx~ etc
-            'git checkout HEAD',  # Checkout HEAD
-            'git reset refs/remotes/origin/{} --hard'.format(branch)  # Reset to branch
-        ]
-        with silent():
+
+        with silent('warnings'):
+            commands = [
+                'git fetch origin',  # Fetch branches and tags
+                'git reset --hard HEAD',  # Make hard reset to HEAD
+                'git clean -fdx',  # Remove untracked files pyc, xxx~ etc
+                'git checkout HEAD',  # Checkout HEAD
+                'git reset refs/remotes/origin/{} --hard'.format(branch)  # Reset to branch
+            ]
             output = run(' && '.join(commands))
-            if output.return_code != 0:
-                warn('Failed to reset repository "{}", probably permission denied!'.format(name))
-            else:
-                output = output.split(os.linesep)[-1][len('HEAD is now at '):]
-                commit = output.split()[0]
-                info('HEAD is now at: {}', output)
+
+        if output.return_code != 0:
+            warn('Failed to reset repository "{}", probably permission denied!'.format(name))
+        else:
+            output = output.split(os.linesep)[-1][len('HEAD is now at '):]
+            commit = output.split()[0]
+            info('HEAD is now at: {}', output)
 
     return commit
 
