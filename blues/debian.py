@@ -33,7 +33,7 @@ def chmod(location, mode=None, owner=None, group=None, recursive=False):
 
 
 def chown(location, owner, group=None, recursive=False):
-    owner = '{}:{}'.format(owner, group) if group else owner
+    owner = '{}:{}'.format(owner, group if group else owner)
     run('chown {} {} {}'.format(recursive and '-R ' or '', owner, location))
 
 
@@ -99,7 +99,6 @@ def temporary_dir(mode=None):
         yield path
     finally:
         rm(path, recursive=True)
-
 
 
 def lbs_release():
@@ -427,3 +426,94 @@ def sighup(process=None):
         abort('Missing process argument, sighup:<process>')
 
     kill('HUP', process)
+
+
+def get_mount(mount_point):
+    """
+    Resolve a mount point to mounted file system.
+    If not mounted, return None.
+
+    :param str mount_point: Name of mount point to reslve
+    :return str: Mounted file system
+    """
+    with silent():
+        output = run('egrep ".+ {} .+" /proc/mounts'.format(mount_point))
+        if output:
+            file_system = output.stdout.split()[0]
+            return file_system
+
+
+def is_mounted(mount_point):
+    """
+    Check if mount point is mounted.
+
+    :param mount_point: Name of mount point
+    :return bool:
+    """
+    return get_mount(mount_point) is not None
+
+
+def mount(mount_point, owner=None, group=None, **fstab):
+    """
+    Mount and optionally add configuration to fstab.
+
+    :param str mount_point: Name of mount point
+    :param str owner: Name of mount point owner
+    :param str group: Name of mount point group
+    :param dict fstab: Optional kwargs passed to add_fstab()
+    """
+    with sudo():
+        if fstab:
+            add_fstab(mount_point=mount_point, **fstab)
+
+        # Mount
+        if not is_mounted(mount_point):
+            # Ensure mount point dir exists
+            mkdir(mount_point, owner=owner, group=group, mode=755)
+
+            info('Mounting {}', mount_point)
+            run('mount {}'.format(mount_point))
+
+
+def unmount(mount_point):
+    """
+    Unmount mount point.
+
+    :param str mount_point: Name of mount point to unmount
+    """
+    with sudo():
+        run('umount {}'.format(mount_point))
+
+
+def add_fstab(filesystem=None, mount_point=None, type='auto', options='rw', dump='0', pazz='0'):
+    """
+    Add mount point configuration to /etc/fstab.
+    If mount point already mounted on different file system then unmount.
+
+    :param str filesystem: The partition or storage device to be mounted
+    :param str mount_point: The mount point where <filesystem> is mounted to
+    :param str type: The file system type (Default: auto)
+    :param str options: Mount options of the filesystem (Default: rw)
+    :param str dump: Used by the dump utility to decide when to make a backup, 0|1 (Default: 0)
+    :param str pazz: Used by fsck to decide which order filesystems are to be checked (Default: 0)
+    """
+    with sudo(), fabric.context_managers.cd('/etc'):
+        fstab_line = '{fs} {mount} {type} {options} {dump} {pazz}'.format(
+            fs=filesystem,
+            mount=mount_point,
+            type=type,
+            options=options,
+            dump=dump,
+            pazz=pazz
+        )
+
+        # Add mount to /etc/fstab if not already there (?)
+        if not fabric.contrib.files.contains('fstab', fstab_line, use_sudo=True, exact=True, escape=True):
+            info('Adding fstab: {} on {}', filesystem, mount_point)
+            fabric.contrib.files.append('fstab', fstab_line, use_sudo=True)
+
+        # Unmount any previous mismatching mount point
+        mounted_file_system = get_mount(mount_point)
+        if mounted_file_system and mounted_file_system != filesystem:
+            info('Unmounting {} from {}', mount_point, mounted_file_system)
+            unmount(mount_point)
