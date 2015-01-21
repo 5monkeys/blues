@@ -2,7 +2,7 @@ import os
 
 from fabric.context_managers import cd
 from fabric.state import env
-from fabric.utils import indent
+from fabric.utils import indent, abort
 
 from refabric.context_managers import sudo
 from refabric.utils import info
@@ -125,8 +125,11 @@ def install_source():
         with cd(path):
             repository = git_repository()
             path, cloned = git.clone(repository['url'], branch=repository['branch'])
+            if cloned is None:
+                abort('Failed to install source, aborting!')
 
     return cloned
+
 
 def update_source():
     """
@@ -143,7 +146,7 @@ def update_source():
         repository = git_repository()
         current_commit = git.reset(repository['branch'], repository_path=path)
 
-        if current_commit != previous_commit:
+        if current_commit is not None and current_commit != previous_commit:
             info(indent('(new version)'))
         else:
             info(indent('(same commit)'))
