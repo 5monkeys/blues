@@ -89,7 +89,7 @@ def install_solr():
                 run('tar xzf {}'.format(archive))
                 solr_version_dir = os.path.splitext(archive)[0]
                 solr_version_path = os.path.join('/usr', 'share', solr_version_dir)
-                debian.chmod(solr_version_path, 755, 'solr', 'solr', recursive=True)
+                debian.chmod(solr_version_dir, 755, 'solr', 'solr', recursive=True)
                 if files.exists(solr_version_path):
                     info('Found same existing version, removing it...')
                     debian.rm(solr_version_path, recursive=True)
