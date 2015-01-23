@@ -121,7 +121,7 @@ def reload(vassal_path=None):
     if not vassal_path:
         debian.service('uwsgi', 'reload', check_status=False)
     else:
-        vassal_name = os.path.splitext(os.path.dirname(vassal_path))[0]
+        vassal_name = os.path.splitext(os.path.basename(vassal_path))[0]
         with sudo(), silent():
             info('Reloading {} uWSGI vassal', vassal_name)
             run('touch {}'.format(vassal_path))
