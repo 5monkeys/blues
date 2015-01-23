@@ -142,6 +142,7 @@ class UWSGIProvider(BaseProvider):
 
         :return: [project_name].ini
         """
+        # TODO: Maybe check if uwsgi actually is a web provider
         return '{}.ini'.format(self.project)
 
     def list_worker_vassals(self):
@@ -152,8 +153,10 @@ class UWSGIProvider(BaseProvider):
         """
         vassals = set()
 
-        if blueprint.get('worker'):
-            vassals.add('celery.ini')
+        if not blueprint.get('worker.provider') == 'uwsgi':
+            return vassals
+
+        vassals.add('celery.ini')
 
         # Filter vassal extensions by host
         extensions = blueprint.get('worker.extensions')
