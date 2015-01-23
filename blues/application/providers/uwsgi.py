@@ -187,5 +187,4 @@ class UWSGIProvider(BaseProvider):
         """
         for vassal_ini in vassals or self.list_vassals():
             vassal_ini_path = os.path.join(self.get_config_path(), vassal_ini)
-            with sudo(), silent():
-                run('touch {}'.format(vassal_ini_path))
+            uwsgi.reload(vassal_ini_path)
