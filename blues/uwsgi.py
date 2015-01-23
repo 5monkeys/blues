@@ -40,7 +40,6 @@ tmpfs_path = '/run/uwsgi/'
 start = debian.service_task('uwsgi', 'start')
 stop = debian.service_task('uwsgi', 'stop')
 restart = debian.service_task('uwsgi', 'restart')
-reload = debian.service_task('uwsgi', 'reload')
 
 
 @task
@@ -110,6 +109,22 @@ def fifo(vassal_name, command):
     fifo_file = '/run/uwsgi/fifo-{}'.format(vassal_name)
     with sudo(), silent():
         run('echo {} > {}'.format(command, fifo_file))
+
+
+@task
+def reload(vassal_path=None):
+    """
+    Reload uwsgi or reload specific vassal @ path, via touch.
+
+    :param vassal_path: The absolute path to vassal ini to reload. If not given, the uwsgi service will reload
+    """
+    if not vassal_path:
+        debian.service('uwsgi', 'reload', check_status=False)
+    else:
+        vassal_name = os.path.splitext(os.path.dirname(vassal_path))[0]
+        with sudo(), silent():
+            info('Reloading {} uWSGI vassal', vassal_name)
+            run('touch {}'.format(vassal_path))
 
 
 def get_worker_count(cores):
