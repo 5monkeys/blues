@@ -217,7 +217,7 @@ def reload(program=None):
     """
     Reload supervisor or reload program(s), via SIGHUP
 
-    :param program: The program to reload (all|exact|pattern). If not given, supervisor service will reload
+    :param program: The program to reload (all|exact|pattern). If not given, the supervisor service will reload
     """
     if not program:
         service('reload')
@@ -228,5 +228,10 @@ def reload(program=None):
             output = supervisorctl('status', program=program)
             if output.return_code == 0:
                 pids = [line.split()[3][:-1] for line in output.stdout.split('\n')]
+                program_count = len(pids)
+                if program_count > 1:
+                    info('Reloading {} supervisor programs', program_count)
+                else:
+                    info('Reloading {} supervisor program', program or 'all')
                 for pid in pids:
                     debian.sighup(pid)
