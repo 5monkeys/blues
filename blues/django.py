@@ -15,6 +15,8 @@ Management helper blueprint.
         # manage: ../manage.py  # Manage module relative to python path; ./src (Default: manage.py)
 
 """
+import re
+
 from fabric.context_managers import cd
 from fabric.decorators import task, runs_once
 from fabric.operations import prompt
@@ -63,6 +65,7 @@ def version():
     """
     if not hasattr(version, 'version'):
         v = manage('--version')
+        v = re.split('[a-z]', v)[0]
         version.version = tuple(map(int, v.split('\n')[0].strip().split('.')))
     return version.version
 
