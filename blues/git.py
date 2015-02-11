@@ -80,6 +80,14 @@ def clone(url, branch=None, repository_path=None, **kwargs):
     return repository_path, cloned
 
 
+def fetch(repository_path=None):
+    if not repository_path:
+        repository_path = debian.pwd()
+
+    with cd(repository_path), silent():
+        run('git fetch origin', pty=False)
+
+
 def reset(branch, repository_path=None, **kwargs):
     """
     Fetch, reset, clean and checkout repository branch.
@@ -171,6 +179,32 @@ def diff_stat(repository_path=None, commit='HEAD^', path=None):
                 raise ValueError('unexpected git output')
 
         return changed, insertions, deletions
+
+
+def log(repository_path=None, commit='HEAD', count=1, path=None):
+    """
+    Get log for repository and optional commit range.
+
+    :param repository_path: Repository path
+    :param commit: Commit to log, ex HEAD..origin
+    :param path: Path or file to log
+    :return: [(<commit>, <comment>), ...]
+    """
+    if not repository_path:
+        repository_path = debian.pwd()
+
+    with cd(repository_path), silent():
+        cmd = 'git log --pretty=oneline {}'.format(commit)
+        if count:
+            cmd += ' -{}'.format(count)
+        if path:
+            cmd += ' -- {}'.format(path)
+        output = run(cmd, pty=False)
+        git_log = output.stdout.strip()
+        git_log = [col.strip() for row in git_log.split('\n') for col in row.split(' ', 1) if col]
+        git_log = zip(git_log[::2], git_log[1::2])
+
+    return git_log
 
 
 def current_tag(repository_path=None):
