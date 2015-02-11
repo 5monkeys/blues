@@ -74,6 +74,27 @@ def deploy(auto_reload=True, force=False):
 
 
 @task
+def deployed():
+    """
+    Show deployed and last origin commit
+    """
+    with sudo_project():
+        repository_path = git_repository_path()
+        git.fetch(repository_path)
+
+        head_commit, head_message = git.log(repository_path)[0]
+        origin_commit, origin_message = git.log(repository_path, commit='origin')[0]
+
+        info('Deployed commit: {} - {}', head_commit[:7], head_message)
+        if head_commit == origin_commit:
+            info(indent('(up-to-date with origin)'))
+        else:
+            info('Pending release: {} - {}', origin_commit[:7], origin_message)
+
+        return head_commit, origin_commit
+
+
+@task
 def start():
     """
     Start all application providers on current host
