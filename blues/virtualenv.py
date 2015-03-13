@@ -47,9 +47,14 @@ def install():
 
 
 def create(path):
+    options = ''
+
+    if python.requested_version() > (3,):
+        options += ' -p /usr/bin/python3'
+
     if not files.exists(path):
         info('Creating virtualenv: {}', path)
-        run('virtualenv {}'.format(path))
+        run('virtualenv{options} {}'.format(path, options=options))
     else:
         info('Virtualenv already exists: {}', path)
 

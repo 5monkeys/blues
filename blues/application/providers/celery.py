@@ -1,42 +1,23 @@
 import os
 
-from fabric.context_managers import settings
 from fabric.state import env
+from fabric.context_managers import settings
 
-from .base import BaseProvider
+from .base import ManagedProvider
+from ..managers.supervisor import SupervisorManager
 from ..project import *
 
 from ... import debian
 from ...app import blueprint
 
 
-class SupervisorProvider(BaseProvider):
-
-    def install(self):
-        """
-        Install system wide Supervisor and upstart service.
-        """
-        from blues import supervisor
-        supervisor.setup()
-
-    def get_config_path(self):
-        """
-        Get or create Supervisor project programs home dir.
-
-        :return: Remote config path
-        """
-        # Join config path and make sure that it ends with a slash
-        destination = os.path.join(project_home(), 'supervisor.d', '')
-        debian.mkdir(destination)
-        return destination
+class CeleryProvider(ManagedProvider):
+    name = 'celery'
+    default_manager = 'supervisor'
 
     def configure_web(self):
-        """
-        TODO: Render and upload web program to projects Supervisor home dir.
-
-        :return: Updated programs
-        """
-        raise NotImplementedError('Supervisor provider not yet implements web workers.')
+        raise NotImplementedError('celery cannot be configured as a web '
+                                  'provider')
 
     def configure_worker(self):
         """
@@ -47,7 +28,7 @@ class SupervisorProvider(BaseProvider):
         from blues import supervisor
 
         destination = self.get_config_path()
-        context = super(SupervisorProvider, self).get_context()
+        context = super(SupervisorManager, self).get_context()
         context.update({
             'workers': blueprint.get('worker.workers', debian.nproc()),
         })

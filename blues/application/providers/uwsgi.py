@@ -15,6 +15,7 @@ from ...app import blueprint
 
 
 class UWSGIProvider(BaseProvider):
+    name = 'uwsgi'
 
     def install(self):
         """

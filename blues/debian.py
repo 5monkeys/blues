@@ -58,7 +58,8 @@ def mv(source, destination, force=True):
     run('mv %s %s %s' % (force, source, destination))
 
 
-def ln(source, destination, symbolic=True, force=True, mode=None, owner=None, group=None):
+def ln(source, destination, symbolic=True, force=True, mode=None,
+       owner=None, group=None):
     force = force and '-f' or ''
     symbolic = symbolic and '-sn' or ''
     run('ln %s %s "%s" "%s"' % (symbolic, force, source, destination))
@@ -67,15 +68,18 @@ def ln(source, destination, symbolic=True, force=True, mode=None, owner=None, gr
 
 def mkdir(location, recursive=True, mode=None, owner=None, group=None):
     with silent(), sudo():
-        result = run('test -d "%s" || mkdir %s %s "%s"' % (location,
-                                                           mode and '-m %s' % mode or '',
-                                                           recursive and '-p' or '',
-                                                           location))
+        result = run('test -d "%s" || mkdir %s %s "%s"'
+                     % (location,
+                        mode and '-m %s' % mode or '',
+                        recursive and '-p' or '',
+                        location))
+
         if result.succeeded:
             if owner or group:
                 chmod(location, owner=owner, group=group)
         else:
-            raise Exception('Failed to create directory %s, %s' % (location, result.stdout))
+            raise Exception('Failed to create directory %s, %s'
+                            % (location, result.stdout))
 
 
 def mktemp(directory=False, mode=None):
@@ -115,6 +119,7 @@ def hostname():
 
 def apt_get(command, *options):
     options = ' '.join(options) if options else ''
+
     return run('apt-get --yes {} {}'.format(command, options))
 
 
@@ -134,12 +139,14 @@ def dpkg_query(package):
 
 def add_apt_repository(repository, accept=True, src=False):
     if src:
-        run('add-apt-repository "{}" {}'.format(repository, '--yes' if accept else ''))
+        run('add-apt-repository "{}" {}'.format(repository,
+                                                '--yes' if accept else ''))
     else:
         # Add repository manually to sources.list due to ubuntu bug
         if not repository.startswith('deb '):
             repository = 'deb {}'.format(repository)
-        fabric.contrib.files.append('/etc/apt/sources.list', repository, shell=True)
+        fabric.contrib.files.append('/etc/apt/sources.list', repository,
+                                    shell=True)
 
 
 def add_apt_key(url):
@@ -157,13 +164,18 @@ def add_apt_ppa(name, accept=True, src=False):
 
 def command_exists(*command):
     with fabric.context_managers.quiet():
-        return all((run("which '%s' >& /dev/null" % c).succeeded for c in command))
+        return all((
+            run("which '%s' >& /dev/null" % c).succeeded
+            for c in command
+        ))
 
 
 def get_user(name):
     with silent():
         d = run("cat /etc/passwd | egrep '^%s:' ; true" % name, user='root')
-        s = run("cat /etc/shadow | egrep '^%s:' | awk -F':' '{print $2}'" % name, user='root')
+        s = run("cat /etc/shadow | egrep '^%s:' | awk -F':' '{print $2}'"
+                % name,
+                user='root')
 
     results = {}
     if d:
