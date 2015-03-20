@@ -27,13 +27,24 @@ from fabric.decorators import task
 from fabric.utils import warn
 
 from refabric.contrib import blueprints
+from refabric.context_managers import sudo
 
 from blues import debian
 
-__all__ = ['configure']
+__all__ = ['setup', 'configure']
 
 
 blueprint = blueprints.get(__name__)
+
+
+@task
+def setup():
+    """
+    Install nfs-common
+    """
+    with sudo():
+        debian.apt_get('install', 'nfs-common')
+    configure()
 
 
 @task
