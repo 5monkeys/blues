@@ -41,12 +41,12 @@ def install_project_user():
         # Get UID for project user
         user.create_system_user(username, groups=project_user_groups, home=home_path)
 
-        # Configure ssh for github
-        user.set_strict_host_checking(username, 'github.com')
-
         # Create application log path
         application_log_path = os.path.join('/var', 'log', username)
         debian.mkdir(application_log_path, group='app-data', mode=1775)
+
+        # Configure ssh for github
+        user.set_strict_host_checking(username, 'github.com')
 
 
 def install_project_structure():
