@@ -521,3 +521,13 @@ def add_fstab(filesystem=None, mount_point=None, type='auto', options='rw', dump
         mounted_file_system = get_mount(mount_point)
         if mounted_file_system and mounted_file_system != filesystem:
             unmount(mount_point)
+
+
+def locale_gen(locale, utf8=True):
+    locale_gen_cmd = 'locale-gen {}'.format(locale)
+    locale_gen_utf8_cmd = locale_gen_cmd + '.UTF-8'
+
+    with sudo():
+        run(locale_gen_cmd)
+        if utf8:
+            run(locale_gen_utf8_cmd)
