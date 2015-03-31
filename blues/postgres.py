@@ -11,11 +11,15 @@ Postgres Blueprint
 
     settings:
       postgres:
-        version: 9.3           # PostgreSQL version (required)
+        version: 9.3               # PostgreSQL version (required)
         schemas:
-          some_schema_name:    # The schema name
-            user: foo          # Username to connect to schema
-            password: bar      # Password to connect to schema (optional)
+          some_schema_name:        # The schema name
+            user: foo              # Username to connect to schema
+            password: bar          # Password to connect to schema (optional)
+            dump_options:          # Specify extra options passed to pg_dump (optional)
+              exclude_table_data:  # Exclude data from table (optional)
+                - some_table
+                - another_table
 
 """
 import os
@@ -195,21 +199,30 @@ def dump(schema=None):
             print("{i}. {schema}".format(i=i, schema=schema))
         valid_indices = '[1-{}]+'.format(len(schemas))
         schema_choice = prompt('Select schema to dump:', default='1', validate=valid_indices)
-        schema = schemas[int(schema_choice)-1]
+        schema = schemas[int(schema_choice) - 1]
+        dump_options = blueprint[schema].get(
+            'dump_options',
+            blueprint.get('dump_options', {})
+        )
 
     with sudo('postgres'):
         now = datetime.now().strftime('%Y-%m-%d')
         output_file = '/tmp/{}_{}.backup'.format(schema, now)
         filename = os.path.basename(output_file)
 
-        options = dict(
-            format='tar',
-            output_file=output_file,
-            schema=schema
-        )
+        options = [
+            '-c',
+            '-F', 'tar',
+            'f', output_file
+        ]
+
+        if dump_options:
+            exclude_table_data = dump_options.get('exclude_table_data', [])
+            if exclude_table_data:
+                options += ['--exclude-table-data=' + table for table in exclude_table_data]
 
         info('Dumping schema {}...', schema)
-        run('pg_dump -c -F {format} -f {output_file} {schema}'.format(**options))
+        run('pg_dump ' + ' '.join(options + [schema]))
 
         info('Downloading dump...')
         local_file = '~/{}'.format(filename)
