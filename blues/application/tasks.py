@@ -45,7 +45,9 @@ def deploy(auto_reload=True, force=False):
     """
     Reset source to configured branch and install requirements, if needed
 
-    :return: Got new source?
+    :param bool auto_reload: Reload application providers if source has changed
+    :param bool force: Force install of requirements
+    :return bool: Source code has changed?
     """
     # Reset git repo
     previous_commit, current_commit = update_source()
@@ -100,7 +102,7 @@ def start():
     Start all application providers on current host
     """
     providers = get_providers(env.host_string)
-    for provider in providers.values():
+    for provider in set(providers.values()):
         provider.start()
 
 
@@ -110,7 +112,7 @@ def stop():
     Stop all application providers on current host
     """
     providers = get_providers(env.host_string)
-    for provider in providers.values():
+    for provider in set(providers.values()):
         provider.stop()
 
 
@@ -120,7 +122,7 @@ def reload():
     Reload all application providers on current host
     """
     providers = get_providers(env.host_string)
-    for provider in providers.values():
+    for provider in set(providers.values()):
         provider.reload()
 
 
@@ -128,6 +130,9 @@ def reload():
 def configure_providers(force_reload=False):
     """
     Render, upload and reload web & worker config
+
+    :param bool force_reload: Force reload of providers, even if not updated
+    :return dict: Application providers for current host
     """
     with sudo_project():
         providers = get_providers(env.host_string)
@@ -136,7 +141,7 @@ def configure_providers(force_reload=False):
         if 'worker' in providers:
             providers['worker'].configure_worker()
 
-    for provider in providers.values():
+    for provider in set(providers.values()):
         if provider.updates or force_reload:
             provider.reload()
 
@@ -147,6 +152,8 @@ def configure_providers(force_reload=False):
 def generate_nginx_conf(role='www'):
     """
     Genereate nginx site config for web daemon
+
+    :param str role: Name of role (directory) to generate config to
     """
     name = blueprint.get('project')
     socket = blueprint.get('web.socket', default='0.0.0.0:3030')
