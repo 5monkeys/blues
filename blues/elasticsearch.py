@@ -20,17 +20,22 @@ Elasticsearch Blueprint
         # network_publish_host: 127.0.0.1  # Set the address other nodes will use to communicate with this node (Optional)
         # network_host: 127.0.0.1          # Set both `network_bind_host` and `network_publish_host` (Optional)
         # queue_size: 3000                 # Set thread pool queue size (Default: 1000)
+        # plugins:                         # Optional list of plugins to install
+        #   - mobz/elasticsearch-head
 
 """
 from fabric.decorators import task
+from fabric.utils import abort
 
 from refabric.api import info
 from refabric.context_managers import sudo
 from refabric.contrib import blueprints
 
 from . import debian
+from refabric.operations import run
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
+           'install_plugin']
 
 
 blueprint = blueprints.get(__name__)
@@ -68,6 +73,12 @@ def install():
         info('Installing {} version {}', 'elasticsearch', version)
         debian.apt_get('install', 'elasticsearch')
 
+        # Install plugins
+        plugins = blueprint.get('plugins', [])
+        for plugin in plugins:
+            info('Installing elasticsearch "{}" plugin...', plugin)
+            install_plugin(plugin)
+
         # Enable on boot
         debian.add_rc_service('elasticsearch', priorities='defaults 95 10')
 
@@ -95,3 +106,12 @@ def configure():
 
     if config or default:
         restart()
+
+
+@task
+def install_plugin(name=None):
+    if not name:
+        abort('No plugin name given')
+
+    with sudo():
+        run('/usr/share/elasticsearch/bin/plugin -install {}'.format(name))
