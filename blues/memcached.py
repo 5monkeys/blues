@@ -57,7 +57,9 @@ def configure():
         'size': blueprint.get('size', 64),
         'bind': blueprint.get('bind', None)
     }
-    blueprint.upload('memcached', '/etc/', context)
+    uploads = blueprint.upload('memcached', '/etc/', context)
+    if uploads:
+        restart()
 
 
 @task
