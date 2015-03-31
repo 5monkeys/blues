@@ -11,7 +11,6 @@ from .base import BaseProvider
 from ..project import *
 
 from ... import debian
-from ... import uwsgi
 from ...app import blueprint
 
 
@@ -21,6 +20,7 @@ class UWSGIProvider(BaseProvider):
         """
         Install system wide uWSGI and upstart service.
         """
+        from blues import uwsgi
         uwsgi.setup()
 
     def get_config_path(self):
@@ -29,6 +29,8 @@ class UWSGIProvider(BaseProvider):
 
         :return: Remote config path
         """
+        from blues import uwsgi
+
         destination = uwsgi.blueprint.get('emperor')
 
         if destination and '*' in destination:
@@ -52,6 +54,8 @@ class UWSGIProvider(BaseProvider):
 
         :return: context
         """
+        from blues import uwsgi
+
         context = super(UWSGIProvider, self).get_context()
 
         # Memory optimized options
@@ -85,6 +89,8 @@ class UWSGIProvider(BaseProvider):
 
         :return: Updated vassals
         """
+        from blues import uwsgi
+
         destination = self.get_config_path()
         context = self.get_context()
 
@@ -115,6 +121,8 @@ class UWSGIProvider(BaseProvider):
 
         :return: Updated vassals
         """
+        from blues import uwsgi
+
         # TODO: destination could be global (uwsgi.emperor setting) and therefore contain same vassal names (celery.ini)
         destination = self.get_config_path()
         context = super(UWSGIProvider, self).get_context()
@@ -143,7 +151,7 @@ class UWSGIProvider(BaseProvider):
         :return: [project_name].ini
         """
         # TODO: Maybe check if uwsgi actually is a web provider
-        return '{}.ini'.format(self.project)
+        return '{}.ini'.format(blueprint.get('web.name', self.project))
 
     def list_worker_vassals(self):
         """
@@ -188,6 +196,8 @@ class UWSGIProvider(BaseProvider):
 
         :param vassals: Vassals to reload
         """
+        from blues import uwsgi
+
         for vassal_ini in vassals or self.list_vassals():
             vassal_ini_path = os.path.join(self.get_config_path(), vassal_ini)
             uwsgi.reload(vassal_ini_path)

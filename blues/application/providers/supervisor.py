@@ -7,7 +7,6 @@ from .base import BaseProvider
 from ..project import *
 
 from ... import debian
-from ... import supervisor
 from ...app import blueprint
 
 
@@ -17,6 +16,7 @@ class SupervisorProvider(BaseProvider):
         """
         Install system wide Supervisor and upstart service.
         """
+        from blues import supervisor
         supervisor.setup()
 
     def get_config_path(self):
@@ -44,6 +44,8 @@ class SupervisorProvider(BaseProvider):
 
         :return: Updated programs
         """
+        from blues import supervisor
+
         destination = self.get_config_path()
         context = super(SupervisorProvider, self).get_context()
         context.update({
@@ -77,4 +79,5 @@ class SupervisorProvider(BaseProvider):
         return self.updates
 
     def reload(self):
+        from blues import supervisor
         supervisor.reload()
