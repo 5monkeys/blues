@@ -89,6 +89,7 @@ def configure():
         # Upload templates
         uploads = blueprint.upload('init/', '/etc/init/')
         uploads.extend(blueprint.upload('supervisord.conf', '/etc/'))
+        uploads.extend(blueprint.upload('programs-available/', programs_available_path + '/'))
 
         # Disable previously enabled programs not configured programs-enabled
         changes = []
