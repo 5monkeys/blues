@@ -11,13 +11,15 @@ Elasticsearch Blueprint
 
     settings:
       elasticsearch:
-        version: 1.3                       # Version of elasticsearch to install (Required)
+        version: 1.5                       # Version of elasticsearch to install (Required)
         cluster_name: foobar               # Name of the cluster (Default: elasticsearch)
-        # number_of_shards: 5              # Number of shards (Default: 5)
-        # number_of_replicas: 0            # Number of replicas (Default: 0)
+        # heap_size: 1g                    # Heap Size (defaults to 256m min, 1g max)
+        # number_of_shards: 1              # Number of shards/splits of an index (Default: 5)
+        # number_of_replicas: 0            # Number of replicas / additional copies of an index (Default: 0)
         # network_bind_host: 127.0.0.1     # Set the bind address specifically, IPv4 or IPv6 (Default: 0.0.0.0)
         # network_publish_host: 127.0.0.1  # Set the address other nodes will use to communicate with this node (Optional)
         # network_host: 127.0.0.1          # Set both `network_bind_host` and `network_publish_host` (Optional)
+        # queue_size: 3000                 # Set thread pool queue size (Default: 1000)
 
 """
 from fabric.decorators import task
@@ -83,8 +85,15 @@ def configure():
         'number_of_replicas': blueprint.get('number_of_replicas', '0'),
         'bind_host': blueprint.get('network_bind_host'),
         'publish_host': blueprint.get('network_publish_host'),
-        'host': blueprint.get('network_host')
+        'host': blueprint.get('network_host'),
+        'queue_size': blueprint.get('queue_size', 1000)
     }
-    uploads = blueprint.upload('./', '/etc/elasticsearch/', context)
-    if uploads:
+    config = blueprint.upload('./elasticsearch.yml', '/etc/elasticsearch/', context)
+
+    context = {
+        'heap_size': blueprint.get('heap_size', '256m')
+    }
+    default = blueprint.upload('./default', '/etc/default/elasticsearch', context)
+
+    if config or default:
         restart()

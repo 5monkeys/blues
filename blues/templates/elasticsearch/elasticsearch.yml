@@ -389,3 +389,7 @@ discovery.zen.ping.multicast.enabled: false
 # it unless you need it is recommended (it is disabled by default).
 #
 #http.jsonp.enable: true
+
+#threadpool.search.type: cached
+threadpool.search.queue_size: {{ queue_size|default('1000') }}
+threadpool.bulk.queue_size: {{ queue_size|default('1000') }}
