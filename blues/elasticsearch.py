@@ -52,10 +52,8 @@ def setup():
 
 def install():
     with sudo():
-        # TODO: Change to java.install (openjdk)?
-        debian.add_apt_ppa('webupd8team/java')
-        debian.debconf_set_selections('shared/accepted-oracle-license-v1-1 select true',
-                                      'shared/accepted-oracle-license-v1-1 seen true')
+        from blues import java
+        java.install()
 
         version = blueprint.get('version', '1.0')
         info('Adding apt repository for {} version {}', 'elasticsearch', version)
@@ -68,7 +66,7 @@ def install():
 
         # Install elasticsearch (and java)
         info('Installing {} version {}', 'elasticsearch', version)
-        debian.apt_get('install', 'oracle-java7-installer', 'elasticsearch')
+        debian.apt_get('install', 'elasticsearch')
 
         # Enable on boot
         debian.add_rc_service('elasticsearch', priorities='defaults 95 10')
