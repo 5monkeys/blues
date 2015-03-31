@@ -13,6 +13,8 @@ Management helper blueprint.
 
     settings:
         # manage: ../manage.py  # Manage module relative to python path; ./src (Default: manage.py)
+        # use_south: false      # Enable south migrations, only for Django < 1.7 (Default: true)
+        # use_syncdb: true      # Enable syncdb, only for Django < 1.7 (Default: false)
 
 """
 import re
@@ -82,11 +84,11 @@ def migrate():
 
     if version() >= (1, 7):
         manage('migrate ' + options)
-    elif blueprint.get('use_south', True):
-        manage('syncdb --noinput')  # TODO: Remove?
-        manage('migrate --merge ' + options)  # TODO: Remove --merge?
     else:
-        manage('syncdb --noinput')
+        if blueprint.get('use_syncdb', False):
+            manage('syncdb --noinput')
+        if blueprint.get('use_south', True):
+            manage('migrate --merge ' + options)  # TODO: Remove --merge?
 
 
 @task
