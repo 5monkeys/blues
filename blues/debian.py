@@ -109,6 +109,10 @@ def lbs_codename():
     return run('lsb_release --codename --short')
 
 
+def hostname():
+    return run('hostname -A').stdout.strip()
+
+
 def apt_get(command, *options):
     options = ' '.join(options) if options else ''
     return run('apt-get --yes {} {}'.format(command, options))
