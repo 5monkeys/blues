@@ -56,9 +56,10 @@ def install():
 
 
 def install_gems():
-    info('Installing Gems')
     gems = blueprint.get('gems', [])
-    gem('install', *gems)
+    if gems:
+        info('Installing Gems')
+        gem('install', *gems)
 
 
 def gem(command, *options):
