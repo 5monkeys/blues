@@ -145,9 +145,13 @@ def create_server_ssl_cert():
         debian.mkdir('/etc/pki/tls/certs')
         debian.mkdir('/etc/pki/tls/private')
         with cd('/etc/pki/tls'):
+            hostname = debian.hostname()
             key = 'private/logstash-forwarder.key'
             crt = 'certs/logstash-forwarder.crt'
-            run('openssl req -x509 -batch -nodes -days 3650 -newkey rsa:2048 -keyout {} -out {}'.format(key, crt))
+            run('openssl req -x509 -batch -nodes -days 3650 -newkey rsa:2048 '
+                '-keyout {} '
+                '-out {} '
+                '-subj "/CN={}"'.format(key, crt, hostname))
 
 
 def download_server_ssl_cert(destination='ssl/'):
