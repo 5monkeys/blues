@@ -9,6 +9,10 @@ Kibana Blueprint
     blueprints:
       - blues.kibana
 
+    settings:
+      kibana:
+        version: 3.1.2  # Version of kibana to install (Required)
+
 """
 import os.path
 
@@ -37,7 +41,7 @@ def setup():
 def install():
     with sudo():
         info('Downloading kibana')
-        version = blueprint.get('version', '3.1.0')
+        version = blueprint.get('version', '3.1.2')
         tar_file = 'kibana-{}.tar.gz'.format(version)
         run('wget -P /tmp/ https://download.elasticsearch.org/kibana/kibana/{f}'.format(f=tar_file))
 
