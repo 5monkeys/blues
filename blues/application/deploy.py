@@ -115,6 +115,8 @@ def install_or_update_source():
 def install_source():
     """
     Install git and clone application repository.
+
+    :return: True, if repository got cloned
     """
     with sudo():
         git.install()

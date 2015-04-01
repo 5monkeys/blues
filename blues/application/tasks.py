@@ -25,8 +25,9 @@ def setup():
     install_project_user()
     install_system_dependencies()
     install_or_update_source()
-    install_virtualenv()
-    install_requirements()
+    if use_virtualenv():
+        install_virtualenv()
+        install_requirements()
     install_providers()
     configure_providers()
 
@@ -53,7 +54,7 @@ def deploy(auto_reload=True, force=False):
     previous_commit, current_commit = update_source()
     code_changed = current_commit is not None and previous_commit != current_commit
 
-    if code_changed or force:
+    if use_virtualenv() and (code_changed or force):
         requirements = blueprint.get('requirements', 'requirements.txt')
         requirements_changed = False
 

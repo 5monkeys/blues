@@ -16,6 +16,7 @@ Application Blueprint
         # git_branch: master                          # Branch to clone, if not specified in `git_url` setting
         # git_source: ./                              # Relative path within repository added to python path (Default: src/)
 
+        # virtualenv: false                           # Enable virtualenv and pip requirements (Default: true)
         # requirements: requirements/live.txt         # Pip requirements file to install (Default: requirements.txt)
         # system_dependencies:                        # List of debian packages to install
         #   - build-essential  # gcc

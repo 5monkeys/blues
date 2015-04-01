@@ -7,14 +7,16 @@ from .. import git
 from ..app import blueprint
 
 __all__ = [
-    'app_root', 'project_home', 'git_root', 'virtualenv_path', 'git_repository',
-    'git_repository_path', 'python_path', 'sudo_project', 'requirements_txt'
+    'app_root', 'project_home', 'git_root', 'use_virtualenv', 'virtualenv_path',
+    'git_repository', 'git_repository_path', 'python_path', 'sudo_project',
+    'requirements_txt'
 ]
 
 
 app_root = lambda: blueprint.get('root_path') or '/srv/app'  # /srv/app
 project_home = lambda: os.path.join(app_root(), blueprint.get('project'))  # /srv/app/project
 git_root = lambda: os.path.join(project_home(), 'src')  # /srv/app/project/src
+use_virtualenv = lambda: blueprint.get('virtualenv', True)
 virtualenv_path = lambda: os.path.join(project_home(), 'env')  # /srv/app/project/env
 git_repository = lambda: git.parse_url(blueprint.get('git_url'), branch=blueprint.get('git_branch'))  # git repo dict
 git_repository_path = lambda: os.path.join(git_root(), git_repository()['name'])  # /srv/app/project/src/repo.git
