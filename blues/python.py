@@ -43,6 +43,8 @@ def install():
         debian.chmod(pip_log_file, mode=777)
         pip('install', 'setuptools', '--upgrade')
 
+
 def pip(command, *options):
     info('Running pip {}', command)
+    # TODO: change pip log location, per env? per user?
     run('pip {0} {1} -v --log={2} --log-file={2}'.format(command, ' '.join(options), pip_log_file))

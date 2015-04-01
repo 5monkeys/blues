@@ -198,6 +198,21 @@ def upgrade_server():
 
 
 def install_forwarder():
+    """
+    TODO: Build from github
+
+    - wget https://storage.googleapis.com/golang/go1.4.1.linux-amd64.tar.gz
+    - gunzip <go>
+    - mv go /usr/local/
+    - apt-get install unzip make ruby ruby-dev
+    - wget https://github.com/elasticsearch/logstash-forwarder/archive/master.zip
+    - unzip <forwarder>
+    - cd <forwarder>
+    - go build
+    - gem install fpm
+    - make deb
+    - dpkg -i <forwarder>
+    """
     with sudo():
         info('Adding apt repository for {}', 'logstash forwarder')
         debian.add_apt_repository('http://packages.elasticsearch.org/logstashforwarder/debian stable main')
