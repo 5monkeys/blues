@@ -64,9 +64,10 @@ def install():
 
 
 def install_packages():
-    info('Installing Packages')
     packages = blueprint.get('packages', [])
-    npm('install', *packages)
+    if packages:
+        info('Installing Packages')
+        npm('install', *packages)
 
 
 def npm(command, *options):
