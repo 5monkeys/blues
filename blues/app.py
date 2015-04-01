@@ -20,8 +20,13 @@ Application Blueprint
         # requirements: requirements/live.txt         # Pip requirements file to install (Default: requirements.txt)
         # system_dependencies:                        # List of debian packages to install
         #   - build-essential  # gcc
+        #   - libmemcached-dev # memcached
+        #   - python-dev       # postgres, psycopg2
+        #   - libpq-dev        # postgres, psycopg2
         #   - zlib1g-dev       # PIL, png
         #   - libjpeg62-dev    # PIL, jpeg
+        #   - libxml2-dev      # lxml
+        #   - libxslt-dev      # lxml
 
         web:                                          # Enable web workers
           provider: uwsgi                             # Set web provider
