@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Nginx Blueprint &mdash; Blues 1.0.0 documentation</title>
+  <title>PureFTP Blueprint &mdash; Blues 1.0.0 documentation</title>
   
 
   
@@ -30,8 +30,8 @@
   
     <link rel="top" title="Blues 1.0.0 documentation" href="../index.html"/>
         <link rel="up" title="blues package" href="blues.html"/>
-        <link rel="next" title="Node.js Blueprint" href="blues.node.html"/>
-        <link rel="prev" title="NFS Blueprint" href="blues.nfs.html"/> 
+        <link rel="next" title="Python Blueprint" href="blues.python.html"/>
+        <link rel="prev" title="Postgres Blueprint" href="blues.postgres.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -96,7 +96,7 @@
       
           <li><a href="blues.html">blues package</a> &raquo;</li>
       
-    <li>Nginx Blueprint</li>
+    <li>PureFTP Blueprint</li>
       <li class="wy-breadcrumbs-aside">
         
       </li>
@@ -105,72 +105,28 @@
 </div>
           <div role="main" class="document">
             
-  <span class="target" id="module-blues.nginx"></span><div class="section" id="nginx-blueprint">
-<h1>Nginx Blueprint<a class="headerlink" href="#nginx-blueprint" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="module-blues.pureftp"></span><div class="section" id="pureftp-blueprint">
+<h1>PureFTP Blueprint<a class="headerlink" href="#pureftp-blueprint" title="Permalink to this headline">¶</a></h1>
 <p><strong>Fabric environment:</strong></p>
 <div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">blueprints</span><span class="p-Indicator">:</span>
-  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">blues.nginx</span>
-
+  <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">blues.pureftp</span>
 <span class="l-Scalar-Plain">settings</span><span class="p-Indicator">:</span>
-  <span class="l-Scalar-Plain">nginx</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">sites</span><span class="p-Indicator">:</span>                      <span class="c1"># List of sites/templates in `sites-available` folder to enable (Optional)</span>
-      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">foo</span>                     <span class="c1"># Template name, with or without .conf extension</span>
-      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">bar</span>
-    <span class="c1"># auto_disable_sites: true  # Auto disable sites not specified in `sites` setting (Default: true)</span>
+  <span class="l-Scalar-Plain">pureftp</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">users</span><span class="p-Indicator">:</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">username</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">joe</span>
+        <span class="l-Scalar-Plain">password</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">rosebud</span>
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="blues.nginx.setup">
-<code class="descname">setup</code><a class="headerlink" href="#blues.nginx.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Install and configure nginx</p>
+<dt id="blues.pureftp.setup">
+<code class="descname">setup</code><a class="headerlink" href="#blues.pureftp.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install and configure PureFTP</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="blues.nginx.configure">
-<code class="descname">configure</code><a class="headerlink" href="#blues.nginx.configure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Configure nginx and enable/disable sites</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="blues.nginx.enable">
-<code class="descname">enable</code><a class="headerlink" href="#blues.nginx.enable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Enable site</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>site</strong> &#8211; Site to enable</li>
-<li><strong>do_reload</strong> &#8211; Reload nginx service</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Got enabled?</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="blues.nginx.disable">
-<code class="descname">disable</code><a class="headerlink" href="#blues.nginx.disable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Disable site</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>site</strong> &#8211; Site to disable</li>
-<li><strong>do_reload</strong> &#8211; Reload nginx service</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Got disabled?</p>
-</td>
-</tr>
-</tbody>
-</table>
+<dt id="blues.pureftp.configure">
+<code class="descname">configure</code><a class="headerlink" href="#blues.pureftp.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure PureFTP</p>
 </dd></dl>
 
 </div>
@@ -181,10 +137,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="blues.node.html" class="btn btn-neutral float-right" title="Node.js Blueprint">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="blues.python.html" class="btn btn-neutral float-right" title="Python Blueprint">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="blues.nfs.html" class="btn btn-neutral" title="NFS Blueprint"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="blues.postgres.html" class="btn btn-neutral" title="Postgres Blueprint"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

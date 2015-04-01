@@ -30,7 +30,7 @@
   
     <link rel="top" title="Blues 1.0.0 documentation" href="../index.html"/>
         <link rel="up" title="blues package" href="blues.html"/>
-        <link rel="next" title="Git Blueprint" href="blues.git.html"/>
+        <link rel="next" title="Fstab Blueprint" href="blues.fstab.html"/>
         <link rel="prev" title="Django Blueprint" href="blues.django.html"/> 
 
   
@@ -113,13 +113,17 @@
 
 <span class="l-Scalar-Plain">settings</span><span class="p-Indicator">:</span>
   <span class="l-Scalar-Plain">elasticsearch</span><span class="p-Indicator">:</span>
-    <span class="l-Scalar-Plain">version</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1.3</span>                       <span class="c1"># Version of elasticsearch to install (Required)</span>
+    <span class="l-Scalar-Plain">version</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1.5</span>                       <span class="c1"># Version of elasticsearch to install (Required)</span>
     <span class="l-Scalar-Plain">cluster_name</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">foobar</span>               <span class="c1"># Name of the cluster (Default: elasticsearch)</span>
-    <span class="c1"># number_of_shards: 5              # Number of shards (Default: 5)</span>
-    <span class="c1"># number_of_replicas: 0            # Number of replicas (Default: 0)</span>
+    <span class="c1"># heap_size: 1g                    # Heap Size (defaults to 256m min, 1g max)</span>
+    <span class="c1"># number_of_shards: 1              # Number of shards/splits of an index (Default: 5)</span>
+    <span class="c1"># number_of_replicas: 0            # Number of replicas / additional copies of an index (Default: 0)</span>
     <span class="c1"># network_bind_host: 127.0.0.1     # Set the bind address specifically, IPv4 or IPv6 (Default: 0.0.0.0)</span>
     <span class="c1"># network_publish_host: 127.0.0.1  # Set the address other nodes will use to communicate with this node (Optional)</span>
     <span class="c1"># network_host: 127.0.0.1          # Set both `network_bind_host` and `network_publish_host` (Optional)</span>
+    <span class="c1"># queue_size: 3000                 # Set thread pool queue size (Default: 1000)</span>
+    <span class="c1"># plugins:                         # Optional list of plugins to install</span>
+    <span class="c1">#   - mobz/elasticsearch-head</span>
 </pre></div>
 </div>
 <dl class="attribute">
@@ -134,6 +138,11 @@
 <dd><p>Configure Elasticsearch</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="blues.elasticsearch.install_plugin">
+<code class="descname">install_plugin</code><a class="headerlink" href="#blues.elasticsearch.install_plugin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -142,7 +151,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="blues.git.html" class="btn btn-neutral float-right" title="Git Blueprint">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="blues.fstab.html" class="btn btn-neutral float-right" title="Fstab Blueprint">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="blues.django.html" class="btn btn-neutral" title="Django Blueprint"><span class="fa fa-arrow-circle-left"></span> Previous</a>

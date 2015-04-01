@@ -116,8 +116,23 @@ Currently only acts as a provider for the application blueprint and can not be u
 <span class="l-Scalar-Plain">settings</span><span class="p-Indicator">:</span>
   <span class="l-Scalar-Plain">uwsgi</span><span class="p-Indicator">:</span>
     <span class="l-Scalar-Plain">version</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">2.0.8</span>  <span class="c1"># Version of uWSGI to install (Required)</span>
+    <span class="c1"># emperor: /etc/uwsgi/vassals (Default: /srv/app/*/uwsgi.d)</span>
 </pre></div>
 </div>
+<dl class="attribute">
+<dt id="blues.uwsgi.reload">
+<code class="descname">reload</code><a class="headerlink" href="#blues.uwsgi.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload uwsgi or reload specific vassal &#64; path, via touch.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vassal_path</strong> &#8211; The absolute path to vassal ini to reload. If not given, the uwsgi service will reload</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="blues.uwsgi.setup">
 <code class="descname">setup</code><a class="headerlink" href="#blues.uwsgi.setup" title="Permalink to this definition">¶</a></dt>

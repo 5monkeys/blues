@@ -124,6 +124,29 @@
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="blues.debian.add_fstab">
+<code class="descname">add_fstab</code><span class="sig-paren">(</span><em>filesystem=None</em>, <em>mount_point=None</em>, <em>type='auto'</em>, <em>options='rw'</em>, <em>dump='0'</em>, <em>pazz='0'</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.add_fstab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add mount point configuration to /etc/fstab.
+If mount point already mounted on different file system then unmount.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filesystem</strong> (<em>str</em>) &#8211; The partition or storage device to be mounted</li>
+<li><strong>mount_point</strong> (<em>str</em>) &#8211; The mount point where &lt;filesystem&gt; is mounted to</li>
+<li><strong>type</strong> (<em>str</em>) &#8211; The file system type (Default: auto)</li>
+<li><strong>options</strong> (<em>str</em>) &#8211; Mount options of the filesystem (Default: rw)</li>
+<li><strong>dump</strong> (<em>str</em>) &#8211; Used by the dump utility to decide when to make a backup, 0|1 (Default: 0)</li>
+<li><strong>pazz</strong> (<em>str</em>) &#8211; Used by fsck to decide which order filesystems are to be checked (Default: 0)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="blues.debian.add_rc_service">
 <code class="descname">add_rc_service</code><span class="sig-paren">(</span><em>name</em>, <em>priorities='defaults'</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.add_rc_service" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -184,6 +207,23 @@
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="blues.debian.get_mount">
+<code class="descname">get_mount</code><span class="sig-paren">(</span><em>mount_point</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.get_mount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolve a mount point to mounted file system.
+If not mounted, return None.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mount_point</strong> (<em>str</em>) &#8211; Name of mount point to reslve</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return str:</th><td class="field-body">Mounted file system</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="blues.debian.get_user">
 <code class="descname">get_user</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.get_user" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -197,6 +237,27 @@
 <dt id="blues.debian.groupmod">
 <code class="descname">groupmod</code><span class="sig-paren">(</span><em>name</em>, <em>gid</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.groupmod" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="blues.debian.hostname">
+<code class="descname">hostname</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.hostname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="blues.debian.is_mounted">
+<code class="descname">is_mounted</code><span class="sig-paren">(</span><em>mount_point</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.is_mounted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if mount point is mounted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mount_point</strong> &#8211; Name of mount point</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return bool:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.kill">
@@ -219,6 +280,11 @@
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="blues.debian.locale_gen">
+<code class="descname">locale_gen</code><span class="sig-paren">(</span><em>locale</em>, <em>utf8=True</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.locale_gen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="blues.debian.mkdir">
 <code class="descname">mkdir</code><span class="sig-paren">(</span><em>location</em>, <em>recursive=True</em>, <em>mode=None</em>, <em>owner=None</em>, <em>group=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.mkdir" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -227,6 +293,26 @@
 <dt id="blues.debian.mktemp">
 <code class="descname">mktemp</code><span class="sig-paren">(</span><em>directory=False</em>, <em>mode=None</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.mktemp" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="blues.debian.mount">
+<code class="descname">mount</code><span class="sig-paren">(</span><em>mount_point</em>, <em>owner=None</em>, <em>group=None</em>, <em>**fstab</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.mount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mount and optionally add configuration to fstab.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mount_point</strong> (<em>str</em>) &#8211; Name of mount point</li>
+<li><strong>owner</strong> (<em>str</em>) &#8211; Name of mount point owner</li>
+<li><strong>group</strong> (<em>str</em>) &#8211; Name of mount point group</li>
+<li><strong>fstab</strong> (<em>dict</em>) &#8211; Optional kwargs passed to add_fstab()</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="blues.debian.mv">
@@ -313,6 +399,20 @@
 <dt id="blues.debian.total_memory">
 <code class="descname">total_memory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.total_memory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get total memory in bytes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="blues.debian.unmount">
+<code class="descname">unmount</code><span class="sig-paren">(</span><em>mount_point</em><span class="sig-paren">)</span><a class="headerlink" href="#blues.debian.unmount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unmount mount point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mount_point</strong> (<em>str</em>) &#8211; Name of mount point to unmount</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
