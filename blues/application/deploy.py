@@ -62,7 +62,7 @@ def install_project_structure():
         debian.mkdir(root_path)
 
         # Create static web paths
-        static_base = os.path.join('/srv/www/', project_name)
+        static_base = blueprint.get('static_base', os.path.join('/srv/www/', project_name))
         static_path = os.path.join(static_base, 'static')
         media_path = os.path.join(static_base, 'media')
         debian.mkdir(static_path, group='www-data', mode=1775)

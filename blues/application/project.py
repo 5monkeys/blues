@@ -20,7 +20,7 @@ use_virtualenv = lambda: blueprint.get('virtualenv', True)
 virtualenv_path = lambda: os.path.join(project_home(), 'env')  # /srv/app/project/env
 git_repository = lambda: git.parse_url(blueprint.get('git_url'), branch=blueprint.get('git_branch'))  # git repo dict
 git_repository_path = lambda: os.path.join(git_root(), git_repository()['name'])  # /srv/app/project/src/repo.git
-python_path = lambda: os.path.join(git_repository_path(), blueprint.get('git_source', 'src'))  # /srv/app/project/src/repo.git
+python_path = lambda: os.path.join(git_repository_path(), blueprint.get('git_source', 'src'))  # /srv/app/project/src/repo.git/src
 requirements_txt = lambda: os.path.join(git_repository_path(), blueprint.get('requirements', 'requirements.txt'))  # /srv/app/project/src/repo.git/requirements.txt
 
 
