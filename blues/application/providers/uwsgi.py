@@ -7,15 +7,16 @@ from fabric.utils import indent, warn
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
 
-from .base import BaseProvider
+from .base import ManagedProvider
 from ..project import *
 
 from ... import debian
 from ...app import blueprint
 
 
-class UWSGIProvider(BaseProvider):
+class UWSGIProvider(ManagedProvider):
     name = 'uwsgi'
+    default_manager = 'noop'
 
     def install(self):
         """

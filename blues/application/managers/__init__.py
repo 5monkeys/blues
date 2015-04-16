@@ -10,8 +10,10 @@ def get_manager(name):
 def list_managers():
     from .nginx import NginxManager
     from .supervisor import SupervisorManager
+    from .noop import NoopManager
 
     return [
+        NoopManager,
         NginxManager,
         SupervisorManager
     ]
