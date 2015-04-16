@@ -27,21 +27,22 @@ class GunicornProvider(ManagedProvider):
     def create_socket(self):
         socket = blueprint.get('web.socket')
 
-        parts = urlparse(socket)
+        if ':' in socket:  # It's a tcp socket
+            return
 
-        if not parts.path:
-            path = socket
-        else:
-            path = parts.path
+        # It's an unix socket
+        path = socket
 
         if len(path.split('/')) < 2:
-            raise ValueError('socket cannot be placed in /.')
+            raise ValueError('socket should not be placed in /.')
 
         info('Creating socket for gunicorn: %s' % path)
 
         with sudo():
-            debian.mkdir(os.path.dirname(path))
-            debian.chown(os.path.dirname(path), self.project)
+            mkdir_result = debian.mkdir(os.path.dirname(path))
+
+            if mkdir_result.return_code == 0:
+                debian.chown(os.path.dirname(path), self.project, 'www-data')
 
     def get_context(self):
         context = super(GunicornProvider, self).get_context()
@@ -50,7 +51,7 @@ class GunicornProvider(ManagedProvider):
         host, _, port = socket.partition(':')
 
         if not port:
-            socket = 'unix://{}'.format(socket)
+            socket = 'unix:{}'.format(socket)
 
         bp = {
             'socket': socket,
