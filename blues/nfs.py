@@ -14,6 +14,9 @@ NFS Blueprint
         exports:
           /foo/bar:                                              # Path to export
             host: 10.0.0.0/24                                    # Host mask to allow
+            # mode: 755                                          # Optional file mode on exported path
+            # owner: foobar                                      # Optional owner of exported path
+            # group: foobar                                      # Optional group of exported path
             # options: rw,async,no_root_squash,no_subtree_check  # Optional export options
 
 """
