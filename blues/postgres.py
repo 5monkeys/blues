@@ -12,6 +12,7 @@ Postgres Blueprint
     settings:
       postgres:
         version: 9.3           # PostgreSQL version (required)
+        # bind: *              # What IP address(es) to listen on, use '*' for all (Default: localhost)
         schemas:
           some_schema_name:    # The schema name
             user: foo          # Username to connect to schema
@@ -81,10 +82,13 @@ def configure():
     """
     Configure Postgresql
     """
+    context = {
+        'listen_addresses': blueprint.get('bind', 'localhost')
+    }
     updates = [blueprint.upload(os.path.join('.', 'pgtune.conf'), postgres_root(), user='postgres'),
                blueprint.upload(os.path.join('.', 'pg_hba.conf'), postgres_root(), user='postgres'),
                blueprint.upload(os.path.join('.', 'postgresql-{}.conf'.format(version())),
-                                postgres_root('postgresql.conf'), user='postgres')]
+                                postgres_root('postgresql.conf'), context=context, user='postgres')]
     if any(updates):
         restart()
 
