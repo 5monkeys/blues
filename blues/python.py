@@ -30,7 +30,7 @@ blueprint = blueprints.get(__name__)
 
 def requested_version():
     ver = blueprint.get('version', '2.7')  # Default to python 2.7
-    return tuple(map(int, ver.split('.')))[:2]
+    return tuple(map(int, str(ver).split('.')))[:2]
 
 
 @task
@@ -92,10 +92,11 @@ def install():
 
 
 def pip(command, *options):
-    info('Running pip {}', command)
     # TODO: change pip log location, per env? per user?
-    run('pip {0} {1} -v --log={2} --log-file={2}'\
-        .format(
-            command,
-            ' '.join(options),
-            pip_log_file))
+
+    info('Running pip {}', command)
+    bin = 'pip3' if requested_version() >= (3,) else 'pip'
+    cmd = '{pip} {command} {options} -v --log={log_file} --log-file={log_file}'
+
+    run(cmd.format(pip=bin, command=command,
+                   options=' '.join(options), log_file=pip_log_file))

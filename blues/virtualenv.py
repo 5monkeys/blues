@@ -49,7 +49,7 @@ def install():
 def create(path):
     options = ''
 
-    if python.requested_version() > (3,):
+    if python.requested_version() >= (3,):
         options += ' -p /usr/bin/python3'
 
     if not files.exists(path):
