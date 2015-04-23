@@ -1,6 +1,3 @@
-blues.git module
-================
-
 .. automodule:: blues.git
     :members:
     :undoc-members:

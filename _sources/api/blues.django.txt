@@ -1,6 +1,3 @@
-blues.django module
-===================
-
 .. automodule:: blues.django
     :members:
     :undoc-members:

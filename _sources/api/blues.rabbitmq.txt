@@ -1,6 +1,3 @@
-blues.rabbitmq module
-=====================
-
 .. automodule:: blues.rabbitmq
     :members:
     :undoc-members:

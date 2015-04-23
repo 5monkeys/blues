@@ -1,6 +1,3 @@
-blues.fstab module
-==================
-
 .. automodule:: blues.fstab
     :members:
     :undoc-members:

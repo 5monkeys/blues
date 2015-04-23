@@ -1,6 +1,3 @@
-blues.percona module
-====================
-
 .. automodule:: blues.percona
     :members:
     :undoc-members:
