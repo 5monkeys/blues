@@ -1,3 +1,6 @@
+blues.redis module
+==================
+
 .. automodule:: blues.redis
     :members:
     :undoc-members:

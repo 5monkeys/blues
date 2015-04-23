@@ -1,3 +1,6 @@
+blues.supervisor module
+=======================
+
 .. automodule:: blues.supervisor
     :members:
     :undoc-members:

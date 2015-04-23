@@ -1,3 +1,6 @@
+blues.uwsgi module
+==================
+
 .. automodule:: blues.uwsgi
     :members:
     :undoc-members:

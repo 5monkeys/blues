@@ -1,3 +1,6 @@
+blues.wowza module
+==================
+
 .. automodule:: blues.wowza
     :members:
     :undoc-members:

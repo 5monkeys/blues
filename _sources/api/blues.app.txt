@@ -1,3 +1,6 @@
+blues.app module
+================
+
 .. automodule:: blues.app
     :members:
     :undoc-members:

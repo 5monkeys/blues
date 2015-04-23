@@ -1,3 +1,6 @@
+blues.elasticsearch module
+==========================
+
 .. automodule:: blues.elasticsearch
     :members:
     :undoc-members:

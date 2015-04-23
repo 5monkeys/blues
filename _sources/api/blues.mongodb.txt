@@ -1,3 +1,6 @@
+blues.mongodb module
+====================
+
 .. automodule:: blues.mongodb
     :members:
     :undoc-members:

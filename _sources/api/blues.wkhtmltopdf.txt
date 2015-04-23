@@ -1,3 +1,6 @@
+blues.wkhtmltopdf module
+========================
+
 .. automodule:: blues.wkhtmltopdf
     :members:
     :undoc-members:

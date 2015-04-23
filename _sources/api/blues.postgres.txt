@@ -1,3 +1,6 @@
+blues.postgres module
+=====================
+
 .. automodule:: blues.postgres
     :members:
     :undoc-members:

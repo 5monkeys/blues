@@ -1,3 +1,6 @@
+blues.solr module
+=================
+
 .. automodule:: blues.solr
     :members:
     :undoc-members:

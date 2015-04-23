@@ -1,3 +1,6 @@
+blues.logstash module
+=====================
+
 .. automodule:: blues.logstash
     :members:
     :undoc-members:

@@ -1,3 +1,6 @@
+blues.gunicorn module
+=====================
+
 .. automodule:: blues.gunicorn
     :members:
     :undoc-members:

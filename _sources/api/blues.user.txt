@@ -1,3 +1,6 @@
+blues.user module
+=================
+
 .. automodule:: blues.user
     :members:
     :undoc-members:

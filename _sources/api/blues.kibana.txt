@@ -1,3 +1,6 @@
+blues.kibana module
+===================
+
 .. automodule:: blues.kibana
     :members:
     :undoc-members:

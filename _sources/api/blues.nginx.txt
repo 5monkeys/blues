@@ -1,3 +1,6 @@
+blues.nginx module
+==================
+
 .. automodule:: blues.nginx
     :members:
     :undoc-members:

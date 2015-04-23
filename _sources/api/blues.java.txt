@@ -1,3 +1,6 @@
+blues.java module
+=================
+
 .. automodule:: blues.java
     :members:
     :undoc-members:

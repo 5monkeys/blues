@@ -1,3 +1,6 @@
+blues.ruby module
+=================
+
 .. automodule:: blues.ruby
     :members:
     :undoc-members:

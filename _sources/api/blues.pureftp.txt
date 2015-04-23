@@ -1,3 +1,6 @@
+blues.pureftp module
+====================
+
 .. automodule:: blues.pureftp
     :members:
     :undoc-members:

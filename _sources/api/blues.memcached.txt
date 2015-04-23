@@ -1,3 +1,6 @@
+blues.memcached module
+======================
+
 .. automodule:: blues.memcached
     :members:
     :undoc-members:

@@ -1,3 +1,6 @@
+blues.cron module
+=================
+
 .. automodule:: blues.cron
     :members:
     :undoc-members:

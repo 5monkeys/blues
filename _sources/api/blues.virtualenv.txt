@@ -1,3 +1,6 @@
+blues.virtualenv module
+=======================
+
 .. automodule:: blues.virtualenv
     :members:
     :undoc-members:
