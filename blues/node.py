@@ -11,13 +11,17 @@ Node.js Blueprint
 
     settings:
       node:
+        # version: latest    # Install latest node version
         packages:            # List of npm packages to install (Optional)
           # - coffee-script
+          # - yuglify
+          # - less
 
 """
 from contextlib import contextmanager
 from fabric.context_managers import cd, prefix
 from fabric.decorators import task
+from fabric.utils import abort
 
 from refabric.api import run, info
 from refabric.context_managers import sudo
@@ -57,10 +61,6 @@ def get_version():
 def install(for_user=None):
     version = get_version()
 
-    if not version:
-        info('Installing node from apt')
-        return install()
-
     if version == 'latest':
         info('Installing latest node from tarball', )
         with sudo():
@@ -73,6 +73,10 @@ def install(for_user=None):
 
         with maybe_managed(cm):
             return install_latest()
+
+    else:
+        info('Installing node from apt')
+        return install_deb()
 
 
 def install_node_build_deps():
