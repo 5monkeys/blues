@@ -108,8 +108,22 @@ def install_system_dependencies():
     """
     with sudo():
         info('Install system dependencies')
-        dependencies = blueprint.get('system_dependencies')
-        if dependencies:
+        system_dependencies = blueprint.get('system_dependencies')
+
+        if system_dependencies:
+            dependencies = []
+            repositories = []
+            for dependency in system_dependencies:
+                dep, _, rep = dependency.partition('@')
+                if dep not in dependencies:
+                    dependencies.append(dep)
+                if rep and rep not in repositories:
+                    repositories.append(rep)
+
+            if repositories:
+                for repository in repositories:
+                    debian.add_apt_repository(repository, src=True)
+
             debian.apt_get('update')
             debian.apt_get('install', *dependencies)
 
