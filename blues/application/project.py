@@ -16,7 +16,7 @@ blueprint = blueprints.get('blues.app')
 
 use_python = lambda: blueprint.get('use_python', True)
 
-use_virtualenv = lambda: blueprint.get('virtualenv', True) and use_python()
+use_virtualenv = lambda: blueprint.get('use_virtualenv', True) and use_python()
 
 # /srv/app
 app_root = lambda: blueprint.get('root_path') or '/srv/app'

@@ -20,7 +20,8 @@ Application Blueprint
         #  - /node_modules
         #  - /bower_components
 
-        # virtualenv: false                           # Enable virtualenv and pip requirements (Default: true)
+        # use_python: false                           # Enable python support, required for virtualenv (Default: true)
+        # use_virtualenv: false                       # Enable virtualenv and pip requirements, unless `use_python` is false (Default: true)
         # requirements: requirements/live.txt         # Pip requirements file to install (Default: requirements.txt)
         # system_dependencies:                        # List of debian packages to install
         #   - build-essential  # gcc
@@ -45,7 +46,10 @@ Application Blueprint
           # Set worker provider (uwsgi or supervisor)
           provider: celery:supervisor
           module: foobar.celery                       # Set worker module to load
-          # extensions:                               # Optional Worker framework specific extension configuration
+          # extensions:                               # Optional Worker framework specific extension configuration [dict|list]
+          #   - beat
+          #   - flower
+          #   (OR)
           #   beat: 10.0.0.12                         # Celery: Restrict beat service to specific host
           #   flower: 10.0.0.12                       # Celery: Restrict flower service to specific host
           # hosts:                                    # Optional host list restricting worker provider installation
@@ -58,11 +62,13 @@ Application Blueprint
                 # hosts:                              # Optional host list restriction for queue
                 #   - 10.0.0.11
 
-      # Do not forget to configure the providers properly
+      # Do not forget to configure the dependencies properly
       # uwsgi:
-      #   version: 2.0.8
+      #   version: 2.0.10
       # supervisor:
       #   version: 3.1.3
+      # python:
+      #   version: 3
 
 """
 from refabric.contrib import blueprints
