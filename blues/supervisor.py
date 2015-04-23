@@ -235,7 +235,7 @@ def reload(program=None):
     Reload supervisor or reload program(s), via SIGHUP
 
     :param program: The program to reload (all|exact|pattern). If not given,
-    the supervisor service will reload.
+        the supervisor service will reload.
     """
     if not program:
         service('reload')
