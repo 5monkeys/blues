@@ -36,12 +36,15 @@ class GunicornProvider(ManagedProvider):
         if len(path.split('/')) < 2:
             raise ValueError('socket should not be placed in /.')
 
-        info('Creating socket for gunicorn: %s' % path)
+        info('Creating socket for gunicorn: {}', path)
 
         with sudo():
             mkdir_result = debian.mkdir(os.path.dirname(path))
 
-            if mkdir_result.return_code == 0:
+            # If we could not create the directory, don't chown it.
+            # mkdir returns 0 if successsfully created or already exists,
+            # and > 0 for permission denied.
+            if mkdir_result is not None and mkdir_result.return_code == 0:
                 debian.chown(os.path.dirname(path), self.project, 'www-data')
 
     def get_context(self):

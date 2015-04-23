@@ -5,7 +5,7 @@ from fabric.state import env
 from fabric.utils import indent, abort
 from blues.application.project import git_repository_path
 
-from refabric.context_managers import sudo
+from refabric.context_managers import sudo, silent
 from refabric.operations import run
 from refabric.utils import info
 from refabric.contrib import blueprints
@@ -106,7 +106,7 @@ def install_system_dependencies():
     """
     Install system wide packages that application depends on.
     """
-    with sudo():
+    with sudo(), silent():
         info('Install system dependencies')
         system_dependencies = blueprint.get('system_dependencies')
 
