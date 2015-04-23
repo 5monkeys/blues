@@ -81,7 +81,7 @@ def configure():
             export_changes.append(exported)
 
     if any(export_changes):
-        reload()
+        restart()
 
 
 def export(path, host, options='rw,async,no_root_squash,no_subtree_check'):
