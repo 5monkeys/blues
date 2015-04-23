@@ -1,4 +1,4 @@
-.. automodule:: blues.application.deploy
+.. automodule:: blues.gunicorn
     :members:
     :undoc-members:
     :show-inheritance:

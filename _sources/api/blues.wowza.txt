@@ -1,4 +1,4 @@
-.. automodule:: blues.application.providers.supervisor
+.. automodule:: blues.wowza
     :members:
     :undoc-members:
     :show-inheritance:

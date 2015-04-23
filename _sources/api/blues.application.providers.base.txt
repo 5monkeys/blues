@@ -1,4 +1,0 @@
-.. automodule:: blues.application.providers.base
-    :members:
-    :undoc-members:
-    :show-inheritance:
