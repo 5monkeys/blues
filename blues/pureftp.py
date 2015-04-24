@@ -93,10 +93,14 @@ def configure():
 
         for user in blueprint.get('users'):
             username, password = user['username'], user['password']
+            if 'homedir' in user:
+                user_home = user['homedir']
+            else:
+                user_home = os.path.join(ftp_root, username)
+
             passwd_path = '/etc/pure-ftpd/pureftpd.passwd'
             if files.exists(passwd_path) and run('pure-pw show {}'.format(username)).return_code == 0:
                 continue
-            user_home = os.path.join(ftp_root, username)
             debian.mkdir(user_home, owner=ftp_user, group=ftp_group)
             prompts = {
                 'Password: ': password,
