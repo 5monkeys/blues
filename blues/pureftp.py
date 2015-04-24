@@ -100,8 +100,10 @@ def configure():
                 user_home = os.path.join(ftp_root, username)
 
             passwd_path = '/etc/pure-ftpd/pureftpd.passwd'
-            if files.exists(passwd_path) and run('pure-pw show {}'.format(username)).return_code == 0:
-                continue
+            with settings(warn_only=True):
+                if files.exists(passwd_path) and run('pure-pw show {}'.format(
+                                                     username)).return_code == 0:
+                    continue
             debian.mkdir(user_home, owner=ftp_user, group=ftp_group)
             prompts = {
                 'Password: ': password,
