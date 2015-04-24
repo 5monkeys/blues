@@ -55,7 +55,8 @@ def install():
         debian.apt_get('install', 'pure-ftpd', 'openssl')
 
         # Create ftp user
-        user.create_service_user(ftp_user, groups=[ftp_group])
+        debian.useradd(ftp_user, '/dev/null', shell='/bin/false',
+                       user_group=True, groups=[ftp_group], uid_min=1000)
 
         # Create ftp root dir
         debian.mkdir(ftp_root, mode=1770, owner=ftp_user, group=ftp_group)
