@@ -91,11 +91,14 @@ def install():
         pip('install', 'setuptools', '--upgrade')
 
 
-def pip(command, *options):
+def pip(command, *options, **kwargs):
     # TODO: change pip log location, per env? per user?
-
+    # Perhaps we should just remove the log_file argument and let pip put it
+    # where it belongs.
     info('Running pip {}', command)
-    bin = 'pip3' if requested_version() >= (3,) else 'pip'
+    bin = kwargs.pop('bin',
+                     'pip3' if requested_version() >= (3,)
+                     else 'pip')
     cmd = '{pip} {command} {options} -v --log={log_file} --log-file={log_file}'
 
     run(cmd.format(pip=bin, command=command,

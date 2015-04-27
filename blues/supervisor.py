@@ -74,7 +74,7 @@ def install():
         info('Installing: {} ({})', 'Supervisor', (version
                                                    if version
                                                    else 'latest'))
-        python.pip('install', package)
+        python.pip('install', package, bin='pip2')
 
         # Create group
         debian.groupadd('app-data', gid_min=10000)
