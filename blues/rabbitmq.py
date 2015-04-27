@@ -79,7 +79,9 @@ def configure():
     """
     Configure Rabbitmq
     """
-    uploads = blueprint.upload('./', '/etc/rabbitmq/')
+    uploads = blueprint.upload('rabbitmq/', '/etc/rabbitmq/')
+    uploads += blueprint.upload('erlang.cookie', '/var/lib/rabbitmq/.erlang.cookie', \
+                                user='rabbitmq')
     if uploads:
         restart()
 
