@@ -81,7 +81,7 @@ def install(for_user=None):
 
 def install_node_build_deps():
     info('Installing build tools')
-    debian.apt_get('update')
+    debian.apt_get_update()
     debian.apt_get('install', 'build-essential node-rimraf')
 
 

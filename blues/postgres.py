@@ -87,11 +87,21 @@ def configure():
         'listen_addresses': blueprint.get('bind', 'localhost'),
         'host_all_allow': blueprint.get('allow', None)
     }
-    updates = [blueprint.upload(os.path.join('.', 'pgtune.conf'), postgres_root(), user='postgres'),
-               blueprint.upload(os.path.join('.', 'pg_hba.conf'),
-                                postgres_root(), context=context, user='postgres'),
-               blueprint.upload(os.path.join('.', 'postgresql-{}.conf'.format(version())),
-                                postgres_root('postgresql.conf'), context=context, user='postgres')]
+    updates = [
+        blueprint.upload(os.path.join('.', 'pgtune.conf'),
+                         postgres_root(),
+                         user='postgres'),
+        blueprint.upload(os.path.join('.', 'pg_hba.conf'),
+                         postgres_root(),
+                         context=context,
+                         user='postgres'),
+        blueprint.upload(os.path.join('.',
+                                      'postgresql-{}.conf'.format(version())),
+                         postgres_root('postgresql.conf'),
+                         context=context,
+                         user='postgres')
+    ]
+
     if any(updates):
         restart()
 
@@ -109,8 +119,10 @@ def setup_schemas(drop=False):
             user, password = config['user'], config.get('password')
             info('Creating user {}', user)
             if password:
-                _client_exec("CREATE ROLE %(user)s WITH PASSWORD '%(password)s' LOGIN",
-                             user=user, password=password)
+                _client_exec("CREATE ROLE %(user)s WITH PASSWORD '%(password)s'"
+                             " LOGIN",
+                             user=user,
+                             password=password)
             else:
                 _client_exec("CREATE ROLE %(user)s LOGIN", user=user)
             if drop:
@@ -119,7 +131,8 @@ def setup_schemas(drop=False):
             info('Creating schema {}', schema)
             _client_exec('CREATE DATABASE %(name)s', name=schema)
             info('Granting user {} to schema {}'.format(user, schema))
-            _client_exec("GRANT ALL PRIVILEGES ON DATABASE %(schema)s to %(user)s",
+            _client_exec("GRANT ALL PRIVILEGES"
+                         " ON DATABASE %(schema)s to %(user)s",
                          schema=schema, user=user)
 
 
@@ -179,8 +192,13 @@ def generate_pgtune_conf(role='db'):
 
         tune_conf = dict(parse(output))
         tune_conf.update(blueprint.get('pgtune', {}))
-        tune_conf = '\n'.join((' = '.join(item)) for item in tune_conf.iteritems())
-        conf_dir = os.path.join(os.path.dirname(env['real_fabfile']), 'templates', role, 'postgres')
+        tune_conf = '\n'.join(' = '.join(item)
+                              for item in tune_conf.iteritems())
+        conf_dir = os.path.join(
+            os.path.dirname(env['real_fabfile']),
+            'templates',
+            role,
+            'postgres')
         conf_path = os.path.join(conf_dir, 'pgtune.conf')
 
         if not os.path.exists(conf_dir):
@@ -202,7 +220,8 @@ def dump(schema=None):
         for i, schema in enumerate(schemas, start=1):
             print("{i}. {schema}".format(i=i, schema=schema))
         valid_indices = '[1-{}]+'.format(len(schemas))
-        schema_choice = prompt('Select schema to dump:', default='1', validate=valid_indices)
+        schema_choice = prompt('Select schema to dump:', default='1',
+                               validate=valid_indices)
         schema = schemas[int(schema_choice)-1]
 
     with sudo('postgres'):

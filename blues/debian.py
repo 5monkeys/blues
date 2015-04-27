@@ -123,6 +123,12 @@ def apt_get(command, *options):
     return run('apt-get --yes {} {}'.format(command, options))
 
 
+def apt_get_update(quiet=True):
+    options = '-q' if quiet else ''
+    info('Updating apt package lists')
+    return run('apt-get {} update'.format(options))
+
+
 def debconf_set_selections(*selections):
     for selection in selections:
         run('echo debconf "{}" | debconf-set-selections'.format(selection))
@@ -159,7 +165,7 @@ def add_apt_ppa(name, accept=True, src=False):
 
         if not fabric.contrib.files.exists(source_list):
             add_apt_repository('ppa:{}'.format(name), accept=accept, src=src)
-            apt_get('update')
+            apt_get_update()
 
 
 def command_exists(*command):

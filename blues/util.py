@@ -8,4 +8,3 @@ def maybe_managed(*context_managers):
             yield
     else:
         yield
-

@@ -71,7 +71,7 @@ def install_from_source():
     from blues import debian, nginx
 
     with sudo():
-        debian.apt_get('update')
+        debian.apt_get_update()
 
         #Install dependencies
         packages = ('build-essential', 'libpcre3', 'libpcre3-dev',

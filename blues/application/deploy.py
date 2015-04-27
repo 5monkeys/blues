@@ -124,7 +124,7 @@ def install_system_dependencies():
                 for repository in repositories:
                     debian.add_apt_repository(repository, src=True)
 
-            debian.apt_get('update')
+            debian.apt_get_update()
             debian.apt_get('install', *dependencies)
 
 
