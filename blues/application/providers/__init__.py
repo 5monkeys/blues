@@ -31,7 +31,7 @@ def get_providers(host=None):
 
     # TODO: TEST! TEST! TEST! NEEDS TESTING!, rewrote host filtering.
 
-    web_hosts = blueprint.get('web.hosts')
+    web_hosts = blueprint.get('web', {}).get('hosts', [])
     # Filter out bad values
     web_hosts = filter(lambda x: x, web_hosts)
     web_provider = blueprint.get('web.provider')
@@ -40,7 +40,7 @@ def get_providers(host=None):
         providers[web_provider] = resolve_runners(web_provider)
 
     # Install worker providers
-    worker_hosts = blueprint.get('worker.hosts')
+    worker_hosts = blueprint.get('worker', {}).get('hosts', [])
 
     # Filter out bad values
     worker_hosts = filter(lambda x: x, worker_hosts)

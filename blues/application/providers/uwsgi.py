@@ -156,7 +156,7 @@ class UWSGIProvider(ManagedProvider):
             return None
 
         host = env.host_string
-        web_hosts = blueprint.get('web.hosts')
+        web_hosts = blueprint.get('web', {}).get('hosts', [])
 
         if not web_hosts or host in web_hosts:
             return '{}.ini'.format(blueprint.get('web.name', self.project))
@@ -173,7 +173,7 @@ class UWSGIProvider(ManagedProvider):
             return vassals
 
         host = env.host_string
-        worker_hosts = blueprint.get('worker.hosts')
+        worker_hosts = blueprint.get('worker', {}).get('hosts', [])
 
         if not worker_hosts or host in worker_hosts:
             vassals.add('celery.ini')
@@ -202,6 +202,7 @@ class UWSGIProvider(ManagedProvider):
         web_vassal = self.get_web_vassal()
         if web_vassal:
             vassals.add(web_vassal)
+
         return vassals
 
     def reload(self, vassals=None):
