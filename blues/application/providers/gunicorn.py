@@ -1,15 +1,15 @@
 import os
-from urlparse import urlparse
-from blues import python, virtualenv
-from blues.application.project import sudo_project, project_home, \
-    virtualenv_path
-from refabric.context_managers import sudo
 
-from ... import debian
+from refabric.context_managers import sudo
+from refabric.utils import info
+from refabric.utils.socket import format_socket
+
+from ..project import sudo_project, virtualenv_path
+
+from ... import debian, python, virtualenv
 from ...app import blueprint
 
 from .base import ManagedProvider
-from refabric.utils import info
 
 
 class GunicornProvider(ManagedProvider):
@@ -39,25 +39,19 @@ class GunicornProvider(ManagedProvider):
         info('Creating socket for gunicorn: {}', path)
 
         with sudo():
-            mkdir_result = debian.mkdir(os.path.dirname(path))
-
-            # If we could not create the directory, don't chown it.
-            # mkdir returns 0 if successsfully created or already exists,
-            # and > 0 for permission denied.
-            if mkdir_result is not None and mkdir_result.return_code == 0:
-                debian.chown(os.path.dirname(path), self.project, 'www-data')
+            mkdir_result = debian.mkdir(os.path.dirname(path),
+                                        owner=self.project,
+                                        group='www-data')
 
     def get_context(self):
         context = super(GunicornProvider, self).get_context()
-        socket = blueprint.get('web.socket')
+        socket_string = blueprint.get('web.socket')
 
-        host, _, port = socket.partition(':')
-
-        if not port:
-            socket = 'unix:{}'.format(socket)
+        if socket_string:
+            socket_string = format_socket(socket_string)
 
         bp = {
-            'socket': socket,
+            'socket': socket_string,
             'workers': blueprint.get('web.workers', debian.nproc() * 2),
             'module': blueprint.get('web.module'),
         }
