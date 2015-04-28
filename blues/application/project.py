@@ -9,13 +9,15 @@ from .. import git
 __all__ = [
     'app_root', 'project_home', 'git_root', 'use_virtualenv', 'virtualenv_path',
     'git_repository', 'git_repository_path', 'python_path', 'sudo_project',
-    'requirements_txt', 'use_python',
+    'requirements_txt', 'use_python', 'static_base'
 ]
 
 blueprint = blueprints.get('blues.app')
 
+# install python runtime and libs
 use_python = lambda: blueprint.get('use_python', True)
 
+# install virtualenv and python dependencies
 use_virtualenv = lambda: blueprint.get('use_virtualenv', True) and use_python()
 
 # /srv/app
@@ -41,7 +43,12 @@ python_path = lambda: os.path.join(git_repository_path(),
 requirements_txt = lambda: os.path.join(git_repository_path(),
                                         blueprint.get('requirements',
                                                       'requirements.txt'))
+# <project>
 project_name = lambda: blueprint.get('project')
+
+# /srv/www/project
+static_base = lambda: blueprint.get('static_base',
+                                    os.path.join('/srv/www/', project_name()))
 
 
 @contextmanager
