@@ -66,28 +66,31 @@ def deploy(auto_reload=True, force=False):
     code_changed = current_commit is not None and \
                    previous_commit != current_commit
 
-    if use_virtualenv() and (code_changed or force):
-        # May be requirements.txt, setup.py, or other
-        installation_file = requirements_txt()
+    if code_changed or force:
+        # Install python dependencies
+        if use_virtualenv():
+            # May be requirements.txt, setup.py, or other
+            installation_file = requirements_txt()
 
-        installation_file_changed = False
+            installation_file_changed = False
 
-        if not force:
-            # Check if installation_file has changed
-            commit_range = '{}..{}'.format(previous_commit, current_commit)
-            installation_file_changed, _, _ = git.diff_stat(
-                git_repository_path(),
-                commit_range,
-                installation_file)
+            if not force:
+                # Check if installation_file has changed
+                commit_range = '{}..{}'.format(previous_commit, current_commit)
+                installation_file_changed, _, _ = git.diff_stat(
+                    git_repository_path(),
+                    commit_range,
+                    installation_file)
 
-        # Install repo requirements.txt
-        info('Install requirements {}', installation_file)
-        if installation_file_changed or force:
-            install_requirements(installation_file)
-        else:
-            info(indent('(requirements not changed in {}...skipping)'),
-                 commit_range)
+            # Install repo requirements.txt
+            info('Install requirements {}', installation_file)
+            if installation_file_changed or force:
+                install_requirements(installation_file)
+            else:
+                info(indent('(requirements not changed in {}...skipping)'),
+                     commit_range)
 
+        # Reload providers
         if auto_reload:
             reload()
 
