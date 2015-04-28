@@ -67,16 +67,23 @@ def install():
         # PIP install system wide Supervisor
         package = 'supervisor'
         version = blueprint.get('version')
+
         if version:
             package += '=={}'.format(version)
-        info('Installing: {} ({})', 'Supervisor', version if version else 'latest')
-        python.pip('install', package)
+
+        info('Installing: {} ({})', 'Supervisor', (version
+                                                   if version
+                                                   else 'latest'))
+        python.pip('install', package, bin='pip2')
 
         # Create group
         debian.groupadd('app-data', gid_min=10000)
 
         # Create directories
-        for d in (programs_available_path, programs_enabled_path, log_path, tmpfs_path):
+        for d in (programs_available_path,
+                  programs_enabled_path,
+                  log_path,
+                  tmpfs_path):
             debian.mkdir(d, owner='root', group='app-data', mode=1775)
 
 
@@ -88,8 +95,9 @@ def configure():
     with sudo():
         # Upload templates
         uploads = blueprint.upload('init/', '/etc/init/')
-        uploads.extend(blueprint.upload('supervisord.conf', '/etc/'))
-        uploads.extend(blueprint.upload('programs-available/', programs_available_path + '/'))
+        uploads.extend(blueprint.upload('supervisord.conf', '/etc/') or [])
+        uploads.extend(blueprint.upload('programs-available/',
+                                        programs_available_path + '/') or [])
 
         # Disable previously enabled programs not configured programs-enabled
         changes = []
@@ -97,19 +105,22 @@ def configure():
         auto_disable = blueprint.get('auto_disable_programs', True)
         if auto_disable:
             with silent():
-                enabled_program_links = run('ls {}'.format(programs_enabled_path)).split()
+                enabled_program_links = run(
+                    'ls {}'.format(programs_enabled_path)).split()
+
             for link in enabled_program_links:
                 link_name = os.path.splitext(link)[0]  # Without extension
                 if link not in programs and link_name not in programs:
                     changed = disable(link, do_reload=False)
                     changes.append(changed)
 
-        ### Enable programs from settings
+        # Enable programs from settings
         for program in programs:
             changed = enable(program, do_reload=False)
             changes.append(changed)
 
-        ### Reload supervisor if new templates or any program has been enabled/disabled
+        # Reload supervisor if new templates or any program has been
+        # enabled/disabled.
         if uploads or any(changes):
             reload()
 
@@ -124,7 +135,10 @@ def disable(program, do_reload=True):
     :return: Got disabled?
     """
     disabled = False
-    program = program if program.endswith('.conf') or program == 'default' else '{}.conf'.format(program)
+
+    if not (program.endswith('.conf') or program == 'default'):
+        program = '{}.conf'.format(program)
+
     with sudo(), cd(programs_enabled_path):
         if files.is_link(program):
             info('Disabling program: {}', program)
@@ -149,7 +163,9 @@ def enable(program, do_reload=True):
     :return: Got enabled?
     """
     enabled = False
-    program = program if program.endswith('.conf') or program == 'default' else '{}.conf'.format(program)
+
+    if not (program.endswith('.conf') or program == 'default'):
+        program = '{}.conf'.format(program)
 
     with sudo():
         available_program = os.path.join(programs_available_path, program)
@@ -218,7 +234,8 @@ def reload(program=None):
     """
     Reload supervisor or reload program(s), via SIGHUP
 
-    :param program: The program to reload (all|exact|pattern). If not given, the supervisor service will reload
+    :param program: The program to reload (all|exact|pattern). If not given,
+        the supervisor service will reload.
     """
     if not program:
         service('reload')
@@ -226,10 +243,15 @@ def reload(program=None):
         with silent():
             if program == 'all':
                 program = ''
+
             output = supervisorctl('status', program=program)
+
             if output.return_code == 0:
-                pids = [line.split()[3][:-1] for line in output.stdout.split('\n')]
+                pids = [line.split()[3][:-1]
+                        for line in output.stdout.split('\n')]
+
                 program_count = len(pids)
+
                 if program_count > 1:
                     info('Reloading {} supervisor programs', program_count)
                 else:

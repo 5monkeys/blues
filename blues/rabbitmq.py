@@ -60,7 +60,7 @@ def install_testing():
 
         info('Adding apt repository for {}', package_name)
         debian.add_apt_repository('http://www.rabbitmq.com/debian/ testing main')
-        debian.apt_get('update')
+        debian.apt_get_update()
 
         info('Installing {}', package_name)
         debian.apt_get('install', package_name)

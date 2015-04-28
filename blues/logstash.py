@@ -128,7 +128,7 @@ def install_server():
         debian.add_apt_repository('http://packages.elasticsearch.org/logstash/{}/debian stable main'.format(version))
 
         info('Installing {} version {}', 'logstash', version)
-        debian.apt_get('update')
+        debian.apt_get_update()
         debian.apt_get('install', 'logstash')
 
         # Enable on boot

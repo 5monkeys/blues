@@ -51,7 +51,7 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 
-html:
+html: modules
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
@@ -180,11 +180,17 @@ pseudoxml:
 
 modules:
 	rm -rf source/api
-	$(SPHINXAPIDOC) --no-headings --no-toc --separate --output-dir=source/api $(PACKAGEDIR) $(PACKAGEDIR)/application
+	$(SPHINXAPIDOC)\
+		--no-headings\
+		--no-toc\
+		--separate\
+		--output-dir=source/api\
+		$(PACKAGEDIR)\
+		$(PACKAGEDIR)/application
 	@echo
 	@echo "Build finished. The module files are in source/api."
 
-publish:
+publish: html
 	ghp-import -n -p $(BUILDDIR)/html
 	@echo
 	@echo "Published!"

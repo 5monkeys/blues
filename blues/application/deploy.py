@@ -3,11 +3,13 @@ import os
 from fabric.context_managers import cd
 from fabric.state import env
 from fabric.utils import indent, abort
+from blues.application.project import git_repository_path
 
-from refabric.context_managers import sudo
+from refabric.context_managers import sudo, silent
+from refabric.operations import run
 from refabric.utils import info
+from refabric.contrib import blueprints
 
-from .project import *
 from .providers import get_providers
 
 from .. import debian
@@ -15,10 +17,39 @@ from .. import git
 from .. import user
 from .. import python
 from .. import virtualenv
-from ..app import blueprint
 
-__all__ = ['install_project_user', 'install_project_structure', 'install_system_dependencies', 'install_virtualenv',
-           'install_requirements', 'install_or_update_source', 'install_source', 'update_source', 'install_providers']
+__all__ = [
+    'install_project',
+    'install_project_user',
+    'install_project_structure',
+    'install_system_dependencies',
+    'install_virtualenv',
+    'install_requirements',
+    'install_or_update_source',
+    'install_source',
+    'update_source',
+    'install_providers'
+]
+
+
+blueprint = blueprints.get('blues.app')
+
+
+def install_project():
+    create_app_root()
+    install_project_user()
+    install_project_structure()
+    install_system_dependencies()
+    install_or_update_source()
+
+
+def create_app_root():
+    from .project import app_root
+
+    with sudo():
+        # Create global apps root
+        root_path = app_root()
+        debian.mkdir(root_path, recursive=True)
 
 
 def install_project_user():
@@ -28,6 +59,8 @@ def install_project_user():
     Disable ssh host checking.
     Create log dir.
     """
+    from .project import project_home
+
     with sudo():
         info('Install application user')
         username = blueprint.get('project')
@@ -39,7 +72,8 @@ def install_project_user():
             debian.groupadd(group, gid_min=10000)
 
         # Get UID for project user
-        user.create_system_user(username, groups=project_user_groups, home=home_path)
+        user.create_system_user(username, groups=project_user_groups,
+                                home=home_path)
 
         # Create application log path
         application_log_path = os.path.join('/var', 'log', username)
@@ -53,13 +87,12 @@ def install_project_structure():
     """
     Create project directory structure
     """
+
     with sudo():
         info('Install application directory structure')
         project_name = blueprint.get('project')
 
-        # Create global apps root
-        root_path = app_root()
-        debian.mkdir(root_path)
+        create_app_root()
 
         # Create static web paths
         static_base = blueprint.get('static_base', os.path.join('/srv/www/', project_name))
@@ -73,10 +106,25 @@ def install_system_dependencies():
     """
     Install system wide packages that application depends on.
     """
-    with sudo():
+    with sudo(), silent():
         info('Install system dependencies')
-        dependencies = blueprint.get('system_dependencies')
-        if dependencies:
+        system_dependencies = blueprint.get('system_dependencies')
+
+        if system_dependencies:
+            dependencies = []
+            repositories = []
+            for dependency in system_dependencies:
+                dep, _, rep = dependency.partition('@')
+                if dep not in dependencies:
+                    dependencies.append(dep)
+                if rep and rep not in repositories:
+                    repositories.append(rep)
+
+            if repositories:
+                for repository in repositories:
+                    debian.add_apt_repository(repository, src=True)
+
+            debian.apt_get_update()
             debian.apt_get('install', *dependencies)
 
 
@@ -84,6 +132,8 @@ def install_virtualenv():
     """
     Create a project virtualenv.
     """
+    from .project import sudo_project, virtualenv_path
+
     with sudo():
         virtualenv.install()
 
@@ -91,16 +141,28 @@ def install_virtualenv():
         virtualenv.create(virtualenv_path())
 
 
-def install_requirements():
+def install_requirements(installation_file):
     """
     Pip install requirements in project virtualenv.
     """
+    from .project import sudo_project, virtualenv_path, requirements_txt
+
     with sudo_project():
-        info('Install requirements')
         path = virtualenv_path()
-        requirements = requirements_txt()
+
+        info('Installing requirements from file {}', installation_file)
+
         with virtualenv.activate(path):
-            python.pip('install', '-r', requirements)
+            if installation_file.endswith('.txt') or \
+                    installation_file.endswith('.pip'):
+                python.pip('install', '-r', installation_file)
+            elif installation_file.endswith('.py'):
+                with cd(git_repository_path()):
+                    run('python {} develop'.format(installation_file))
+            else:
+                raise ValueError(
+                    '"{}" is not a valid installation file'.format(
+                        installation_file))
 
 
 def install_or_update_source():
@@ -118,6 +180,8 @@ def install_source():
 
     :return: True, if repository got cloned
     """
+    from .project import sudo_project, git_repository, git_root
+
     with sudo():
         git.install()
 
@@ -139,6 +203,8 @@ def update_source():
 
     :return: tuple(previous commit, current commit)
     """
+    from .project import sudo_project, git_repository_path, git_repository
+
     with sudo_project():
         # Get current commit
         path = git_repository_path()
@@ -146,7 +212,9 @@ def update_source():
 
         # Update source from git (reset)
         repository = git_repository()
-        current_commit = git.reset(repository['branch'], repository_path=path)
+        current_commit = git.reset(repository['branch'],
+                                   repository_path=path,
+                                   ignore=blueprint.get('git_force_ignore'))
 
         if current_commit is not None and current_commit != previous_commit:
             info(indent('(new version)'))
@@ -163,4 +231,7 @@ def install_providers():
     host = env.host_string
     providers = get_providers(host)
     for provider in providers.values():
+        if hasattr(provider, 'manager') and provider.manager is not None:
+            provider.manager.install()
+
         provider.install()
