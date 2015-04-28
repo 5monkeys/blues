@@ -140,7 +140,9 @@ def reset(branch, repository_path=None, **kwargs):
             # git-show. This includes terminal colors but also other
             # terminal-stuff that is emitted by git-show if it prints to a
             # terminal.
-            output = run('git show --oneline -s | cat')
+            with silent('warnings'):
+                output = run('git show --oneline -s | cat')
+
             match_commit = re.search(
                 r'(^|\n)(?P<commit>[0-9a-f]+)'
                 r'\s(?P<subject>.*)(\r|\n|$)',
