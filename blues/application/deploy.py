@@ -87,6 +87,7 @@ def install_project_structure():
     """
     Create project directory structure
     """
+    from .project import static_base
 
     with sudo():
         info('Install application directory structure')
@@ -95,9 +96,8 @@ def install_project_structure():
         create_app_root()
 
         # Create static web paths
-        static_base = blueprint.get('static_base', os.path.join('/srv/www/', project_name))
-        static_path = os.path.join(static_base, 'static')
-        media_path = os.path.join(static_base, 'media')
+        static_path = os.path.join(static_base(), 'static')
+        media_path = os.path.join(static_base(), 'media')
         debian.mkdir(static_path, group='www-data', mode=1775)
         debian.mkdir(media_path, group='www-data', mode=1775)
 
