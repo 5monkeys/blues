@@ -19,16 +19,8 @@ class CeleryProvider(ManagedProvider):
         raise NotImplementedError('celery cannot be configured as a web '
                                   'provider')
 
-    def configure_worker(self):
-        """
-        Render and upload worker program(s) to projects Supervisor home dir.
-
-        :return: Updated programs
-        """
-        from blues import supervisor
-
-        destination = self.get_config_path()
-        context = super(SupervisorManager, self).get_context()
+    def get_context(self):
+        context = super(CeleryProvider, self).get_context()
         context.update({
             'workers': blueprint.get('worker.workers', debian.nproc()),
         })
@@ -36,11 +28,21 @@ class CeleryProvider(ManagedProvider):
         # Override context defaults with blueprint settings
         context.update(blueprint.get('worker'))
 
+        return context
+
+    def reload(self):
+        for program in self.get_programs():
+            name, _, _ = program.partition('.')
+            self.manager.reload(name)
+
+    @staticmethod
+    def get_programs(self):
         # Filter program extensions by host
         programs = ['celery.conf']
         extensions = blueprint.get('worker.celery.extensions')
+
         if isinstance(extensions, list):
-            # Filter of bad values
+            # Filter or bad values
             extensions = [extension for extension in extensions if extension]
             for extension in extensions:
                 programs.append('{}.conf'.format(extension))
@@ -49,16 +51,29 @@ class CeleryProvider(ManagedProvider):
                 if extension_host in ('*', env.host_string):
                     programs.append('{}.conf'.format(extension))
 
-        # Upload programs
-        for program in programs:
+        return programs
+
+    def configure_worker(self):
+        """
+        Render and upload worker program(s) to projects Supervisor home dir.
+
+        :return: Updated programs
+        """
+        return self.configure()
+
+    def configure(self):
+        context = self.get_context()
+
+        for program in self.get_programs():
             template = os.path.join('supervisor', 'default', program)
-            default_templates = supervisor.blueprint.get_default_template_root()
-            with settings(template_dirs=[default_templates]):
-                uploads = blueprint.upload(template, destination, context=context)
-            self.updates.extend(uploads)
+            if not hasattr(self.manager, '_upload_provider_template'):
+                raise Exception('the celery provider only works with the '
+                                'supervisor manager as of now.')
+
+            self.updates.extend(
+                self.manager._upload_provider_template(
+                    template,
+                    context,
+                    program))
 
         return self.updates
-
-    def reload(self):
-        from blues import supervisor
-        supervisor.reload()
