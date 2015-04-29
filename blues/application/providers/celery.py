@@ -36,7 +36,7 @@ class CeleryProvider(ManagedProvider):
             self.manager.reload(name)
 
     @staticmethod
-    def get_programs(self):
+    def get_programs():
         # Filter program extensions by host
         programs = ['celery.conf']
         extensions = blueprint.get('worker.celery.extensions')
