@@ -1,13 +1,17 @@
 from contextlib import contextmanager
+
 from fabric.context_managers import prefix, cd
-from blues.util import maybe_managed
+
 from refabric.context_managers import sudo
 from refabric.contrib import blueprints
 from refabric.operations import run
 
-from ... import node
+from blues.util import maybe_managed
 
-from ..project import sudo_project, project_home, git_repository_path
+from ... import node, debian
+
+from ..project import sudo_project, project_home, git_repository_path,\
+    static_base
 
 from .base import ManagedProvider
 
@@ -38,17 +42,24 @@ class NodeProvider(ManagedProvider):
             node.install_latest()
             node.npm('install', 'gulp', 'bower')
 
-            with cd(git_repository_path()):
-                install_package_dependencies()
-
         self.build()
+
+    def install_requirements(self):
+        with sudo_project(), bash_profile(), cd(git_repository_path()):
+            install_package_dependencies()
 
     def reload(self):
         self.build()
 
     def build(self):
-        with sudo_project(), cd(git_repository_path()), bash_profile():
-            run('gulp build || true')
+        # This is necessary since the app blueprint doesn't care about
+        # package.json change detection and handling.
+        self.install_requirements()
+
+        with sudo_project(), cd(git_repository_path()), bash_profile(), \
+                prefix('export STATIC_BASE={}'.format(static_base())):
+            run('gulp build')
+            debian.chgrp(static_base(), group='www-data', recursive=True)
 
     def configure_web(self):
         return self.configure()
@@ -56,9 +67,9 @@ class NodeProvider(ManagedProvider):
     def configure(self):
         context = self.get_context()
 
-        self.manager.configure_provider(self,
-                                        context,
-                                        program_name=self.project)
+        return self.manager.configure_provider(self,
+                                               context,
+                                               program_name=self.project)
 
 
 def install_package_dependencies(path=None):
@@ -73,5 +84,5 @@ def install_package_dependencies(path=None):
         cd_cm = cd(path)
 
     with maybe_managed(cd_cm):
-        run('npm install')
+        run('npm install --production')
         run('test -f bower.json && bower install')
