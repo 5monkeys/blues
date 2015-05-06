@@ -87,8 +87,6 @@ def configure():
     if uploads:
         restart()
 
-    return uploads
-
 
 @task
 def ctl(command=None):
