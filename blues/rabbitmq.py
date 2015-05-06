@@ -80,8 +80,10 @@ def configure():
     Configure Rabbitmq
     """
     uploads = blueprint.upload('rabbitmq/', '/etc/rabbitmq/')
-    uploads += blueprint.upload('erlang.cookie', '/var/lib/rabbitmq/.erlang.cookie', \
-                                user='rabbitmq')
+    uploads.extend(blueprint.upload('erlang.cookie',
+                                    '/var/lib/rabbitmq/.erlang.cookie',
+                                    user='rabbitmq')
+                   or [])
     if uploads:
         restart()
 
