@@ -141,11 +141,14 @@ def install_virtualenv():
         virtualenv.create(virtualenv_path())
 
 
-def install_requirements(installation_file):
+def install_requirements(installation_file=None):
     """
     Pip install requirements in project virtualenv.
     """
     from .project import sudo_project, virtualenv_path, requirements_txt
+
+    if not installation_file:
+        installation_file = requirements_txt()
 
     with sudo_project():
         path = virtualenv_path()
