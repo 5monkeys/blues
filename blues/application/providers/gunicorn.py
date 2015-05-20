@@ -20,29 +20,6 @@ class GunicornProvider(ManagedProvider):
         with sudo_project(), virtualenv.activate(virtualenv_path()):
             python.pip('install', 'gunicorn')
 
-        self.manager.install()
-
-        self.create_socket()
-
-    def create_socket(self):
-        socket = blueprint.get('web.socket')
-
-        if ':' in socket:  # It's a tcp socket
-            return
-
-        # It's an unix socket
-        path = socket
-
-        if len(path.split('/')) < 2:
-            raise ValueError('socket should not be placed in /.')
-
-        info('Creating socket for gunicorn: {}', path)
-
-        with sudo():
-            mkdir_result = debian.mkdir(os.path.dirname(path),
-                                        owner=self.project,
-                                        group='www-data')
-
     def get_context(self):
         context = super(GunicornProvider, self).get_context()
         socket_string = blueprint.get('web.socket')
