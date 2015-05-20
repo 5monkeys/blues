@@ -19,6 +19,7 @@ from fabric.context_managers import cd
 from fabric.contrib import files
 from fabric.decorators import task
 from fabric.utils import warn
+from fabric.operations import local
 
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
@@ -141,6 +142,10 @@ def get_commit(repository_path=None, short=False):
             commit = commit[:7]
 
     return commit
+
+
+def get_local_commiter():
+    return local('git config user.name', capture=True)
 
 
 def diff_stat(repository_path=None, commit='HEAD^', path=None):
