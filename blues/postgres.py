@@ -49,13 +49,23 @@ version = lambda: blueprint.get('version', '9.1')
 postgres_root = lambda *a: os.path.join('/etc/postgresql/{}/main/'.format(version()), *a)
 
 
-def install():
+def install(add_repo=None):
     with sudo():
+        v = version()
+        if add_repo is None:
+            add_repo = (debian.lbs_release() == '14.04' and
+                        tuple(map(int, str(v).split('.'))) >= (9, 4))
+        if add_repo:
+            name = debian.lbs_codename()
+            repo = 'https://apt.postgresql.org/pub/repos/apt/ {}-pgdg main'.format(name)
+            debian.add_apt_key('https://www.postgresql.org/media/keys/ACCC4CF8.asc')
+            debian.add_apt_repository(repository=repo)
+            debian.apt_get_update()
         debian.apt_get('install',
                        'postgresql',
-                       'postgresql-server-dev-{}'.format(version()),
+                       'postgresql-server-dev-{}'.format(v),
                        'libpq-dev',
-                       'postgresql-contrib-{}'.format(version()),
+                       'postgresql-contrib-{}'.format(v),
                        'pgtune')
 
 
