@@ -13,6 +13,7 @@ __all__ = [
 ]
 
 
+project_name = lambda: blueprint.get('project')
 app_root = lambda: blueprint.get('root_path') or '/srv/app'  # /srv/app
 project_home = lambda: os.path.join(app_root(), blueprint.get('project'))  # /srv/app/project
 git_root = lambda: os.path.join(project_home(), 'src')  # /srv/app/project/src
