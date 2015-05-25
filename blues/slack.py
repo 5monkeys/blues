@@ -30,7 +30,7 @@ def notify(msg):
         return None
 
     data = json.dumps({
-        "channel": channal,
+        "channel": channel,
         "username": username,
         "text": msg,
         "icon_emoji": icon_emoji,
