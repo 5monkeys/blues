@@ -119,11 +119,9 @@ def setup_schemas(drop=False):
             _client_exec("GRANT ALL PRIVILEGES ON DATABASE %(schema)s to %(user)s",
                          schema=schema, user=user)
 
-            _schema = config.get('schema', 'public')
             for ext in config.get('extensions', []):
-                info('Creating extension {} on schema {}'.format(ext, schema))
-                _client_exec("CREATE EXTENSION IF NOT EXISTS %(ext)s SCHEMA %(schema)s",
-                             schema=_schema, ext=ext)
+                info('Creating extension {}'.format(ext))
+                _client_exec("CREATE EXTENSION IF NOT EXISTS %(ext)s", ext=ext)
 
 
 def _client_exec(cmd, **kwargs):
