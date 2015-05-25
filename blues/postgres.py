@@ -147,7 +147,7 @@ def setup_schemas(drop=False):
 
             for ext in config.get('extensions', []):
                 info('Creating extension {} on schema {}'.format(ext, schema))
-                _client_exec("CREATE EXTENSION IF NOT EXISTS %(ext)s SCHEMA %(schema)s"
+                _client_exec("CREATE EXTENSION IF NOT EXISTS %(ext)s SCHEMA %(schema)s",
                              schema=schema, ext=ext)
 
 
