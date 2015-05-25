@@ -145,9 +145,9 @@ def setup_schemas(drop=False):
                          " ON DATABASE %(schema)s to %(user)s",
                          schema=schema, user=user)
 
-            for ext in config.get('extensions', []):
+            for ext in blueprint.get('extensions', []):
                 info('Creating extension {}'.format(ext))
-                _client_exec("CREATE EXTENSION IF NOT EXISTS %(ext)s", ext=ext)
+                _client_exec("CREATE EXTENSION IF NOT EXISTS %(ext)s", ext=ext, schema=schema)
 
 
 def _client_exec(cmd, **kwargs):
