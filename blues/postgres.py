@@ -145,6 +145,11 @@ def setup_schemas(drop=False):
                          " ON DATABASE %(schema)s to %(user)s",
                          schema=schema, user=user)
 
+            for ext in config.get('extensions', []):
+                info('Creating extension {} on schema {}'.format(ext, schema))
+                _client_exec("CREATE EXTENSION IF NOT EXISTS %(ext)s SCHEMA %(schema)s"
+                             schema=schema, ext=ext)
+
 
 def _client_exec(cmd, **kwargs):
     with sudo('postgres'):
