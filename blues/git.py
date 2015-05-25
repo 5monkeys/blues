@@ -101,6 +101,17 @@ def fetch(repository_path=None):
         run('git fetch origin', pty=False)
 
 
+def show_file(repository_path, filename, revision='HEAD'):
+    with cd(repository_path), silent():
+        # pipe through cat to get rid of any ANSI codes
+        output = run('git show {revision}:{filename} | cat'.format(
+            revision=revision,
+            filename=filename
+        ))
+
+    return output
+
+
 def reset(branch, repository_path=None, **kwargs):
     """
     Fetch, reset, clean and checkout repository branch.

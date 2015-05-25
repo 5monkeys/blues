@@ -17,7 +17,7 @@ class BaseProvider(object):
         """
         Install provider.
         """
-        raise NotImplementedError
+        pass
 
     def get_config_path(self):
         """

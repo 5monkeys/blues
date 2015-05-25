@@ -59,7 +59,8 @@ class NodeProvider(ManagedProvider):
         with sudo_project(), cd(git_repository_path()), bash_profile(), \
                 prefix('export STATIC_BASE={}'.format(static_base())):
             run('gulp build')
-            debian.chgrp(static_base(), group='www-data', recursive=True)
+            debian.chgrp(static_base(), group='www-data',
+                         recursive=True)
 
     def configure_web(self):
         return self.configure()

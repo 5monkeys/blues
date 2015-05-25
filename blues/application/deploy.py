@@ -1,8 +1,12 @@
 import os
 
+from functools import partial
+
+from pkg_resources import parse_requirements
+
 from fabric.context_managers import cd
 from fabric.state import env
-from fabric.utils import indent, abort
+from fabric.utils import indent, abort, warn
 from blues.application.project import git_repository_path
 
 from refabric.context_managers import sudo, silent
@@ -87,19 +91,19 @@ def install_project_structure():
     """
     Create project directory structure
     """
-    from .project import static_base
+    from .project import static_base, use_static
 
     with sudo():
         info('Install application directory structure')
-        project_name = blueprint.get('project')
 
         create_app_root()
 
-        # Create static web paths
-        static_path = os.path.join(static_base(), 'static')
-        media_path = os.path.join(static_base(), 'media')
-        debian.mkdir(static_path, group='www-data', mode=1775)
-        debian.mkdir(media_path, group='www-data', mode=1775)
+        if use_static():
+            # Create static web paths
+            static_path = os.path.join(static_base(), 'static')
+            media_path = os.path.join(static_base(), 'media')
+            debian.mkdir(static_path, group='www-data', mode=1775)
+            debian.mkdir(media_path, group='www-data', mode=1775)
 
 
 def install_system_dependencies():
@@ -141,6 +145,88 @@ def install_virtualenv():
         virtualenv.create(virtualenv_path())
 
 
+def maybe_install_requirements(previous_commit, current_commit, force=False):
+    from .project import requirements_txt, git_repository_path
+
+    installation_file = requirements_txt()
+
+    installation_method = get_installation_method(installation_file)
+
+    has_changed = False
+
+    commit_range = '{}..{}'.format(previous_commit, current_commit)
+
+    if not force:
+        if installation_method == 'pip':
+            has_changed, added, removed = diff_requirements(
+                previous_commit,
+                current_commit,
+                installation_file)
+
+            if has_changed:
+                info('Requirements have changed, added: {}, removed: {}'.format(
+                    ', '.join(added) or None,
+                    ', '.join(removed) or None))
+        else:
+            # Check if installation_file has changed
+            commit_range = '{}..{}'.format(previous_commit, current_commit)
+            has_changed, _, _ = git.diff_stat(
+                git_repository_path(),
+                commit_range,
+                installation_file)
+
+    if has_changed or force:
+        info('Install requirements {}', installation_file)
+        install_requirements(installation_file)
+    else:
+        info(indent('(requirements not changed in {}...skipping)'),
+             commit_range)
+
+
+def diff_requirements(previous_commit, current_commit, filename):
+    filename = os.path.relpath(filename, git_repository_path())
+
+    get_requirements = partial(git.show_file,
+                               repository_path=git_repository_path(),
+                               filename=filename)
+
+    force_changed = False
+
+    try:
+        # Can't fit this is one line :(
+        previous = parse_requirements(get_requirements(revision=previous_commit))
+        previous = {str(r) for r in previous}
+    except ValueError as exc:
+        warn('Failed to parse previous requirements: {}'.format(exc))
+        previous = set()
+        force_changed = True
+
+    try:
+        # Can't fit this is one line :(
+        current = parse_requirements(get_requirements(revision=current_commit))
+        current = {str(r)for r in current}
+    except ValueError as exc:
+        warn('Failed to parse new requirements: {}'.format(exc))
+        current = set()
+        force_changed = True
+
+    additions = current.difference(previous)
+    removals = previous.difference(current)
+
+    has_changed = force_changed or bool(additions or removals)
+
+    return has_changed, additions, removals
+
+
+def get_installation_method(filename):
+    if filename.endswith('.txt') or \
+            filename.endswith('.pip'):
+        return 'pip'
+
+    if os.path.basename(filename) == 'setup.py':
+        return 'setuptools'
+
+
 def install_requirements(installation_file=None):
     """
     Pip install requirements in project virtualenv.
@@ -156,10 +242,11 @@ def install_requirements(installation_file=None):
         info('Installing requirements from file {}', installation_file)
 
         with virtualenv.activate(path):
-            if installation_file.endswith('.txt') or \
-                    installation_file.endswith('.pip'):
+            installation_method = get_installation_method(installation_file
+            )
+            if installation_method == 'pip':
                 python.pip('install', '-r', installation_file)
-            elif installation_file.endswith('.py'):
+            elif installation_method == 'setuptools':
                 with cd(git_repository_path()):
                     run('python {} develop'.format(installation_file))
             else:
@@ -234,7 +321,7 @@ def install_providers():
     host = env.host_string
     providers = get_providers(host)
     for provider in providers.values():
-        if hasattr(provider, 'manager') and provider.manager is not None:
+        if getattr(provider, 'manager', None) is not None:
             provider.manager.install()
 
         provider.install()

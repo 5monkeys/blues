@@ -15,6 +15,9 @@ class CeleryProvider(ManagedProvider):
     name = 'celery'
     default_manager = 'supervisor'
 
+    def install(self):
+        pass
+
     def configure_web(self):
         raise NotImplementedError('celery cannot be configured as a web '
                                   'provider')

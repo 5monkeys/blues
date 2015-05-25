@@ -20,6 +20,9 @@ use_python = lambda: blueprint.get('use_python', True)
 # install virtualenv and python dependencies
 use_virtualenv = lambda: blueprint.get('use_virtualenv', True) and use_python()
 
+# Should we set up /srv/www?
+use_static = lambda: blueprint.get('use_static', True)
+
 # /srv/app
 app_root = lambda: blueprint.get('root_path') or '/srv/app'
 # /srv/app/project
