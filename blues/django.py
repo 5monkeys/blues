@@ -67,7 +67,7 @@ def version():
     """
     if not hasattr(version, 'version'):
         v = manage('--version')
-        v = re.split('[a-z]', v)[0]
+        v = re.split('[a-z]', v.split('\n')[-1])[0]
         version.version = tuple(map(int, v.split('\n')[0].strip().split('.')))
     return version.version
 
