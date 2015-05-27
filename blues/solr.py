@@ -33,9 +33,9 @@ __all__ = ['start', 'stop', 'restart', 'setup', 'configure', 'tail']
 
 blueprint = blueprints.get(__name__)
 
-start = debian.service_task('solr', 'start')
-stop = debian.service_task('solr', 'stop')
-restart = debian.service_task('solr', 'restart')
+start = debian.service_task('solr', 'start', check_status=True)
+stop = debian.service_task('solr', 'stop', check_status=True)
+restart = debian.service_task('solr', 'restart', check_status=True)
 
 solr_home = '/usr/share/solr'
 
