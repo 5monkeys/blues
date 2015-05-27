@@ -4,6 +4,7 @@ from fabric.context_managers import settings
 from fabric.decorators import task
 from fabric.state import env
 from fabric.utils import indent
+from blues.application.deploy import maybe_install_requirements
 
 from refabric.utils import info
 from refabric.contrib import blueprints
@@ -69,26 +70,7 @@ def deploy(auto_reload=True, force=False):
     if code_changed or force:
         # Install python dependencies
         if use_virtualenv():
-            # May be requirements.txt, setup.py, or other
-            installation_file = requirements_txt()
-
-            installation_file_changed = False
-
-            if not force:
-                # Check if installation_file has changed
-                commit_range = '{}..{}'.format(previous_commit, current_commit)
-                installation_file_changed, _, _ = git.diff_stat(
-                    git_repository_path(),
-                    commit_range,
-                    installation_file)
-
-            # Install repo requirements.txt
-            info('Install requirements {}', installation_file)
-            if installation_file_changed or force:
-                install_requirements(installation_file)
-            else:
-                info(indent('(requirements not changed in {}...skipping)'),
-                     commit_range)
+            maybe_install_requirements(previous_commit, current_commit, force)
 
         # Reload providers
         if auto_reload:

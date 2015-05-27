@@ -53,6 +53,7 @@ class SupervisorManager(BaseManager):
 
     def _upload_provider_template(self, template, context, name):
         """
+        Upload a template to the supervisor.d configuration dir.
 
         :param template: local template path
         :param context: template context
