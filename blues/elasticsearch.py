@@ -95,16 +95,21 @@ def configure():
         'bind_host': blueprint.get('network_bind_host'),
         'publish_host': blueprint.get('network_publish_host'),
         'host': blueprint.get('network_host'),
-        'queue_size': blueprint.get('queue_size', 1000)
+        'queue_size': blueprint.get('queue_size', 1000),
     }
     config = blueprint.upload('./elasticsearch.yml', '/etc/elasticsearch/', context)
+
+    context = {
+        'log_level': blueprint.get('log_level', 'WARN'),
+    }
+    logging = blueprint.upload('./logging.yml', '/etc/elasticsearch/', context)
 
     context = {
         'heap_size': blueprint.get('heap_size', '256m')
     }
     default = blueprint.upload('./default', '/etc/default/elasticsearch', context)
 
-    if config or default:
+    if config or logging or default:
         restart()
 
 
