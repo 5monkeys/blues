@@ -9,7 +9,7 @@ from .. import git
 __all__ = [
     'app_root', 'project_home', 'git_root', 'use_virtualenv', 'virtualenv_path',
     'git_repository', 'git_repository_path', 'python_path', 'sudo_project',
-    'requirements_txt', 'use_python', 'static_base'
+    'requirements_txt', 'use_python', 'static_base', 'project_name'
 ]
 
 blueprint = blueprints.get('blues.app')
@@ -53,6 +53,5 @@ static_base = lambda: blueprint.get('static_base',
 
 @contextmanager
 def sudo_project():
-    project_name = blueprint.get('project')
-    with sudo(project_name):
-        yield project_name
+    with sudo(project_name()):
+        yield project_name()
