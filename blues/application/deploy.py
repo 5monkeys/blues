@@ -184,6 +184,33 @@ def maybe_install_requirements(previous_commit, current_commit, force=False):
 
 
 def diff_requirements(previous_commit, current_commit, filename):
+    """
+    Diff requirements file
+
+    :param previous_commit:
+    :param current_commit:
+    :param filename:
+    :return: 3-tuple with (has_changed, additions, removals) where
+        has_changed is a bool, additions and removals may be sets or None.
+    """
+    try:
+        return diff_requirements_smart(previous_commit,
+                                       current_commit,
+                                       filename,
+                                       strict=True)
+    except ValueError:
+        warn('Smart requirements diff failed, falling back to git diff')
+
+    has_changed, _, _ = git.diff_stat(
+        git_repository_path(),
+        '{}..{}'.format(previous_commit, current_commit),
+        filename)
+
+    return has_changed, None, None
+
+
+def diff_requirements_smart(previous_commit, current_commit, filename,
+                            strict=False):
     filename = os.path.relpath(filename, git_repository_path())
 
     get_requirements = partial(git.show_file,
@@ -201,6 +228,9 @@ def diff_requirements(previous_commit, current_commit, filename):
         previous = set()
         force_changed = True
 
+        if strict:
+            raise
+
     try:
         # Can't fit this is one line :(
         current = parse_requirements(get_requirements(revision=current_commit))
@@ -209,6 +239,9 @@ def diff_requirements(previous_commit, current_commit, filename):
         warn('Failed to parse new requirements: {}'.format(exc))
         current = set()
         force_changed = True
+
+        if strict:
+            raise
 
     additions = current.difference(previous)
     removals = previous.difference(current)
