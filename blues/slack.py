@@ -15,6 +15,7 @@ Slack Blueprint
         #icon_emoji: ":rocket"
 
 """
+from fabric.utils import warn
 from refabric.contrib import blueprints
 from collections import OrderedDict
 import urllib2
@@ -23,7 +24,7 @@ import json
 blueprint = blueprints.get(__name__)
 
 def notify(msg):
-    channels = blueprint.get('channels', ['#deploy'])
+    channels = blueprint.get('channels', [])
     channel = blueprint.get('channel', None)
 
     # If channel is specified, add it to channels, and then run it through an
@@ -32,15 +33,21 @@ def notify(msg):
         channels.append(channel)
         channels = list(OrderedDict.fromkeys(channels))
 
+    if not channels:
+        warn('Empty slack channel list, skipping notification')
+        return False
+
     username = blueprint.get('username', 'deploybot')
     icon_emoji = blueprint.get('icon_emoji', ':rocket:')
 
     endpoint = blueprint.get('endpoint')
     if not endpoint:
+        warn('No slack API endpoint found, skipping notification')
         return False
 
     for channel in channels:
         send_request(endpoint, channel, username, msg, icon_emoji)
+
 
 def send_request(endpoint, channel, username, msg, icon_emoji):
     data = json.dumps({
