@@ -20,6 +20,7 @@ Elasticsearch Blueprint
         # network_publish_host: 127.0.0.1  # Set the address other nodes will use to communicate with this node (Optional)
         # network_host: 127.0.0.1          # Set both `network_bind_host` and `network_publish_host` (Optional)
         # queue_size: 3000                 # Set thread pool queue size (Default: 1000)
+        # log_level: WARN                  # Set the log level to use (Default: WARN)
         # plugins:                         # Optional list of plugins to install
         #   - mobz/elasticsearch-head
 
