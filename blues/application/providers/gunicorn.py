@@ -20,6 +20,9 @@ class GunicornProvider(ManagedProvider):
         with sudo_project(), virtualenv.activate(virtualenv_path()):
             python.pip('install', 'gunicorn')
 
+    def reload(self):
+        return self.manager.reload(self.project)
+
     def get_context(self):
         context = super(GunicornProvider, self).get_context()
         socket_string = blueprint.get('web.socket')
