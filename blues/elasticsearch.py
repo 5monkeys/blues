@@ -20,6 +20,7 @@ Elasticsearch Blueprint
         # network_publish_host: 127.0.0.1  # Set the address other nodes will use to communicate with this node (Optional)
         # network_host: 127.0.0.1          # Set both `network_bind_host` and `network_publish_host` (Optional)
         # queue_size: 3000                 # Set thread pool queue size (Default: 1000)
+        # log_level: WARN                  # Set the log level to use (Default: WARN)
         # plugins:                         # Optional list of plugins to install
         #   - mobz/elasticsearch-head
 
@@ -95,16 +96,21 @@ def configure():
         'bind_host': blueprint.get('network_bind_host'),
         'publish_host': blueprint.get('network_publish_host'),
         'host': blueprint.get('network_host'),
-        'queue_size': blueprint.get('queue_size', 1000)
+        'queue_size': blueprint.get('queue_size', 1000),
     }
     config = blueprint.upload('./elasticsearch.yml', '/etc/elasticsearch/', context)
+
+    context = {
+        'log_level': blueprint.get('log_level', 'WARN'),
+    }
+    logging = blueprint.upload('./logging.yml', '/etc/elasticsearch/', context)
 
     context = {
         'heap_size': blueprint.get('heap_size', '256m')
     }
     default = blueprint.upload('./default', '/etc/default/elasticsearch', context)
 
-    if config or default:
+    if config or logging or default:
         restart()
 
 
