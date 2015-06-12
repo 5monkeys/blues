@@ -1,8 +1,8 @@
 import os
+import pkg_resources
+import re
 
 from functools import partial
-
-from pkg_resources import parse_requirements
 
 from fabric.context_managers import cd
 from fabric.state import env
@@ -207,6 +207,27 @@ def diff_requirements(previous_commit, current_commit, filename):
         filename)
 
     return has_changed, None, None
+
+
+def patch_requirements(s):
+    """
+    Replaces VCS urls by `pkg==version` so that setuptools can parse
+    requirements and we can diff them.
+    """
+    ex = re.compile('(\-e\s+)?(git|hg|svn|bzr)(\+|://)\S*@([\S^@]+)#egg=(\S+)',
+                    flags=re.MULTILINE)
+    return ex.sub('\\5==\\4', s)
+
+
+def parse_requirements(strs):
+    """
+    Parse requirements after VCS urls are replaced by `pkg==version`.
+    """
+    if isinstance(strs, basestring):
+        strs = patch_requirements(strs)
+    else:
+        strs = map(patch_requirements, strs)
+    return pkg_resources.parse_requirements(strs)
 
 
 def diff_requirements_smart(previous_commit, current_commit, filename,
