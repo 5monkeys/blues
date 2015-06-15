@@ -11,6 +11,7 @@ from refabric.contrib import blueprints
 
 
 from .. import git
+from .. import slack
 
 blueprint = blueprints.get('blues.app')
 
@@ -211,3 +212,24 @@ def generate_nginx_conf(role='www'):
 
     with open(conf_path, 'w+') as f:
         f.write(conf)
+
+
+def notify_deploy(role=None):
+    variables = {
+        'deployer': git.get_local_commiter(),
+        'project': project_name(),
+        'state': env.get('state', 'unknown'),
+        'role': role,
+        'commit': git.get_commit(repository_path=git_repository_path(), short=True),
+        'user': env['user'],
+        'host': env['host_string'],
+    }
+
+    if role:
+        msg = ('`{deployer}` deployed `{project}::{state}:{role}` '
+               'at `{commit}` to `{user}@{host}`').format(**variables)
+    else:
+        msg = ('`{deployer}` deployed `{project}::{state}` '
+               'at `{commit}` to `{user}@{host}`').format(**variables)
+
+    slack.notify(msg)
