@@ -3,7 +3,7 @@ import os
 from fabric.context_managers import settings
 from fabric.decorators import task
 from fabric.state import env
-from fabric.utils import indent
+from fabric.utils import indent, abort
 from blues.application.deploy import maybe_install_requirements
 
 from refabric.utils import info
@@ -77,6 +77,14 @@ def deploy(auto_reload=True, force=False):
             reload()
 
     return code_changed
+
+
+@task
+def pip_install():
+    if use_virtualenv():
+        install_requirements()
+    else:
+        abort('Cannot install requirements without virtualenv')
 
 
 @task
