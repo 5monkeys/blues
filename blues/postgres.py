@@ -18,7 +18,7 @@ Postgres Blueprint
           some_schema_name:        # The schema name
             user: foo              # Username to connect to schema
             password: bar          # Password to connect to schema (optional)
-            dump_options:          # Specify extra options passed to pg_dump (optional)
+            dump:                  # Specify extra options passed to pg_dump (optional)
               exclude_table_data:  # Exclude data from table (optional)
                 - some_table
                 - another_table
@@ -289,10 +289,7 @@ def dump(schema=None):
         schema_choice = prompt('Select schema to dump:', default='1',
                                validate=valid_indices)
         schema = schemas[int(schema_choice) - 1]
-        dump_options = blueprint[schema].get(
-            'dump_options',
-            blueprint.get('dump_options', {})
-        )
+        dump_options = blueprint[schema].get('dump', {})
 
     with sudo('postgres'):
         now = datetime.now().strftime('%Y-%m-%d')
