@@ -76,7 +76,7 @@ def deploy(auto_reload=True, force=False):
         if auto_reload:
             reload()
 
-    return code_changed
+    return (previous_commit, current_commit) if code_changed else False
 
 
 @task
