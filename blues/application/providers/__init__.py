@@ -1,21 +1,22 @@
-from .uwsgi import UWSGIProvider
-from .supervisor import SupervisorProvider
-from ...app import blueprint
+from refabric.contrib import blueprints
+
+blueprint = blueprints.get('app')
 
 
-def get_provider(name):
-    """
-    Get provider instance by name.
+def list_providers():
+    from .celery import CeleryProvider
+    from .uwsgi import UWSGIProvider
+    from .node import NodeProvider
+    from .gunicorn import GunicornProvider
+    from .program import ProgramProvider
 
-    :param name: Provider name (blueprint)
-    :return: <provider>
-    """
-    if name == 'uwsgi':
-        return UWSGIProvider()
-    elif name == 'supervisor':
-        return SupervisorProvider()
-    else:
-        raise NotImplementedError('"{}" is not a valid application provider'.format(name))
+    return [
+        CeleryProvider,
+        UWSGIProvider,
+        NodeProvider,
+        GunicornProvider,
+        ProgramProvider
+    ]
 
 
 def get_providers(host=None):
@@ -25,25 +26,37 @@ def get_providers(host=None):
     :param host: Provider host filter
     :return: dict(web=<provider>, worker=<provider>)
     """
+    from .. import resolve_runners
     providers = {}
 
-    web_hosts = blueprint.get('web.hosts')
+    # TODO: TEST! TEST! TEST! NEEDS TESTING!, rewrote host filtering.
+
+    web_hosts = blueprint.get('web', {}).get('hosts', [])
     # Filter out bad values
-    web_hosts = [host for host in web_hosts if host]
+    web_hosts = filter(lambda x: x, web_hosts)
     web_provider = blueprint.get('web.provider')
+
     if web_provider:
-        providers[web_provider] = get_provider(web_provider)
+        providers[web_provider] = resolve_runners(web_provider)
 
-    worker_hosts = blueprint.get('worker.hosts')
+    # Install worker providers
+    worker_hosts = blueprint.get('worker', {}).get('hosts', [])
+
     # Filter out bad values
-    worker_hosts = [host for host in worker_hosts if host]
+    worker_hosts = filter(lambda x: x, worker_hosts)
     worker_provider = blueprint.get('worker.provider')
-    if worker_provider and worker_provider not in providers:
-        providers[worker_provider] = get_provider(worker_provider)
 
+    # Set special provider if
+    if worker_provider and worker_provider not in providers:
+        providers[worker_provider] = resolve_runners(worker_provider)
+
+    # Set web provider if web_hosts are not set, or if current host is in
+    # web.hosts
     if web_provider and (not web_hosts or host in web_hosts):
         providers['web'] = providers[web_provider]
 
+    # Set worker provider if worker_hosts are not set, or if current host is in
+    # worker.hosts
     if worker_provider and (not worker_hosts or host in worker_hosts):
         providers['worker'] = providers[worker_provider]
 
