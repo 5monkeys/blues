@@ -1,19 +1,26 @@
 import os
 
+from fabric.context_managers import settings
 from fabric.decorators import task
 from fabric.state import env
 from fabric.utils import indent
+from blues.application.deploy import maybe_install_requirements
 
 from refabric.utils import info
+from refabric.contrib import blueprints
 
-from .deploy import *
-from .project import *
-from .providers import get_providers
 
 from .. import git
-from ..app import blueprint
+from .. import slack
+
+blueprint = blueprints.get('blues.app')
 
 __all__ = []
+
+
+def get_providers(*args, **kw):
+    from .providers import get_providers as real
+    return real(*args, **kw)
 
 
 @task
@@ -21,13 +28,16 @@ def setup():
     """
     Install project user, structure, env, source, dependencies and providers
     """
-    install_project_structure()
-    install_project_user()
-    install_system_dependencies()
-    install_or_update_source()
+    from .deploy import install_project, install_virtualenv, \
+        install_requirements, install_providers
+    from .project import requirements_txt, use_virtualenv
+
+    install_project()
+
     if use_virtualenv():
         install_virtualenv()
-        install_requirements()
+        install_requirements(requirements_txt())
+
     install_providers()
     configure_providers()
 
@@ -50,26 +60,20 @@ def deploy(auto_reload=True, force=False):
     :param bool force: Force install of requirements
     :return bool: Source code has changed?
     """
+    from .deploy import update_source, install_requirements
+    from .project import git_repository_path, requirements_txt, use_virtualenv
+
     # Reset git repo
     previous_commit, current_commit = update_source()
-    code_changed = current_commit is not None and previous_commit != current_commit
+    code_changed = current_commit is not None and \
+                   previous_commit != current_commit
 
-    if use_virtualenv() and (code_changed or force):
-        requirements = blueprint.get('requirements', 'requirements.txt')
-        requirements_changed = False
+    if code_changed or force:
+        # Install python dependencies
+        if use_virtualenv():
+            maybe_install_requirements(previous_commit, current_commit, force)
 
-        if not force:
-            # Check if requirements has changed
-            commit_range = '{}..{}'.format(previous_commit, current_commit)
-            requirements_changed, _, _ = git.diff_stat(git_repository_path(), commit_range, requirements)
-
-        # Install repo requirements.txt
-        info('Install requirements {}', requirements)
-        if requirements_changed or force:
-            install_requirements()
-        else:
-            info(indent('(requirements not changed in {}...skipping)'), commit_range)
-
+        # Reload providers
         if auto_reload:
             reload()
 
@@ -81,12 +85,15 @@ def deployed():
     """
     Show deployed and last origin commit
     """
+    from .project import sudo_project, git_repository_path
+
     with sudo_project():
         repository_path = git_repository_path()
         git.fetch(repository_path)
 
         head_commit, head_message = git.log(repository_path)[0]
-        origin_commit, origin_message = git.log(repository_path, commit='origin')[0]
+        origin_commit, origin_message = git.log(repository_path,
+                                                commit='origin')[0]
 
         info('Deployed commit: {} - {}', head_commit[:7], head_message)
         if head_commit == origin_commit:
@@ -135,6 +142,8 @@ def configure_providers(force_reload=False):
     :param bool force_reload: Force reload of providers, even if not updated
     :return dict: Application providers for current host
     """
+    from .project import sudo_project
+
     with sudo_project():
         providers = get_providers(env.host_string)
         if 'web' in providers:
@@ -176,17 +185,51 @@ def generate_nginx_conf(role='www'):
         'ssl': blueprint.get('web.ssl', False),
         'ip_hash': blueprint.get('web.ip_hash', False)
     }
-    template = 'nginx/site.conf'
+
+    template = blueprint.get('web.nginx_conf')
+
+    if template is None:
+        template = 'nginx/site.conf'
+    else:
+        template = 'nginx/{}.conf'.format(template)
+
     web_provider = blueprint.get('web.provider')
     if web_provider and web_provider == 'uwsgi':
         template = 'nginx/uwsgi_site.conf'
-    conf = blueprint.render_template(template, context)
-    conf_dir = os.path.join(os.path.dirname(env['real_fabfile']), 'templates', role, 'nginx',
-                            'sites-available')
-    conf_path = os.path.join(conf_dir, '{}.conf'.format(name))
+
+    with settings(template_dirs=['templates']):
+        conf = blueprint.render_template(template, context)
+        conf_dir = os.path.join(
+            os.path.dirname(env['real_fabfile']),
+            'templates',
+            role,
+            'nginx',
+            'sites-available')
+        conf_path = os.path.join(conf_dir, '{}.conf'.format(name))
 
     if not os.path.exists(conf_dir):
         os.makedirs(conf_dir)
 
     with open(conf_path, 'w+') as f:
         f.write(conf)
+
+
+def notify_deploy(role=None):
+    variables = {
+        'deployer': git.get_local_commiter(),
+        'project': project_name(),
+        'state': env.get('state', 'unknown'),
+        'role': role,
+        'commit': git.get_commit(repository_path=git_repository_path(), short=True),
+        'user': env['user'],
+        'host': env['host_string'],
+    }
+
+    if role:
+        msg = ('`{deployer}` deployed `{project}::{state}:{role}` '
+               'at `{commit}` to `{user}@{host}`').format(**variables)
+    else:
+        msg = ('`{deployer}` deployed `{project}::{state}` '
+               'at `{commit}` to `{user}@{host}`').format(**variables)
+
+    slack.notify(msg)

@@ -7,14 +7,16 @@ from fabric.utils import indent, warn
 from refabric.api import run, info
 from refabric.context_managers import sudo, silent
 
-from .base import BaseProvider
+from .base import ManagedProvider
 from ..project import *
 
 from ... import debian
 from ...app import blueprint
 
 
-class UWSGIProvider(BaseProvider):
+class UWSGIProvider(ManagedProvider):
+    name = 'uwsgi'
+    default_manager = 'noop'
 
     def install(self):
         """
@@ -150,8 +152,14 @@ class UWSGIProvider(BaseProvider):
 
         :return: [project_name].ini
         """
-        # TODO: Maybe check if uwsgi actually is a web provider
-        return '{}.ini'.format(blueprint.get('web.name', self.project))
+        if not blueprint.get('web.provider') == 'uwsgi':
+            return None
+
+        host = env.host_string
+        web_hosts = blueprint.get('web', {}).get('hosts', [])
+
+        if not web_hosts or host in web_hosts:
+            return '{}.ini'.format(blueprint.get('web.name', self.project))
 
     def list_worker_vassals(self):
         """
@@ -164,19 +172,23 @@ class UWSGIProvider(BaseProvider):
         if not blueprint.get('worker.provider') == 'uwsgi':
             return vassals
 
-        vassals.add('celery.ini')
+        host = env.host_string
+        worker_hosts = blueprint.get('worker', {}).get('hosts', [])
 
-        # Filter vassal extensions by host
-        extensions = blueprint.get('worker.extensions')
-        if isinstance(extensions, list):
-            # Filter of bad values
-            extensions = [extension for extension in extensions if extension]
-            for extension in extensions:
-                vassals.add('{}.ini'.format(extension))
-        elif isinstance(extensions, dict):
-            for extension, extension_host in extensions.items():
-                if extension_host in ('*', env.host_string):
+        if not worker_hosts or host in worker_hosts:
+            vassals.add('celery.ini')
+
+            # Filter vassal extensions by host
+            extensions = blueprint.get('worker.extensions')
+            if isinstance(extensions, list):
+                # Filter of bad values
+                extensions = [extension for extension in extensions if extension]
+                for extension in extensions:
                     vassals.add('{}.ini'.format(extension))
+            elif isinstance(extensions, dict):
+                for extension, extension_host in extensions.items():
+                    if extension_host in ('*', host):
+                        vassals.add('{}.ini'.format(extension))
 
         return vassals
 
@@ -187,7 +199,10 @@ class UWSGIProvider(BaseProvider):
         :return: Set of vassal.ini file names
         """
         vassals = self.list_worker_vassals()
-        vassals.add(self.get_web_vassal())
+        web_vassal = self.get_web_vassal()
+        if web_vassal:
+            vassals.add(web_vassal)
+
         return vassals
 
     def reload(self, vassals=None):

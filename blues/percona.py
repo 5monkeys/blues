@@ -78,7 +78,7 @@ def install():
 
         info('Adding apt repository for {}', __name__)
         debian.add_apt_repository('http://repo.percona.com/apt trusty main')
-        debian.apt_get('update')
+        debian.apt_get_update()
 
         # Percona/MySQL base dependencies
         dependencies = (

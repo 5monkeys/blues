@@ -15,6 +15,9 @@ Nginx Blueprint
           - foo                     # Template name, with or without .conf extension
           - bar
         # auto_disable_sites: true  # Auto disable sites not specified in `sites` setting (Default: true)
+        # modules:                  # If present, nginx will be built and installed from source with these modules
+        #   - rtmp
+        #   - vod
 
 """
 import os
@@ -30,7 +33,8 @@ from refabric.contrib import blueprints
 
 from . import debian
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'enable', 'disable']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
+           'enable', 'disable', 'tail']
 
 
 blueprint = blueprints.get(__name__)
@@ -56,10 +60,97 @@ def setup():
 
 
 def install():
-    # Install package
+    if blueprint.get('modules'):
+        install_from_source()
+    else:
+        with sudo():
+            debian.apt_get('install', 'nginx', 'nginx-extras')
+
+
+def install_from_source():
+    from blues import debian, nginx
+
     with sudo():
-        debian.apt_get('install', 'nginx')
-        debian.apt_get('install', 'nginx-extras')
+        debian.apt_get_update()
+
+        #Install dependencies
+        packages = ('build-essential', 'libpcre3', 'libpcre3-dev',
+                    'libssl-dev', 'dpkg-dev', 'git', 'software-properties-common')
+        debian.apt_get('install', *packages)
+
+        # Setup nginx source
+        nginx_version = '1.4.6'
+        nginx_distro_version = '1ubuntu3.2'
+        nginx_full_distro_version = '{}-{}'.format(nginx_version, nginx_distro_version)
+
+        nginx_source_path = '/usr/src/nginx'
+        nginx_source_version_path = os.path.join(nginx_source_path, 'nginx-{}'.format(nginx_version))
+        nginx_source_module_path = os.path.join(nginx_source_version_path, 'debian/modules/')
+
+        debian.mkdir(nginx_source_path)
+        with cd(nginx_source_path):
+            debian.apt_get('source', 'nginx={}'.format(nginx_full_distro_version))
+            debian.apt_get('build-dep', '-y nginx={}'.format(nginx_full_distro_version))
+
+        # Get wanted nginx modules
+        nginx_modules = blueprint.get('modules')
+
+        if 'rtmp' in nginx_modules:
+            # Download nginx-rtmp module
+            nginx_rtmp_version = '1.1.6'
+            nginx_rtmp_module_path = os.path.join(nginx_source_module_path, 'nginx-rtmp-module')
+            nginx_rtmp_module_version_path = os.path.join(nginx_source_module_path,
+                                                          'nginx-rtmp-module-{}'.format(nginx_rtmp_version))
+
+            archive_file = '{}.tar.gz'.format(nginx_rtmp_version)
+            run('wget -P /tmp/ https://github.com/arut/nginx-rtmp-module/archive/v{f}'.format(
+                f=archive_file))
+
+            # Unpackage to nginx source directory
+            run('tar xzf /tmp/v{f} -C {nginx_source_module_path}'.format(
+                f=archive_file, nginx_source_module_path=nginx_source_module_path))
+
+            # Set up nginx rtmp version symlink
+            debian.ln(nginx_rtmp_module_version_path, nginx_rtmp_module_path)
+
+            # Configure nginx dkpg, TODO: Do not add module if present in rules
+            rtmp_module_string = '"s/^common_configure_flags := /common_configure_flags := \\\\\\\\\\\\\\\\\\n\\t\\t\\t--add-module=\\$\(MODULESDIR\)\/nginx-rtmp-module /g"'
+            run('sed -ri {} {}'.format(rtmp_module_string,
+                                       os.path.join(nginx_source_version_path, 'debian/rules')))
+
+        if 'vod' in nginx_modules:
+            # Download nginx-rtmp module
+            # nginx_vod_version = '2ac3bfeffab2fa1b46923236b7fd0ea15616a417'  # "Latest" git commit
+            # nginx_vod_version = '88160cacd0d9789d84605425b78e3f494950529c'  # Git commit pre mms playready
+            nginx_vod_version = 'master'
+            nginx_vod_module_path = os.path.join(nginx_source_module_path, 'nginx-vod-module')
+            nginx_vod_module_version_path = os.path.join(nginx_source_module_path,
+                                                         'nginx-vod-module-{}'.format(nginx_vod_version))
+            archive_file = '{}.tar.gz'.format(nginx_vod_version)
+
+            debian.rm(nginx_vod_module_version_path, recursive=True)
+
+            run('wget -O /tmp/{f} https://github.com/5monkeys/nginx-vod-module/archive/{f}'.format(
+                f=archive_file))
+
+            # Unpackage to nginx source directory
+            run('tar xzf /tmp/{f} -C {nginx_source_module_path}'.format(
+                f=archive_file, nginx_source_module_path=nginx_source_module_path))
+
+            # Set up nginx rtmp version symlink
+            debian.ln(nginx_vod_module_version_path, nginx_vod_module_path)
+
+            # Configure nginx dkpg, TODO: Do not add module if present in rules
+            vod_module_string = '"s/^common_configure_flags := /common_configure_flags := \\\\\\\\\\\\\\\\\\n\\t\\t\\t--add-module=\\$\(MODULESDIR\)\/nginx-vod-module /g"'
+            run('sed -ri {} {}'.format(vod_module_string,
+                                       os.path.join(nginx_source_version_path, 'debian/rules')))
+
+        # Setup nginx
+        with cd(nginx_source_version_path):
+            run('dpkg-buildpackage -b')
+        with cd(nginx_source_path):
+            run('dpkg --install nginx-common_{nginx_full_distro_version}_all.deb nginx-extras_{nginx_full_distro_version}_amd64.deb'.format(
+                nginx_full_distro_version=nginx_full_distro_version))
 
 
 @task
@@ -132,7 +223,9 @@ def enable(site, do_reload=True):
     :return: Got enabled?
     """
     enabled = False
-    site = site if site.endswith('.conf') or site == 'default' else '{}.conf'.format(site)
+
+    if not (site.endswith('.conf') or site == 'default'):
+        site = '{}.conf'.format(site)
 
     with sudo():
         available_site = os.path.join(sites_available_path, site)
@@ -149,3 +242,11 @@ def enable(site, do_reload=True):
                         reload()
 
     return enabled
+
+
+@task
+def tail(log_name='error'):
+    log_dir = '/var/log/nginx'
+    run('tail -f {}'.format(
+        os.path.join(log_dir,
+                     '{}.log'.format(log_name))))
