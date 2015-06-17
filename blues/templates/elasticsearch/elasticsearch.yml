@@ -393,3 +393,5 @@ discovery.zen.ping.multicast.enabled: false
 #threadpool.search.type: cached
 threadpool.search.queue_size: {{ queue_size|default('1000') }}
 threadpool.bulk.queue_size: {{ queue_size|default('1000') }}
+
+script.disable_dynamic: {{ script_disable_dynamic|default('true') }}
