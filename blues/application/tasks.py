@@ -215,7 +215,7 @@ def generate_nginx_conf(role='www'):
 
 
 def notify_deploy(role=None):
-    from .project import project_name
+    from .project import project_name, git_repository_path
 
     variables = {
         'deployer': git.get_local_commiter(),
