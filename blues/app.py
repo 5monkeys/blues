@@ -75,9 +75,9 @@ from refabric.contrib import blueprints
 blueprint = blueprints.get(__name__)
 
 from .application.tasks import setup, configure, deploy, deployed, start, stop,\
-    reload, configure_providers, generate_nginx_conf, notify_deploy
+    reload, configure_providers, generate_nginx_conf, notify_deploy, install_requirements
 
 from .application.deploy import update_source
 
 __all__ = ['setup', 'configure', 'deploy', 'deployed', 'start', 'stop',
-           'reload', 'configure_providers', 'generate_nginx_conf']
+           'reload', 'configure_providers', 'generate_nginx_conf', 'install_requirements']
