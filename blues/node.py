@@ -149,3 +149,22 @@ def npm(command, *options):
     info('Running npm {}', command)
     with sudo():
         run('npm {} -g {}'.format(command, ' '.join(options)))
+
+
+def install_dependencies(path=None, production=False):
+    """
+    Install dependencies from "package.json" at path.
+
+    :param path: Package path, current directory if None. [default: None]
+    :return:
+    """
+    cd_cm = None
+    if path is not None:
+        cd_cm = cd(path)
+
+    with maybe_managed(cd_cm):
+        if production:
+            npm('install', '--production')
+        else:
+            npm('install')
+        run('test -f bower.json && bower install')
