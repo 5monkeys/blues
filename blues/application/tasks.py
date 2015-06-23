@@ -224,24 +224,53 @@ def generate_nginx_conf(role='www'):
         f.write(conf)
 
 
-def notify_deploy(role=None):
+def get_github_owner():
+    from .project import git_repository
+    from ..git import parse_url
+
+    url = git_repository().get('url', '')
+    if not url.startswith('git@github.com:'):
+        return None
+
+    return parse_url(url)['gh_owner']
+
+
+def notify_deploy(role=None, commits=None):
     from .project import project_name, git_repository_path
 
+    msg = '`{deployer}` deployed '
+    if role:
+        msg += '`{project}@{state}:{role}` '
+    else:
+        msg += '`{project}@{state}` '
+
+    owner = get_github_owner()
+    if owner:
+        if commits:
+            msg += '`<https://github.com/{owner}/{project}/compare/{from}...{to}|{from}→{to}>` '
+        else:
+            msg += '`<https://github.com/{owner}/{project}/commit/{commit}|{commit}>` '
+    else:
+        if commits:
+            msg += '`{from}→{to}` '
+        else:
+            msg += '`{commit}` '
+
+    msg += 'to `{user}@{host}`'
+
+    from_commit, to_commit = commits or (None, None)
+    commit = commits or git.get_commit(repository_path=git_repository_path(), short=True)
     variables = {
         'deployer': git.get_local_commiter(),
         'project': project_name(),
         'state': env.get('state', 'unknown'),
         'role': role,
-        'commit': git.get_commit(repository_path=git_repository_path(), short=True),
+        'owner': owner,
+        'from': from_commit,
+        'to': to_commit,
+        'commit': commit,
         'user': env['user'],
         'host': env['host_string'],
     }
 
-    if role:
-        msg = ('`{deployer}` deployed `{project}::{state}:{role}` '
-               'at `{commit}` to `{user}@{host}`').format(**variables)
-    else:
-        msg = ('`{deployer}` deployed `{project}::{state}` '
-               'at `{commit}` to `{user}@{host}`').format(**variables)
-
-    slack.notify(msg)
+    slack.notify(msg.format(**variables))
