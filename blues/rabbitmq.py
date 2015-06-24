@@ -19,7 +19,8 @@ from refabric.contrib import blueprints
 
 from . import debian
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'ctl']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'ctl',
+           'reset']
 
 
 blueprint = blueprints.get(__name__)
@@ -92,11 +93,20 @@ def configure():
 def ctl(command=None):
     """
     Run rabbitmqctl with given command
-    :param command:
-    :return:
+    :param command: Control command to execute
     """
     if not command:
         abort('No command given, $ fab rabbitmq.ctl:stop_app')
 
     with sudo():
         run('rabbitmqctl {}'.format(command))
+
+
+@task
+def reset():
+    """
+    Stop, reset and start app via rabbitmq ctl
+    """
+    ctl('stop_app')
+    ctl('reset')
+    ctl('start_app')
