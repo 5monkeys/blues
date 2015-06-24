@@ -105,12 +105,14 @@ def temporary_dir(mode=None):
         rm(path, recursive=True)
 
 
-def lbs_release():
+def lsb_release():
     return run('lsb_release --release --short')
+lbs_release = lsb_release  # Backwards compatibility
 
 
-def lbs_codename():
+def lsb_codename():
     return run('lsb_release --codename --short')
+lbs_codename = lsb_codename  # Backwards compatibility
 
 
 def hostname():
