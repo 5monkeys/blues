@@ -53,14 +53,11 @@ def install(add_repo=None):
     with sudo():
         v = version()
         if add_repo is None:
-            add_repo = (debian.lbs_release() == '14.04' and
+            add_repo = (debian.lsb_release() == '14.04' and
                         tuple(map(int, str(v).split('.'))) >= (9, 4))
         if add_repo:
-            name = debian.lbs_codename()
-            repo = 'https://apt.postgresql.org/pub/repos/apt/ {}-pgdg main'.format(name)
-            debian.add_apt_key('https://www.postgresql.org/media/keys/ACCC4CF8.asc')
-            debian.add_apt_repository(repository=repo)
-            debian.apt_get_update()
+            add_repository()
+
         debian.apt_get('install',
                        'postgresql',
                        'postgresql-server-dev-{}'.format(v),
@@ -68,6 +65,23 @@ def install(add_repo=None):
                        'postgresql-contrib-{}'.format(v),
                        'pgtune')
 
+
+def add_repository():
+    name = debian.lsb_codename()
+    info('Adding postgres {} apt repository...', name)
+    repo = 'https://apt.postgresql.org/pub/repos/apt/ {}-pgdg main'.format(name)
+    debian.add_apt_key('https://www.postgresql.org/media/keys/ACCC4CF8.asc')
+    debian.add_apt_repository(repository=repo)
+    debian.apt_get_update()
+
+
+def install_postgis(v=None):
+    if not v:
+        v = version()
+
+    info('Installing postgis...')
+    debian.apt_get('install', 'postgis',
+                   'postgresql-{}-postgis-scripts'.format(v))
 
 @task
 def setup():
@@ -124,6 +138,11 @@ def setup_schemas(drop=False):
     :param drop: Drop existing schemas before creation
     """
     schemas = blueprint.get('schemas', {})
+    extensions = blueprint.get('extensions', [])
+
+    if 'postgis' in extensions:
+        install_postgis(version=version())
+
     with sudo('postgres'):
         for schema, config in schemas.iteritems():
             user, password = config['user'], config.get('password')
@@ -145,7 +164,7 @@ def setup_schemas(drop=False):
                          " ON DATABASE %(schema)s to %(user)s",
                          schema=schema, user=user)
 
-            for ext in blueprint.get('extensions', []):
+            for ext in extensions:
                 info('Creating extension {}'.format(ext))
                 _client_exec("CREATE EXTENSION IF NOT EXISTS %(ext)s", ext=ext, schema=schema)
 
