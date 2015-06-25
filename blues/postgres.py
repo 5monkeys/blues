@@ -141,7 +141,7 @@ def setup_schemas(drop=False):
     extensions = blueprint.get('extensions', [])
 
     if 'postgis' in extensions:
-        install_postgis(version=version())
+        install_postgis(v=version())
 
     with sudo('postgres'):
         for schema, config in schemas.iteritems():
