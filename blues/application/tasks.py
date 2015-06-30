@@ -60,8 +60,8 @@ def deploy(auto_reload=True, force=False):
     :param bool force: Force install of requirements
     :return bool: Source code has changed?
     """
-    from .deploy import update_source, install_requirements
-    from .project import git_repository_path, requirements_txt, use_virtualenv
+    from .deploy import update_source
+    from .project import use_virtualenv
 
     # Reset git repo
     previous_commit, current_commit = update_source()
@@ -83,6 +83,7 @@ def deploy(auto_reload=True, force=False):
 @task
 def install_requirements():
     from .deploy import install_requirements
+    from .project import use_virtualenv
 
     if use_virtualenv():
         install_requirements()
