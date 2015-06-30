@@ -1,13 +1,19 @@
 import os
+import pkg_resources
+import re
+
+from functools import partial
 
 from fabric.context_managers import cd
 from fabric.state import env
-from fabric.utils import indent, abort
+from fabric.utils import indent, abort, warn
+from blues.application.project import git_repository_path
 
-from refabric.context_managers import sudo
+from refabric.context_managers import sudo, silent
+from refabric.operations import run
 from refabric.utils import info
+from refabric.contrib import blueprints
 
-from .project import *
 from .providers import get_providers
 
 from .. import debian
@@ -15,10 +21,39 @@ from .. import git
 from .. import user
 from .. import python
 from .. import virtualenv
-from ..app import blueprint
 
-__all__ = ['install_project_user', 'install_project_structure', 'install_system_dependencies', 'install_virtualenv',
-           'install_requirements', 'install_or_update_source', 'install_source', 'update_source', 'install_providers']
+__all__ = [
+    'install_project',
+    'install_project_user',
+    'install_project_structure',
+    'install_system_dependencies',
+    'install_virtualenv',
+    'install_requirements',
+    'install_or_update_source',
+    'install_source',
+    'update_source',
+    'install_providers'
+]
+
+
+blueprint = blueprints.get('blues.app')
+
+
+def install_project():
+    create_app_root()
+    install_project_user()
+    install_project_structure()
+    install_system_dependencies()
+    install_or_update_source()
+
+
+def create_app_root():
+    from .project import app_root
+
+    with sudo():
+        # Create global apps root
+        root_path = app_root()
+        debian.mkdir(root_path, recursive=True)
 
 
 def install_project_user():
@@ -28,6 +63,8 @@ def install_project_user():
     Disable ssh host checking.
     Create log dir.
     """
+    from .project import project_home
+
     with sudo():
         info('Install application user')
         username = blueprint.get('project')
@@ -39,7 +76,8 @@ def install_project_user():
             debian.groupadd(group, gid_min=10000)
 
         # Get UID for project user
-        user.create_system_user(username, groups=project_user_groups, home=home_path)
+        user.create_system_user(username, groups=project_user_groups,
+                                home=home_path)
 
         # Create application log path
         application_log_path = os.path.join('/var', 'log', username)
@@ -53,30 +91,44 @@ def install_project_structure():
     """
     Create project directory structure
     """
+    from .project import static_base, use_static
+
     with sudo():
         info('Install application directory structure')
-        project_name = blueprint.get('project')
 
-        # Create global apps root
-        root_path = app_root()
-        debian.mkdir(root_path)
+        create_app_root()
 
-        # Create static web paths
-        static_base = blueprint.get('static_base', os.path.join('/srv/www/', project_name))
-        static_path = os.path.join(static_base, 'static')
-        media_path = os.path.join(static_base, 'media')
-        debian.mkdir(static_path, group='www-data', mode=1775)
-        debian.mkdir(media_path, group='www-data', mode=1775)
+        if use_static():
+            # Create static web paths
+            static_path = os.path.join(static_base(), 'static')
+            media_path = os.path.join(static_base(), 'media')
+            debian.mkdir(static_path, group='www-data', mode=1775)
+            debian.mkdir(media_path, group='www-data', mode=1775)
 
 
 def install_system_dependencies():
     """
     Install system wide packages that application depends on.
     """
-    with sudo():
+    with sudo(), silent():
         info('Install system dependencies')
-        dependencies = blueprint.get('system_dependencies')
-        if dependencies:
+        system_dependencies = blueprint.get('system_dependencies')
+
+        if system_dependencies:
+            dependencies = []
+            repositories = []
+            for dependency in system_dependencies:
+                dep, _, rep = dependency.partition('@')
+                if dep not in dependencies:
+                    dependencies.append(dep)
+                if rep and rep not in repositories:
+                    repositories.append(rep)
+
+            if repositories:
+                for repository in repositories:
+                    debian.add_apt_repository(repository, src=True)
+
+            debian.apt_get_update()
             debian.apt_get('install', *dependencies)
 
 
@@ -84,6 +136,8 @@ def install_virtualenv():
     """
     Create a project virtualenv.
     """
+    from .project import sudo_project, virtualenv_path
+
     with sudo():
         virtualenv.install()
 
@@ -91,16 +145,168 @@ def install_virtualenv():
         virtualenv.create(virtualenv_path())
 
 
-def install_requirements():
+def maybe_install_requirements(previous_commit, current_commit, force=False):
+    from .project import requirements_txt, git_repository_path
+
+    installation_file = requirements_txt()
+
+    installation_method = get_installation_method(installation_file)
+
+    has_changed = False
+
+    commit_range = '{}..{}'.format(previous_commit, current_commit)
+
+    if not force:
+        if installation_method == 'pip':
+            has_changed, added, removed = diff_requirements(
+                previous_commit,
+                current_commit,
+                installation_file)
+
+            if has_changed:
+                info('Requirements have changed, added: {}, removed: {}'.format(
+                    ', '.join(added) or None,
+                    ', '.join(removed) or None))
+        else:
+            # Check if installation_file has changed
+            commit_range = '{}..{}'.format(previous_commit, current_commit)
+            has_changed, _, _ = git.diff_stat(
+                git_repository_path(),
+                commit_range,
+                installation_file)
+
+    if has_changed or force:
+        info('Install requirements {}', installation_file)
+        install_requirements(installation_file)
+    else:
+        info(indent('(requirements not changed in {}...skipping)'),
+             commit_range)
+
+
+def diff_requirements(previous_commit, current_commit, filename):
+    """
+    Diff requirements file
+
+    :param previous_commit:
+    :param current_commit:
+    :param filename:
+    :return: 3-tuple with (has_changed, additions, removals) where
+        has_changed is a bool, additions and removals may be sets or None.
+    """
+    try:
+        return diff_requirements_smart(previous_commit,
+                                       current_commit,
+                                       filename,
+                                       strict=True)
+    except ValueError:
+        warn('Smart requirements diff failed, falling back to git diff')
+
+    has_changed, _, _ = git.diff_stat(
+        git_repository_path(),
+        '{}..{}'.format(previous_commit, current_commit),
+        filename)
+
+    return has_changed, None, None
+
+
+def patch_requirements(s):
+    """
+    Replaces VCS urls by `pkg==version` so that setuptools can parse
+    requirements and we can diff them.
+    """
+    ex = re.compile('(\-e\s+)?(git|hg|svn|bzr)(\+|://)\S*@([\S^@]+)#egg=(\S+)',
+                    flags=re.MULTILINE)
+    return ex.sub('\\5==\\4', s)
+
+
+def parse_requirements(strs):
+    """
+    Parse requirements after VCS urls are replaced by `pkg==version`.
+    """
+    if isinstance(strs, basestring):
+        strs = patch_requirements(strs)
+    else:
+        strs = map(patch_requirements, strs)
+    return pkg_resources.parse_requirements(strs)
+
+
+def diff_requirements_smart(previous_commit, current_commit, filename,
+                            strict=False):
+    filename = os.path.relpath(filename, git_repository_path())
+
+    get_requirements = partial(git.show_file,
+                               repository_path=git_repository_path(),
+                               filename=filename)
+
+    force_changed = False
+
+    try:
+        # Can't fit this is one line :(
+        previous = parse_requirements(get_requirements(revision=previous_commit))
+        previous = {str(r) for r in previous}
+    except ValueError as exc:
+        warn('Failed to parse previous requirements: {}'.format(exc))
+        previous = set()
+        force_changed = True
+
+        if strict:
+            raise
+
+    try:
+        # Can't fit this is one line :(
+        current = parse_requirements(get_requirements(revision=current_commit))
+        current = {str(r)for r in current}
+    except ValueError as exc:
+        warn('Failed to parse new requirements: {}'.format(exc))
+        current = set()
+        force_changed = True
+
+        if strict:
+            raise
+
+    additions = current.difference(previous)
+    removals = previous.difference(current)
+
+    has_changed = force_changed or bool(additions or removals)
+
+    return has_changed, additions, removals
+
+
+def get_installation_method(filename):
+    if filename.endswith('.txt') or \
+            filename.endswith('.pip'):
+        return 'pip'
+
+    if os.path.basename(filename) == 'setup.py':
+        return 'setuptools'
+
+
+def install_requirements(installation_file=None):
     """
     Pip install requirements in project virtualenv.
     """
+    from .project import sudo_project, virtualenv_path, requirements_txt
+
+    if not installation_file:
+        installation_file = requirements_txt()
+
     with sudo_project():
-        info('Install requirements')
         path = virtualenv_path()
-        requirements = requirements_txt()
+
+        info('Installing requirements from file {}', installation_file)
+
         with virtualenv.activate(path):
-            python.pip('install', '-r', requirements)
+            installation_method = get_installation_method(installation_file
+            )
+            if installation_method == 'pip':
+                python.pip('install', '-r', installation_file)
+            elif installation_method == 'setuptools':
+                with cd(git_repository_path()):
+                    run('python {} develop'.format(installation_file))
+            else:
+                raise ValueError(
+                    '"{}" is not a valid installation file'.format(
+                        installation_file))
 
 
 def install_or_update_source():
@@ -118,6 +324,8 @@ def install_source():
 
     :return: True, if repository got cloned
     """
+    from .project import sudo_project, git_repository, git_root
+
     with sudo():
         git.install()
 
@@ -139,6 +347,8 @@ def update_source():
 
     :return: tuple(previous commit, current commit)
     """
+    from .project import sudo_project, git_repository_path, git_repository
+
     with sudo_project():
         # Get current commit
         path = git_repository_path()
@@ -146,7 +356,9 @@ def update_source():
 
         # Update source from git (reset)
         repository = git_repository()
-        current_commit = git.reset(repository['branch'], repository_path=path)
+        current_commit = git.reset(repository['branch'],
+                                   repository_path=path,
+                                   ignore=blueprint.get('git_force_ignore'))
 
         if current_commit is not None and current_commit != previous_commit:
             info(indent('(new version)'))
@@ -163,4 +375,7 @@ def install_providers():
     host = env.host_string
     providers = get_providers(host)
     for provider in providers.values():
+        if getattr(provider, 'manager', None) is not None:
+            provider.manager.install()
+
         provider.install()

@@ -19,7 +19,8 @@ from refabric.contrib import blueprints
 
 from . import debian
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'ctl']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'ctl',
+           'reset']
 
 
 blueprint = blueprints.get(__name__)
@@ -60,7 +61,7 @@ def install_testing():
 
         info('Adding apt repository for {}', package_name)
         debian.add_apt_repository('http://www.rabbitmq.com/debian/ testing main')
-        debian.apt_get('update')
+        debian.apt_get_update()
 
         info('Installing {}', package_name)
         debian.apt_get('install', package_name)
@@ -80,8 +81,10 @@ def configure():
     Configure Rabbitmq
     """
     uploads = blueprint.upload('rabbitmq/', '/etc/rabbitmq/')
-    uploads += blueprint.upload('erlang.cookie', '/var/lib/rabbitmq/.erlang.cookie', \
-                                user='rabbitmq')
+    uploads.extend(blueprint.upload('erlang.cookie',
+                                    '/var/lib/rabbitmq/.erlang.cookie',
+                                    user='rabbitmq')
+                   or [])
     if uploads:
         restart()
 
@@ -90,11 +93,20 @@ def configure():
 def ctl(command=None):
     """
     Run rabbitmqctl with given command
-    :param command:
-    :return:
+    :param command: Control command to execute
     """
     if not command:
         abort('No command given, $ fab rabbitmq.ctl:stop_app')
 
     with sudo():
         run('rabbitmqctl {}'.format(command))
+
+
+@task
+def reset():
+    """
+    Stop, reset and start app via rabbitmq ctl
+    """
+    ctl('stop_app')
+    ctl('reset')
+    ctl('start_app')

@@ -13,6 +13,7 @@ Submodules
    blues.elasticsearch
    blues.fstab
    blues.git
+   blues.gunicorn
    blues.java
    blues.kibana
    blues.logstash
@@ -32,9 +33,11 @@ Submodules
    blues.solr
    blues.supervisor
    blues.user
+   blues.util
    blues.uwsgi
    blues.virtualenv
    blues.wkhtmltopdf
+   blues.wowza
 
 Module contents
 ---------------

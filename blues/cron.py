@@ -3,7 +3,7 @@ Cron Blueprint
 ==============
 
 This blueprint has no settings.
-Templates are handled as crontab's and should be named to related user.
+Templates are handled as crontabs and should be named after related user.
 
 **Fabric environment:**
 
@@ -33,7 +33,7 @@ blueprint = blueprints.get(__name__)
 @task
 def configure():
     """
-    Install crontab per termplate (user)
+    Install crontab per template (i.e. user)
     """
     with sudo(), silent():
         with debian.temporary_dir(mode=555) as temp_dir:
