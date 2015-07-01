@@ -280,6 +280,7 @@ def parse_url(url, branch=None):
 
     - url
     - branch
+    - GitHub repository owner
     - repository name
     - egg name
 
@@ -294,6 +295,13 @@ def parse_url(url, branch=None):
     """
     egg = None
     url_branch = None  # branch found in URL, if found
+
+    # Split out repository owner from GitHub URLs
+    if 'git@github.com' in url:
+        path = url.split(':', 1)[1]
+        gh_owner = path.split('/', 1)[0]
+    else:
+        gh_owner = None
 
     # Check to see if @<branch> is in the url.
     if url and '@' in url.split(':', 1)[-1]:
@@ -319,6 +327,7 @@ def parse_url(url, branch=None):
 
     return {
         'url': url,
+        'gh_owner': gh_owner,
         'name': repository_name,
         'branch': branch,
         'egg': egg
