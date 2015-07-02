@@ -42,7 +42,7 @@ service_name = 'neo4j-service'
 start = debian.service_task(service_name, 'start')
 stop = debian.service_task(service_name, 'stop')
 restart = debian.service_task(service_name, 'restart')
-status = debian.service_task(service_name, 'status')
+status = debian.service_task(service_name, 'status', show_output=True)
 force_reload = debian.service_task(service_name, 'force-reload')
 
 
