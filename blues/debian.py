@@ -335,7 +335,7 @@ def pwd():
         return run('pwd').stdout.strip()
 
 
-def service(name, action, check_status=True):
+def service(name, action, check_status=True, show_output=False):
     c = fabric.context_managers
     with sudo('root'), c.settings(c.hide('running', 'stdout', 'stderr', 'warnings'), warn_only=True):
         info('Service: {} {}', name, action)
@@ -350,12 +350,12 @@ def service(name, action, check_status=True):
                 return
 
         output = run('service {} {}'.format(name, action), pty=False, combine_stderr=True)
-        if output.return_code != 0:
+        if output.return_code != 0 or show_output:
             puts(indent(magenta(output)))
 
 
-def service_task(name, action, check_status=False):
-    partial_service = partial(service, name, action, check_status)
+def service_task(name, action, check_status=False, show_output=False):
+    partial_service = partial(service, name, action, check_status, show_output)
     pretty_action = action.replace('-', ' ').capitalize()
     partial_service.__doc__ = '{} {}'.format(pretty_action, name)
     return task(partial_service)
