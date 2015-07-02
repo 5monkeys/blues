@@ -12,19 +12,28 @@ Neo4j Blueprint
 
     settings:
       neo4j:
+        password: "hej"
         # bind: 0.0.0.0  # Set the bind address specifically (Default: 0.0.0.0)
         # heap_size_mb: 512  # Set the heap size explicitly (Default: auto)
 
 """
+import time
+import base64
+
 from fabric.decorators import task
+from fabric.utils import abort
 
 from refabric.api import info
 from refabric.context_managers import sudo
 from refabric.contrib import blueprints
+from refabric.operations import run
 
 from . import debian
 
-__all__ = ['start', 'stop', 'restart', 'status', 'setup', 'configure']
+__all__ = [
+    'start', 'stop', 'restart', 'status',
+    'setup', 'configure', 'install', 'set_password',
+]
 
 
 blueprint = blueprints.get(__name__)
@@ -43,8 +52,10 @@ def setup():
     """
     install()
     configure()
+    set_password()
 
 
+@task
 def install():
     """
     Install Neo4j
@@ -87,3 +98,43 @@ def configure():
 
     if updated:
         restart()
+
+
+@task
+def set_password(old_password='neo4j'):
+    """
+    Sets Neo4j password
+    """
+
+    escape = lambda s: s.replace('\\', '\\\\').replace('"', '\\"')
+    pw = lambda s: base64.b64encode('neo4j:' + s)
+
+    new_password = blueprint.get('password')
+    assert new_password
+
+    info("Checking password")
+    output = run('curl http://localhost:7474/user/neo4j '
+                 '-H "Authorization: Basic %s"' % pw(new_password))
+
+    if '"username" : "neo4j"' not in output:
+        if 'AuthorizationFailed' in output:
+            info("Waiting 5 sec due to Jetty's bruteforce protection")
+            time.sleep(5)
+
+        info("Setting password")
+        assert old_password
+
+        # TODO: it did not work with `-U neo4j:%s` why?
+        output = run(
+            'curl -X POST http://localhost:7474/user/neo4j/password'
+            '-H "Accept: application/json; charset=UTF-8" '
+            '-H "Content-Type: application/json" '
+            '-H "Authorization: Basic %s" '
+            '-d \'{"password" : "%s"}\' ' % (
+                pw(old_password), escape(new_password)))
+
+        if 'AuthorizationFailed' in output:
+            abort("Wrong current Neo4j password, cannot change it")
+
+        elif '"username" : "neo4j"' not in output:
+            abort("Unexpected response")
