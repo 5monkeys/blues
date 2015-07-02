@@ -31,7 +31,7 @@ from refabric.operations import run
 from . import debian
 
 __all__ = [
-    'start', 'stop', 'restart', 'status',
+    'start', 'stop', 'restart', 'status', 'force_reload',
     'setup', 'configure', 'install', 'set_password',
 ]
 
@@ -43,6 +43,7 @@ start = debian.service_task(service_name, 'start')
 stop = debian.service_task(service_name, 'stop')
 restart = debian.service_task(service_name, 'restart')
 status = debian.service_task(service_name, 'status')
+force_reload = debian.service_task(service_name, 'force-reload')
 
 
 @task
@@ -75,6 +76,18 @@ def install():
         debian.apt_get_update()
 
         debian.apt_get('install', 'neo4j')
+
+        # TODO: limits
+        # And add these contents to /etc/security/limits.conf:
+        # neo4j   soft    nofile  40000
+        # neo4j   hard    nofile  40000
+
+        # And uncomment this line in /etc/pam.d/su:
+        # session    required   pam_limits.so
+
+        # After that restart the server and validate the new limit
+        # $ ulimit -n
+        # 40000
 
 
 @task
