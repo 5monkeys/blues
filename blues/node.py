@@ -27,7 +27,7 @@ from refabric.contrib import blueprints
 from refabric.operations import run
 
 from .application.project import git_repository_path, project_home, \
-    sudo_project
+    sudo_project, project_name
 from .util import maybe_managed
 
 from . import debian
@@ -161,9 +161,12 @@ def install_dependencies(path=None, production=True):
     :param path: Package path, current directory if None. [default: None]
     :return:
     """
-    with sudo_project(), cd(path or git_repository_path()):
+    with cd(path or git_repository_path()):
         run('npm install' + (' --production' if production else ''))
         bower_install()
+
+        # Restore project user (set to ubuntu)
+        run('chown {u}:{u} -R node_modules'.format(u=project_name()))
 
 
 def bower_install(path=None):
