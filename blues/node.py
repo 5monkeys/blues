@@ -161,7 +161,7 @@ def install_dependencies(path=None, production=True):
     :param path: Package path, current directory if None. [default: None]
     :return:
     """
-    with cd(path or git_repository_path()):
+    with sudo_project(), cd(path or git_repository_path()):
         run('npm install' + (' --production' if production else ''))
         bower_install()
 
