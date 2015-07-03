@@ -6,8 +6,6 @@ from refabric.context_managers import sudo
 from refabric.contrib import blueprints
 from refabric.operations import run
 
-from blues.util import maybe_managed
-
 from ... import node, debian
 
 from ..project import sudo_project, project_home, git_repository_path,\
