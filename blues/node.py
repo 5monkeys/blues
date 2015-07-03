@@ -151,7 +151,7 @@ def npm(command, *options):
         run('npm {} -g {}'.format(command, ' '.join(options)))
 
 
-def install_dependencies(path=None, production=False):
+def install_dependencies(path=None, production=True):
     """
     Install dependencies from "package.json" at path.
 
