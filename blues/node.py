@@ -161,15 +161,7 @@ def install_dependencies(path=None, production=True):
     :param path: Package path, current directory if None. [default: None]
     :return:
     """
-    with cd(path or git_repository_path()):
-        run('npm install' + (' --production' if production else ''))
-        bower_install()
-
-        # Restore project user (set to ubuntu)
-        run('chown {u}:{u} -R node_modules'.format(u=project_name()))
-
-
-def bower_install(path=None):
     home = 'export HOME=' + project_home()
     with prefix(home), sudo_project(), cd(path or git_repository_path()):
+        run('npm install' + (' --production' if production else ''))
         run('test -f bower.json && bower install --config.interactive=false')
