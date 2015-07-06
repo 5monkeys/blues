@@ -18,15 +18,16 @@ Node.js Blueprint
           # - less
 
 """
-from contextlib import contextmanager
 from fabric.context_managers import cd, prefix
 from fabric.decorators import task
-from fabric.utils import abort
 
-from refabric.api import run, info
+from refabric.api import info
 from refabric.context_managers import sudo
 from refabric.contrib import blueprints
+from refabric.operations import run
 
+from .application.project import git_repository_path, project_home, \
+    sudo_project, project_name
 from .util import maybe_managed
 
 from . import debian
@@ -49,9 +50,11 @@ def setup():
 @task
 def configure():
     """
-    Install npm packages
+    Install npm packages and, if bower is in the packages,
+    install bower dependencies.
     """
     install_packages()
+    install_dependencies()
 
 
 def get_version():
@@ -151,20 +154,14 @@ def npm(command, *options):
         run('npm {} -g {}'.format(command, ' '.join(options)))
 
 
-def install_dependencies(path=None, production=False):
+def install_dependencies(path=None, production=True):
     """
     Install dependencies from "package.json" at path.
 
     :param path: Package path, current directory if None. [default: None]
     :return:
     """
-    cd_cm = None
-    if path is not None:
-        cd_cm = cd(path)
-
-    with maybe_managed(cd_cm):
-        if production:
-            npm('install', '--production')
-        else:
-            npm('install')
-        run('test -f bower.json && bower install')
+    home = 'export HOME=' + project_home()
+    with prefix(home), sudo_project(), cd(path or git_repository_path()):
+        run('npm install' + (' --production' if production else ''))
+        run('test -f bower.json && bower install --config.interactive=false')
