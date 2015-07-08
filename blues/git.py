@@ -213,6 +213,7 @@ def diff_stat(repository_path=None, commit='HEAD^', path=None):
         #    719 files changed, 104452 insertions(+), 29309 deletions(-)
         #    1 file changed, 1 insertion(+)
         output = run('git diff --shortstat {} -- {}'.format(commit, path), pty=False)
+        output = output.lstrip('stdin: is not a tty\n')
         parts = output.strip().split(', ') if output else []
         changed, insertions, deletions = 0, 0, 0
 
