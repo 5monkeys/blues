@@ -172,6 +172,19 @@ def configure_providers(force_reload=False):
 
 
 @task
+def generate_env_file():
+    """
+    Genereate shell_env file for easy shell sourcing
+    """
+
+    from .project import project_home
+
+    context = {'env': env}
+    env_path = os.path.join(project_home(), '.env')
+    blueprint.upload('env', env_path, context=context)
+
+
+@task
 def generate_nginx_conf(role='www'):
     """
     Genereate nginx site config for web daemon
