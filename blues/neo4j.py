@@ -119,15 +119,16 @@ def set_password(old_password='neo4j', user='neo4j'):
     Sets Neo4j password
     """
 
-    auth = lambda u, p: base64.b64encode(u + ':' + p)
-
     new_password = blueprint.get('password')
     assert new_password
 
     info("Checking password")
     output = run(
-        'curl http://localhost:7474/user/%s -H "Authorization: Basic %s"' % (
-            user, auth(user, new_password)))
+        'curl -u %s:%s http://localhost:7474/user/%s' % (
+            user, new_password, user))
+
+    if '"username" : "%s"' % user in output:
+        info("Password already set")
 
     if '"username" : "%s"' % user not in output:
         if 'AuthorizationFailed' in output:
@@ -144,12 +145,11 @@ def set_password(old_password='neo4j', user='neo4j'):
 
         # TODO: it did not work with `-U %s:%s` why?
         output = run(
-            'curl -X POST http://localhost:7474/user/%s/password'
+            'curl -u %s:%s -X POST http://localhost:7474/user/%s/password '
             '-H "Accept: application/json; charset=UTF-8" '
             '-H "Content-Type: application/json" '
-            '-H "Authorization: Basic %s" '
             '-d \'{"password" : "%s"}\' ' % (
-                user, auth(user, old_password), new_password))
+                user, old_password, user, new_password))
 
         if 'AuthorizationFailed' in output:
             abort("Wrong current Neo4j password, cannot change it")
