@@ -38,11 +38,12 @@ def install():
     patched QT. This version doesn't need X/Xvfb to run.
     """
     # Can't be named version since it'll conflict with fabrics own version variable
-    wkhtmltox_ver = blueprint.get('wkhtmltopdf_version', '0.12.2.1')
+    wkhtmltox_long_ver = blueprint.get('wkhtmltopdf_version', '0.12.2.1')
+    wkhtmltox_short_ver = '.'.join(wkhtmltox_long_ver.split('.')[:2])
     wkhtmltox_pkg = 'wkhtmltox-{}_linux-{}-amd64.deb'.format(
-        wkhtmltox_ver, debian.lbs_codename())
-    wkhtmltox_url = 'http://downloads.sourceforge.net/project/wkhtmltopdf/{}/{}'.format(
-        wkhtmltox_ver, wkhtmltox_pkg)
+        wkhtmltox_long_ver, debian.lbs_codename())
+    wkhtmltox_url = 'http://download.gna.org/wkhtmltopdf/{}/{}/{}'.format(
+        wkhtmltox_short_ver, wkhtmltox_long_ver, wkhtmltox_pkg)
     run('curl --silent --location --show-error --remote-name "{}"'.format(
         wkhtmltox_url))
     with sudo():
