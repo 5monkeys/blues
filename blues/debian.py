@@ -341,7 +341,7 @@ def service(name, action, check_status=True, show_output=False):
         info('Service: {} {}', name, action)
 
         if check_status:
-            output = run('service {} status'.format(name), pty=False, combine_stderr=True)
+            output = run('service {} status'.format(name), combine_stderr=True)
             if output.return_code != 0:
                 puts(indent(magenta(output)))
                 return
@@ -349,7 +349,7 @@ def service(name, action, check_status=True, show_output=False):
                 puts(indent('...has status {}'.format(magenta(output[len(name)+1:]))))
                 return
 
-        output = run('service {} {}'.format(name, action), pty=False, combine_stderr=True)
+        output = run('service {} {}'.format(name, action), combine_stderr=True)
         if output.return_code != 0 or show_output:
             puts(indent(magenta(output)))
 
@@ -364,7 +364,7 @@ def service_task(name, action, check_status=False, show_output=False):
 def update_rc(basename, priorities, force=False):
     run('update-rc.d {} {} {}'.format('-f' if force else '',
                                       basename,
-                                      priorities), pty=False, use_sudo=True)
+                                      priorities), use_sudo=True)
 
 
 def add_rc_service(name, priorities='defaults'):
