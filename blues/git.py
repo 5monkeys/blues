@@ -86,7 +86,7 @@ def fetch(repository_path=None):
         repository_path = debian.pwd()
 
     with cd(repository_path), silent():
-        run('git fetch origin')
+        run('git fetch origin', pty=False)
 
 
 def reset(branch, repository_path=None, **kwargs):
@@ -165,7 +165,7 @@ def diff_stat(repository_path=None, commit='HEAD^', path=None):
         # Example output (note leading space):
         #    719 files changed, 104452 insertions(+), 29309 deletions(-)
         #    1 file changed, 1 insertion(+)
-        output = run('git diff --shortstat {} -- {}'.format(commit, path))
+        output = run('git diff --shortstat {} -- {}'.format(commit, path), pty=False)
         parts = output.strip().split(', ') if output else []
         changed, insertions, deletions = 0, 0, 0
 
@@ -204,7 +204,7 @@ def log(repository_path=None, commit='HEAD', count=1, path=None):
             cmd += ' -{}'.format(count)
         if path:
             cmd += ' -- {}'.format(path)
-        output = run(cmd)
+        output = run(cmd, pty=False)
         git_log = output.stdout.strip()
         git_log = [col.strip() for row in git_log.split('\n') for col in row.split(' ', 1) if col]
         git_log = zip(git_log[::2], git_log[1::2])
@@ -221,7 +221,7 @@ def current_tag(repository_path=None):
     if not repository_path:
         repository_path = debian.pwd()
     with cd(repository_path), silent():
-        output = run('git describe --long --tags --dirty --always')
+        output = run('git describe --long --tags --dirty --always', pty=False)
 
         # 20141114.1-306-g72354ae-dirty
         return output.strip().rsplit('-', 2)[0]
