@@ -130,7 +130,7 @@ def set_password(old_password='neo4j', user='neo4j'):
     if '"username" : "%s"' % user in output:
         info("Password already set")
 
-    if '"username" : "%s"' % user not in output:
+    else:
         if 'AuthorizationFailed' in output:
             info("Waiting 5 sec due to Jetty's bruteforce protection")
             time.sleep(5)
@@ -143,7 +143,6 @@ def set_password(old_password='neo4j', user='neo4j'):
         new_password = new_password.replace('"', '\\"')
         new_password = new_password.replace("'", "\\'")
 
-        # TODO: it did not work with `-U %s:%s` why?
         output = run(
             'curl -u %s:%s -X POST http://localhost:7474/user/%s/password '
             '-H "Accept: application/json; charset=UTF-8" '
