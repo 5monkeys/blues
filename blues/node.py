@@ -157,11 +157,16 @@ def npm(command, *options):
         run('npm {} -g {}'.format(command, ' '.join(options)))
 
 
-def install_dependencies(path=None, production=True):
+def install_dependencies(path=None, production=True, changed=True):
     """
     Install dependencies from "package.json" at path.
 
     :param path: Package path, current directory if None. [default: None]
+    :param production:
+        Boolean flag to toggle `--production` parameter for npm
+    :param changed:
+        Boolean flag or tuple of two commit sha to check if package.json and
+        bower.json were changed.
     :return:
     """
 
@@ -171,5 +176,23 @@ def install_dependencies(path=None, production=True):
         return
 
     with sudo_project(), cd(dependency_path_root):
-        run('npm install' + (' --production' if production else ''))
-        run('test -f bower.json && bower install --config.interactive=false')
+
+        npm_changed = bower_changed = changed
+
+        if isinstance(changed, tuple):  # i.e. commits: (from_sha, to_sha)
+            changed = '{}..{}'.format(*changed)
+
+            from blues import git
+
+            npm_changed = git.diff_stat(
+                git_repository_path(), changed, 'package.json')[0]
+
+            bower_changed = git.diff_stat(
+                git_repository_path(), changed, 'bower.json')[0]
+
+        if npm_changed:
+            run('npm install' + (' --production' if production else ''))
+
+        if bower_changed:
+            run('test -f bower.json && '
+                'bower install --config.interactive=false')
