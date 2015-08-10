@@ -18,10 +18,11 @@ Node.js Blueprint
           # - less
 
 """
+import json
 import os
 
 from fabric.contrib import files
-from fabric.context_managers import cd, prefix
+from fabric.context_managers import cd
 from fabric.decorators import task
 
 from refabric.api import info
@@ -29,7 +30,7 @@ from refabric.context_managers import sudo
 from refabric.contrib import blueprints
 from refabric.operations import run
 
-from .application.project import git_repository_path, project_home, \
+from .application.project import git_repository_path, \
     sudo_project, project_name
 from .util import maybe_managed
 
@@ -196,3 +197,21 @@ def install_dependencies(path=None, production=True, changed=True):
         if bower_changed:
             run('test -f bower.json && '
                 'bower install --config.interactive=false')
+
+
+def create_symlinks(npm_path='../node_modules',
+                    bower_path='../bower_components'):
+
+    with cd(git_repository_path()):
+        # get bower components dir from config file
+        b = run('cat .bowerrc 2>/dev/null || true') or '{}'
+        b = json.loads(b).get('directory') or 'bower_components'
+
+        for src, dst in [
+            ('../bower_components', b),
+            ('../node_modules', ''),
+        ]:
+            run('mkdir -p {src} && ln -sf {src} {dst}'.format(
+                src=os.path.abspath(os.path.join(git_repository_path(), src)),
+                dst=dst,
+            ), user=project_name())
