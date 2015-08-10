@@ -200,18 +200,21 @@ def install_dependencies(path=None, production=True, changed=True):
 
 
 def create_symlinks(npm_path='../node_modules',
-                    bower_path='../bower_components'):
+                    bower_path='../bower_components',
+                    bowerrc_path='.bowerrc'):
 
     with cd(git_repository_path()):
         # get bower components dir from config file
-        b = run('cat .bowerrc 2>/dev/null || true') or '{}'
+        b = run('cat %s 2>/dev/null || true' % bowerrc_path) or '{}'
         b = json.loads(b).get('directory') or 'bower_components'
 
         for src, dst in [
-            ('../bower_components', b),
-            ('../node_modules', ''),
+            (npm_path, ''),
+            (bower_path, b),
         ]:
-            run('mkdir -p {src} && ln -sf {src} {dst}'.format(
-                src=os.path.abspath(os.path.join(git_repository_path(), src)),
-                dst=dst,
-            ), user=project_name())
+            if src:
+                src = os.path.abspath(os.path.join(git_repository_path(), src))
+                run('mkdir -p {src} && ln -sf {src} {dst}'.format(
+                    src=src,
+                    dst=dst,
+                ), user=project_name())
