@@ -238,6 +238,32 @@ def get_github_owner():
     return parse_url(url)['gh_owner']
 
 
+def notify_deploy_start(role=None, notifier=slack.notify):
+    from .project import project_name
+
+    msg = '`{deployer}` started deploying '
+    if role:
+        msg += '`{project}@{state}:{role}` '
+    else:
+        msg += '`{project}@{state}` '
+
+    msg += 'to `{user}@{host}`'
+
+    msg = msg.format(
+        deployer=git.get_local_commiter(),
+        project=project_name(),
+        state=env.get('state', 'unknown'),
+        role=role,
+        user=env['user'],
+        host=env['host_string'],
+    )
+
+    if notifier:
+        notifier(msg)
+
+    return msg
+
+
 def notify_deploy(role=None, commits=None):
     from .project import project_name, git_repository_path
 
