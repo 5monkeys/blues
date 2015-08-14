@@ -11,6 +11,7 @@ blueprint = blueprints.get(__name__)
 
 start = debian.service_task('haproxy', 'start')
 stop = debian.service_task('haproxy', 'stop')
+reload = debian.service_task('haproxy', 'reload')
 restart = debian.service_task('haproxy', 'restart')
 status = debian.service_task('haproxy', 'status')
 
