@@ -54,7 +54,7 @@ def configure():
 
 
 @task
-def deploy(auto_reload=True, force=False):
+def deploy(auto_reload=True, force=False, update_pip=False):
     """
     Reset source to configured branch and install requirements, if needed
 
@@ -73,7 +73,8 @@ def deploy(auto_reload=True, force=False):
     if code_changed or force:
         # Install python dependencies
         if use_virtualenv():
-            maybe_install_requirements(previous_commit, current_commit, force)
+            maybe_install_requirements(previous_commit, current_commit, force,
+                                       update_pip=update_pip)
 
         # Reload providers
         if auto_reload:
