@@ -40,12 +40,12 @@ def notify(msg):
     username = blueprint.get('username', 'deploybot')
     icon_emoji = blueprint.get('icon_emoji', ':rocket:')
 
-    endpoint = blueprint.get('endpoint')
-    if not endpoint:
-        warn('No slack API endpoint found, skipping notification')
-        return False
+    endpoint = blueprint.get('endpoint', None)
 
     for channel in channels:
+        if '/' in channel:
+            endpoint, channel = channel.rsplit('/', 1)
+
         send_request(endpoint, channel, username, msg, icon_emoji)
 
 
