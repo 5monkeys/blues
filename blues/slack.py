@@ -8,9 +8,10 @@ Slack Blueprint
 
     settings:
       slack:
-        endpoint: https://hooks.slack.com/...
+        endpoint: https://hooks.slack.com/... # Default endpoint
         #channels:
         #  - "#deploy"
+        #  - "https://hooks.slack.com/.../#deploy" # Specify non-default endpoint
         #username: deploybot
         #icon_emoji: ":rocket"
 
