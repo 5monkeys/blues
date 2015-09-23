@@ -170,6 +170,6 @@ def install_dependencies(path=None, production=True):
     if not files.exists(os.path.join(dependency_path_root, 'package.json')):
         return
 
-    with sudo_project(), cd(path or git_repository_path()):
+    with sudo_project(), cd(dependency_path_root):
         run('npm install' + (' --production' if production else ''))
         run('test -f bower.json && bower install --config.interactive=false')
