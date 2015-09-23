@@ -11,8 +11,9 @@ Nginx Blueprint
 
     settings:
       nginx:
-        sites:                      # List of sites/templates in `sites-available` folder to enable (Optional)
-          - foo                     # Template name, with or without .conf extension
+        source_version: 1.4.6-1ubuntu3.3  # Required if installed from source (see modules)
+        sites:                            # List of sites/templates in `sites-available` folder to enable (Optional)
+          - foo                           # Template name, with or without .conf extension
           - bar
         # auto_disable_sites: true  # Auto disable sites not specified in `sites` setting (Default: true)
         # modules:                  # If present, nginx will be built and installed from source with these modules
