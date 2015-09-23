@@ -128,12 +128,8 @@ def install_system_dependencies():
                 elif dep not in dependencies:
                     dependencies.append(dep)
 
-            from pprint import pprint
-            pprint([dependencies, ppa_dependencies, repositories])
-
             debian.apt_get_update()
             debian.apt_get('install', *dependencies)
-            
 
             if repositories:
                 for repository in repositories:
