@@ -18,6 +18,9 @@ Node.js Blueprint
           # - less
 
 """
+import os
+
+from fabric.contrib import files
 from fabric.context_managers import cd, prefix
 from fabric.decorators import task
 
@@ -161,6 +164,12 @@ def install_dependencies(path=None, production=True):
     :param path: Package path, current directory if None. [default: None]
     :return:
     """
-    with sudo_project(), cd(path or git_repository_path()):
+
+    dependency_path_root = path or git_repository_path()
+
+    if not files.exists(os.path.join(dependency_path_root, 'package.json')):
+        return
+
+    with sudo_project(), cd(dependency_path_root):
         run('npm install' + (' --production' if production else ''))
         run('test -f bower.json && bower install --config.interactive=false')
