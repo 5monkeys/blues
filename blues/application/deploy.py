@@ -117,19 +117,26 @@ def install_system_dependencies():
         if system_dependencies:
             dependencies = []
             repositories = []
+            ppa_dependencies = []
             for dependency in system_dependencies:
                 dep, _, rep = dependency.partition('@')
-                if dep not in dependencies:
+                if rep:
+                    if rep not in repositories:
+                        repositories.append(rep)
+
+                    ppa_dependencies.append(dep)
+                elif dep not in dependencies:
                     dependencies.append(dep)
-                if rep and rep not in repositories:
-                    repositories.append(rep)
+
+            debian.apt_get_update()
+            debian.apt_get('install', *dependencies)
 
             if repositories:
                 for repository in repositories:
                     debian.add_apt_repository(repository, src=True)
 
-            debian.apt_get_update()
-            debian.apt_get('install', *dependencies)
+                debian.apt_get_update()
+                debian.apt_get('install', *ppa_dependencies)
 
 
 def install_virtualenv():
