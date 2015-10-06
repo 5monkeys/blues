@@ -11,8 +11,9 @@ Nginx Blueprint
 
     settings:
       nginx:
-        sites:                      # List of sites/templates in `sites-available` folder to enable (Optional)
-          - foo                     # Template name, with or without .conf extension
+        source_version: 1.4.6-1ubuntu3.3  # Required if installed from source (see modules)
+        sites:                            # List of sites/templates in `sites-available` folder to enable (Optional)
+          - foo                           # Template name, with or without .conf extension
           - bar
         # auto_disable_sites: true  # Auto disable sites not specified in `sites` setting (Default: true)
         # modules:                  # If present, nginx will be built and installed from source with these modules
@@ -79,9 +80,12 @@ def install_from_source():
         debian.apt_get('install', *packages)
 
         # Setup nginx source
-        nginx_version = '1.4.6'
-        nginx_distro_version = '1ubuntu3.2'
-        nginx_full_distro_version = '{}-{}'.format(nginx_version, nginx_distro_version)
+
+        nginx_full_distro_version = blueprint.get('source_version')
+        if not nginx_full_distro_version:
+            raise TypeError('You are installing from nginx from source, please specify source_version')
+
+        nginx_version, nginx_distro_version = nginx_full_distro_version.split('-')
 
         nginx_source_path = '/usr/src/nginx'
         nginx_source_version_path = os.path.join(nginx_source_path, 'nginx-{}'.format(nginx_version))
