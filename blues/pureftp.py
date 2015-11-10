@@ -64,6 +64,11 @@ def install():
         # Set up symlinks
         debian.ln('/etc/pure-ftpd/conf/PureDB', '/etc/pure-ftpd/auth/PureDB')
 
+        # Setup umask
+        umask = blueprint.get('umask')
+        if umask:
+            run('echo {} > /etc/pure-ftpd/conf/Umask'.format(umask.replace(':', ' ')))
+
         # Enable TLS
         run('echo 1 > /etc/pure-ftpd/conf/TLS')
         key_path = '/etc/ssl/private/pure-ftpd.pem'
