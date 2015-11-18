@@ -219,7 +219,7 @@ def create_symlinks(npm_path='../node_modules',
             if src:
                 src = os.path.abspath(os.path.join(git_repository_path(), src))
                 if clear:
-                    run('rm -rf {src} || true')
+                    run('rm -rf {src} || true'.format(src=src))
                 run('mkdir -p {src} && ln -sf {src} {dst}'.format(
                     src=src,
                     dst=dst,
