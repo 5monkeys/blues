@@ -173,8 +173,9 @@ def install_dependencies(path=None, production=True, changed=True):
 
     dependency_path_root = path or git_repository_path()
 
-    if not files.exists(os.path.join(dependency_path_root, 'package.json')):
-        return
+    has_file = lambda x: files.exists(os.path.join(dependency_path_root, x))
+    has_package = has_file('package.json')
+    has_bower = has_file('bower.json')
 
     with sudo_project(), cd(dependency_path_root):
 
@@ -185,16 +186,18 @@ def install_dependencies(path=None, production=True, changed=True):
 
             from blues import git
 
-            npm_changed = git.diff_stat(
-                git_repository_path(), changed, 'package.json')[0]
+            if has_package:
+                npm_changed = git.diff_stat(
+                    git_repository_path(), changed, 'package.json')[0]
 
-            bower_changed = git.diff_stat(
-                git_repository_path(), changed, 'bower.json')[0]
+            if has_bower:
+                bower_changed = git.diff_stat(
+                    git_repository_path(), changed, 'bower.json')[0]
 
-        if npm_changed:
+        if has_package and npm_changed:
             run('npm install' + (' --production' if production else ''))
 
-        if bower_changed:
+        if has_bower and bower_changed:
             run('test -f bower.json && '
                 'bower install --config.interactive=false')
 
