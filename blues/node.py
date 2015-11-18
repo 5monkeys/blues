@@ -201,7 +201,8 @@ def install_dependencies(path=None, production=True, changed=True):
 
 def create_symlinks(npm_path='../node_modules',
                     bower_path='../bower_components',
-                    bowerrc_path='.bowerrc'):
+                    bowerrc_path='.bowerrc',
+                    clear=False):
 
     with cd(git_repository_path()):
         # get bower components dir from config file
@@ -214,6 +215,8 @@ def create_symlinks(npm_path='../node_modules',
         ]:
             if src:
                 src = os.path.abspath(os.path.join(git_repository_path(), src))
+                if clear:
+                    run('rm -rf {src} || true')
                 run('mkdir -p {src} && ln -sf {src} {dst}'.format(
                     src=src,
                     dst=dst,
