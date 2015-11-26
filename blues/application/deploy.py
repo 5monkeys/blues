@@ -172,8 +172,8 @@ def maybe_install_requirements(previous_commit, current_commit, force=False):
 
             if has_changed:
                 info('Requirements have changed, added: {}, removed: {}'.format(
-                    ', '.join(added) or None,
-                    ', '.join(removed) or None))
+                    ', '.join(added),
+                    ', '.join(removed)))
         else:
             # Check if installation_file has changed
             commit_range = '{}..{}'.format(previous_commit, current_commit)
@@ -208,12 +208,12 @@ def diff_requirements(previous_commit, current_commit, filename):
     except ValueError:
         warn('Smart requirements diff failed, falling back to git diff')
 
-    has_changed, _, _ = git.diff_stat(
+    has_changed, insertions, deletions = git.diff_stat(
         git_repository_path(),
         '{}..{}'.format(previous_commit, current_commit),
         filename)
 
-    return has_changed, None, None
+    return has_changed, [str(insertions)], [str(deletions)]
 
 
 def patch_requirements(s):
