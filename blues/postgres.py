@@ -199,15 +199,22 @@ def setup_shared_memory():
 
 
 @task
-def generate_pgtune_conf(role='db'):
+def generate_pgtune_conf(role='db', **options):
     """
     Run pgtune and create pgtune.conf
 
     :param role: Which fabric role to place local pgtune.conf template under
     """
+
+    options.setdefault('type', 'Web')
+    options = ' '.join(
+        '--{}="{}"'.format(key, value)
+        for key, value in options.items()
+    )
+
     conf_path = postgres_root('postgresql.conf')
     with sudo(), silent():
-        output = run('pgtune -T Web -i {}'.format(conf_path)).strip()
+        output = run('pgtune {} -i {}'.format(options, conf_path)).strip()
 
         def parse(c):
             lines = [l for l in c.splitlines() if '# pgtune' in l]
