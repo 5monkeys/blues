@@ -239,7 +239,7 @@ def get_github_owner():
     return parse_url(url)['gh_owner']
 
 
-def notify_deploy_start(role=None, notifier=slack.notify):
+def notify_deploy_start(role=None, notifier=slack.notify, quiet=False):
     from .project import project_name
 
     msg = '`{deployer}` started deploying '
@@ -260,12 +260,12 @@ def notify_deploy_start(role=None, notifier=slack.notify):
     )
 
     if notifier:
-        notifier(msg)
+        notifier(msg, quiet=quiet)
 
     return msg
 
 
-def notify_deploy(role=None, commits=None):
+def notify_deploy(role=None, commits=None, notifier=slack.notify, quiet=False):
     from .project import project_name, git_repository_path
 
     msg = '`{deployer}` deployed '
@@ -303,4 +303,4 @@ def notify_deploy(role=None, commits=None):
         'host': env['host_string'],
     }
 
-    slack.notify(msg.format(**variables))
+    notifier(msg.format(**variables), quiet=quiet)
