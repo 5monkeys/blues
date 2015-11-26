@@ -96,6 +96,7 @@ def top(vassal_name=None):
         stats_path = os.path.join(tmpfs_path, '{}-stats.sock'.format(vassal))
         run('uwsgitop {}'.format(stats_path))
 
+
 @task
 def fifo(vassal_name, command):
     """
