@@ -23,9 +23,9 @@ in settings (which can override shell_env).
 """
 from fabric.decorators import task
 from refabric.contrib import blueprints
+from refabric.utils import info
 
 __all__ = ['configure']
-
 
 blueprint = blueprints.get(__name__)
 
@@ -40,11 +40,12 @@ def configure():
     from fabric.state import env
 
     e = env['shell_env'].copy()
-    e.update(blueprint.settings())
+    e.update(blueprint.settings() or {})
     escape = lambda v: str(v).replace('\\', '\\\\').replace('"', '\\"')
     e = map(lambda v: (v[0], escape(v[1])), sorted(e.items()))
 
     changed = blueprint.upload('./', project_home(), user=project_name(),
                                context={'shell_env': e})
     if changed:
+        info('Environment has been changed')
         configure_providers(force_reload=True)
