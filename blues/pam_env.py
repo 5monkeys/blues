@@ -21,8 +21,10 @@ in settings (which can override shell_env).
           MYUSER_EXTRA_ENV_VAR: "some value"
 
 """
+from fabric.contrib import files
 from fabric.decorators import task
 from refabric.contrib import blueprints
+from refabric.operations import run
 from refabric.utils import info
 
 __all__ = ['configure']
@@ -46,6 +48,15 @@ def configure():
 
     changed = blueprint.upload('./', project_home(), user=project_name(),
                                context={'shell_env': e})
+
+    profile = project_home() + '/.profile'
+    cmd = 'source ~/.env'
+    from refabric.context_managers import silent
+    with silent('warnings'):
+        if not run('grep "%s" %s' % (cmd, profile),
+                   user=project_name()).succeeded:
+            files.append(profile, cmd)
+
     if changed:
         info('Environment has been changed')
         configure_providers(force_reload=True)
