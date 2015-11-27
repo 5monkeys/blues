@@ -33,7 +33,7 @@ import json
 blueprint = blueprints.get(__name__)
 
 
-def notify(msg, quite=False):
+def notify(msg, quiet=False):
     slack_config = blueprint.get('')
 
     if isinstance(slack_config, dict):
