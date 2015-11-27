@@ -26,7 +26,6 @@ Slack Blueprint
 """
 from fabric.utils import warn
 from refabric.contrib import blueprints
-from collections import OrderedDict
 import urllib2
 import json
 
@@ -51,7 +50,6 @@ def notify_with_config(msg, config, quiet):
     # OrderedDict, removing any duplicates.
     if channel:
         channels.append(channel)
-        channels = list(OrderedDict.fromkeys(channels))
 
     if not channels:
         warn('Empty slack channel list, skipping notification')
