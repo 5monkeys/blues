@@ -69,7 +69,7 @@ def install():
 
 
 def install_from_source():
-    from blues import debian, nginx
+    from blues import debian
 
     with sudo():
         debian.apt_get_update()

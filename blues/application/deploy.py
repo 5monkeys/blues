@@ -152,7 +152,7 @@ def install_virtualenv():
         virtualenv.create(virtualenv_path())
 
 
-def maybe_install_requirements(previous_commit, current_commit, force=False):
+def maybe_install_requirements(previous_commit, current_commit, force=False, update_pip=False):
     from .project import requirements_txt, git_repository_path
 
     installation_file = requirements_txt()
@@ -172,8 +172,8 @@ def maybe_install_requirements(previous_commit, current_commit, force=False):
 
             if has_changed:
                 info('Requirements have changed, added: {}, removed: {}'.format(
-                    ', '.join(added) or None,
-                    ', '.join(removed) or None))
+                    ', '.join(added),
+                    ', '.join(removed)))
         else:
             # Check if installation_file has changed
             commit_range = '{}..{}'.format(previous_commit, current_commit)
@@ -184,7 +184,7 @@ def maybe_install_requirements(previous_commit, current_commit, force=False):
 
     if has_changed or force:
         info('Install requirements {}', installation_file)
-        install_requirements(installation_file)
+        install_requirements(installation_file, update_pip=update_pip)
     else:
         info(indent('(requirements not changed in {}...skipping)'),
              commit_range)
@@ -208,12 +208,12 @@ def diff_requirements(previous_commit, current_commit, filename):
     except ValueError:
         warn('Smart requirements diff failed, falling back to git diff')
 
-    has_changed, _, _ = git.diff_stat(
+    has_changed, insertions, deletions = git.diff_stat(
         git_repository_path(),
         '{}..{}'.format(previous_commit, current_commit),
         filename)
 
-    return has_changed, None, None
+    return has_changed, [str(insertions)], [str(deletions)]
 
 
 def patch_requirements(s):
@@ -288,7 +288,7 @@ def get_installation_method(filename):
         return 'setuptools'
 
 
-def install_requirements(installation_file=None):
+def install_requirements(installation_file=None, update_pip=False):
     """
     Pip install requirements in project virtualenv.
     """
@@ -303,9 +303,10 @@ def install_requirements(installation_file=None):
         info('Installing requirements from file {}', installation_file)
 
         with virtualenv.activate(path):
-            installation_method = get_installation_method(installation_file
-            )
+            installation_method = get_installation_method(installation_file)
             if installation_method == 'pip':
+                if update_pip:
+                    python.update_pip()
                 python.pip('install', '-r', installation_file)
             elif installation_method == 'setuptools':
                 with cd(git_repository_path()):

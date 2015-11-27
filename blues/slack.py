@@ -33,17 +33,17 @@ import json
 blueprint = blueprints.get(__name__)
 
 
-def notify(msg):
+def notify(msg, quite=False):
     slack_config = blueprint.get('')
 
     if isinstance(slack_config, dict):
         slack_config = [slack_config]
 
     for config in slack_config:
-        notify_with_config(msg, config)
+        notify_with_config(msg, config, quiet)
 
 
-def notify_with_config(msg, config):
+def notify_with_config(msg, config, quiet):
     channels = config.get('channels', [])
     channel = config.get('channel', None)
 
@@ -65,11 +65,12 @@ def notify_with_config(msg, config):
         warn('No slack API endpoint found, skipping notification')
         return False
 
-    for channel in channels:
-        send_request(endpoint, channel, username, msg, icon_emoji)
+    for channel in set(channels):
+        send_request(endpoint=endpoint, channel=channel, username=username,
+                     msg=msg, icon_emoji=icon_emoji, quiet=quiet)
 
 
-def send_request(endpoint, channel, username, msg, icon_emoji):
+def send_request(endpoint, channel, username, msg, icon_emoji, quiet=False):
     data = json.dumps({
         "channel": channel,
         "username": username,
@@ -78,4 +79,10 @@ def send_request(endpoint, channel, username, msg, icon_emoji):
     })
 
     req = urllib2.Request(endpoint, data, {'Content-Type': 'application/json'})
-    urllib2.urlopen(req).close()
+    try:
+        urllib2.urlopen(req).close()
+    except urllib2.HTTPError as e:
+        if quiet:
+            warn(e)
+        else:
+            raise

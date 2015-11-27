@@ -54,7 +54,7 @@ def configure():
 
 
 @task
-def deploy(auto_reload=True, force=False):
+def deploy(auto_reload=True, force=False, update_pip=False):
     """
     Reset source to configured branch and install requirements, if needed
 
@@ -73,7 +73,8 @@ def deploy(auto_reload=True, force=False):
     if code_changed or force:
         # Install python dependencies
         if use_virtualenv():
-            maybe_install_requirements(previous_commit, current_commit, force)
+            maybe_install_requirements(previous_commit, current_commit, force,
+                                       update_pip=update_pip)
 
         # Reload providers
         if auto_reload:
@@ -238,7 +239,7 @@ def get_github_owner():
     return parse_url(url)['gh_owner']
 
 
-def notify_deploy_start(role=None, notifier=slack.notify):
+def notify_deploy_start(role=None, notifier=slack.notify, quiet=False):
     from .project import project_name
 
     msg = '`{deployer}` started deploying '
@@ -259,12 +260,12 @@ def notify_deploy_start(role=None, notifier=slack.notify):
     )
 
     if notifier:
-        notifier(msg)
+        notifier(msg, quiet=quiet)
 
     return msg
 
 
-def notify_deploy(role=None, commits=None):
+def notify_deploy(role=None, commits=None, notifier=slack.notify, quiet=False):
     from .project import project_name, git_repository_path
 
     msg = '`{deployer}` deployed '
@@ -302,4 +303,4 @@ def notify_deploy(role=None, commits=None):
         'host': env['host_string'],
     }
 
-    slack.notify(msg.format(**variables))
+    notifier(msg.format(**variables), quiet=quiet)

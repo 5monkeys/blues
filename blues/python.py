@@ -14,7 +14,6 @@ Contains pip helper for other blueprints to use.
 
 """
 from fabric.decorators import task
-from pip.req import parse_requirements
 
 from refabric.api import run, info
 from refabric.context_managers import sudo
@@ -106,5 +105,7 @@ def pip(command, *options, **kwargs):
                    options=' '.join(options), log_file=pip_log_file))
 
 
-def parse_requirements():
-    parse_requirements()
+@task
+def update_pip():
+    info('Updating pip')
+    pip('install -U pip')
