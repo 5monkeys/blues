@@ -95,7 +95,7 @@ def send_deploy_event():
             }
 
         response = requests.post(url, data=payload, headers=headers)
-        info(response)
+        info(response.text)
     else:
         info('No key found')
 
