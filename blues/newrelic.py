@@ -94,8 +94,8 @@ def send_deploy_event():
                 'deployment[user]': deployer,
             }
 
-        requests.post(url, data=payload, headers=headers)
-
+        response = requests.post(url, data=payload, headers=headers)
+        info(response)
     else:
         info('No key found')
 
