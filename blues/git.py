@@ -268,11 +268,11 @@ def log_between_tags(repository_path, tag1, tag2):
     :param tag2: newset tag
     :return: changelog in text
     """
-    with cd(repository_path), silent():
+    with cd(repository_path):
         cmd = 'git --no-pager log --pretty=oneline {0}..{1}'.format(
             tag1, tag2)
         # removes carriage return
-        changes = run(cmd.replace('\r', ''))
+        changes = run(cmd).replace('\r', '')
         return changes
 
 
@@ -302,7 +302,7 @@ def get_two_most_recent_tags(repository_path):
                    'git --no-pager describe --tags '
                    '"`git --no-pager describe --tags`~1"')
         new_tag, runner_up_tag = tags.strip().split('\n')
-
+        new_tag = new_tag.replace('\r', '')
         return new_tag, runner_up_tag
 
 

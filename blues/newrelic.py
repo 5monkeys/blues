@@ -19,13 +19,13 @@ from refabric.api import run, info
 
 from refabric.context_managers import sudo
 from refabric.contrib import blueprints
-from fabric.context_managers import cd
 from .application.project import python_path
 
 
 from . import debian, git
 
-import pip._vendor.requests as requests
+import urllib2
+import urllib
 
 __all__ = ['start', 'stop', 'restart', 'setup', 'configure']
 
@@ -92,12 +92,9 @@ def send_deploy_event(payload=None):
         headers = {'x-api-key': newrelic_key}
 
         if not payload:
-            with cd(python_path()):
-                commit_hash = git.get_commit(python_path)
-                new_tag, old_tag = git.get_two_most_recent_tags(python_path)
-                changes = git.log_between_tags(python_path,
-                                               new_tag, old_tag)
-
+            commit_hash = git.get_commit(python_path())
+            new_tag, old_tag = git.get_two_most_recent_tags(python_path())
+            changes = git.log_between_tags(python_path(), old_tag, new_tag)
             deployer = git.get_local_commiter()
 
             payload = {
@@ -108,8 +105,9 @@ def send_deploy_event(payload=None):
                     'deployment[user]': deployer,
                 }
 
-        requests.post(url, data=payload, headers=headers)
-
+        request = urllib2.Request(url, headers=headers)
+        request_payload = urllib.urlencode(payload)
+        urllib2.urlopen(request, data=request_payload)
+        info('Deploy event sent')
     else:
         info('No key found')
-
