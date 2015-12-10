@@ -25,7 +25,7 @@ from .application.project import python_path
 
 from . import debian, git
 
-import requests
+import pip._vendor.requests as requests
 
 __all__ = ['start', 'stop', 'restart', 'setup', 'configure']
 
@@ -71,34 +71,42 @@ def configure():
         run('nrsysmond-config --set license_key={}'.format(newrelic_key))
 
 
-def send_deploy_event():
-
+def send_deploy_event(payload=None):
+    """
+    Sends deploy event to newrelic
+    payload ={
+        'deployment[app_name]': app_name,
+        'deployment[description]': new_tag,
+        'deployment[revision]': commit_hash,
+        'deployment[changelog]': changes,
+        'deployment[user]': deployer,
+    }
+    :param payload: payload is a dict with newrelic api info
+    :return:
+    """
     newrelic_key = blueprint.get('newrelic_key', None)
     app_name = blueprint.get('app_name', None)
 
     if newrelic_key and app_name:
         url = 'https://api.newrelic.com/deployments.xml'
         headers = {'x-api-key': newrelic_key}
-        with cd(python_path()):
-            commit_hash = run('git rev-parse HEAD')
-            tags = run('git --no-pager describe --tags && git --no-pager describe --tags "`git --no-pager describe --tags`~1"')
 
-            new_tag, old_tag = tags.strip().split('\n')
+        if not payload:
+            with cd(python_path()):
+                commit_hash = git.get_commit(python_path)
+                new_tag, old_tag = git.get_two_most_recent_tags(python_path)
+                changes = git.log_between_tags(python_path,
+                                               new_tag, old_tag)
 
-            cmd = 'git --no-pager log --pretty=oneline %s..%s' % (old_tag,
-            new_tag)
+            deployer = git.get_local_commiter()
 
-            changes = run(cmd.replace('\r', ''))
-
-        deployer = git.get_local_commiter()
-
-        payload = {
-                'deployment[app_name]': app_name,
-                'deployment[description]': new_tag,
-                'deployment[revision]': commit_hash,
-                'deployment[changelog]': changes,
-                'deployment[user]': deployer,
-            }
+            payload = {
+                    'deployment[app_name]': app_name,
+                    'deployment[description]': new_tag,
+                    'deployment[revision]': commit_hash,
+                    'deployment[changelog]': changes,
+                    'deployment[user]': deployer,
+                }
 
         requests.post(url, data=payload, headers=headers)
 
