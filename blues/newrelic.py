@@ -92,9 +92,10 @@ def send_deploy_event(payload=None):
         headers = {'x-api-key': newrelic_key}
 
         if not payload:
-            commit_hash = git.get_commit(python_path())
-            new_tag, old_tag = git.get_two_most_recent_tags(python_path())
-            changes = git.log_between_tags(python_path(), old_tag, new_tag)
+            path = python_path()
+            commit_hash = git.get_commit(path)
+            new_tag, old_tag = git.get_two_most_recent_tags(path)
+            changes = git.log_between_tags(path, old_tag, new_tag)
             deployer = git.get_local_commiter()
 
             payload = {
