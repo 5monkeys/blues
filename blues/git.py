@@ -259,6 +259,23 @@ def log(repository_path=None, commit='HEAD', count=1, path=None):
     return git_log
 
 
+def log_between_tags(repository_path, tag1, tag2):
+    """
+    get log for repository between 2 tags
+    (--no-pager removes garbled text around the changelog)
+    :param repository_path:
+    :param tag1: oldest tag
+    :param tag2: newset tag
+    :return: changelog in text
+    """
+    with cd(repository_path):
+        cmd = 'git --no-pager log --pretty=oneline {0}..{1}'.format(
+            tag1, tag2)
+        # removes carriage return
+        changes = run(cmd).replace('\r', '')
+        return changes
+
+
 def current_tag(repository_path=None):
     """
     Get most recent tag
@@ -272,6 +289,21 @@ def current_tag(repository_path=None):
 
         # 20141114.1-306-g72354ae-dirty
         return output.strip().rsplit('-', 2)[0]
+
+
+def get_two_most_recent_tags(repository_path):
+    """
+    Get two most recent tags
+    :param repository_path:
+    :return: new_tag, runner_up_tag
+    """
+    with cd(repository_path), silent():
+        tags = run('git --no-pager describe --tags && '
+                   'git --no-pager describe --tags '
+                   '"`git --no-pager describe --tags`~1"')
+        new_tag, runner_up_tag = tags.strip().split('\n')
+        new_tag = new_tag.replace('\r', '')
+        return new_tag, runner_up_tag
 
 
 def parse_url(url, branch=None):
