@@ -122,6 +122,11 @@ def install_from_source():
             run('sed -ri {} {}'.format(rtmp_module_string,
                                        os.path.join(nginx_source_version_path, 'debian/rules')))
 
+            # Install useful tools, like ffmpeg
+            debian.add_apt_repository('ppa:mc3man/trusty-media', src=True)
+            debian.apt_get_update()
+            debian.apt_get('install', 'libfaac-dev', 'ffmpeg', 'zlib1g-dev', 'libjpeg8-dev')
+
         if 'vod' in nginx_modules:
             # Download nginx-rtmp module
             # nginx_vod_version = '2ac3bfeffab2fa1b46923236b7fd0ea15616a417'  # "Latest" git commit
