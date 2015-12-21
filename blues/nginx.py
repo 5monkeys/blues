@@ -74,7 +74,7 @@ def install_from_source():
     with sudo():
         debian.apt_get_update()
 
-        #Install dependencies
+        # Install dependencies
         packages = ('build-essential', 'libpcre3', 'libpcre3-dev',
                     'libssl-dev', 'dpkg-dev', 'git', 'software-properties-common')
         debian.apt_get('install', *packages)
@@ -101,7 +101,7 @@ def install_from_source():
 
         if 'rtmp' in nginx_modules:
             # Download nginx-rtmp module
-            nginx_rtmp_version = '1.1.6'
+            nginx_rtmp_version = '1.1.7'
             nginx_rtmp_module_path = os.path.join(nginx_source_module_path, 'nginx-rtmp-module')
             nginx_rtmp_module_version_path = os.path.join(nginx_source_module_path,
                                                           'nginx-rtmp-module-{}'.format(nginx_rtmp_version))
