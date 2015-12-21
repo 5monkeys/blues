@@ -176,7 +176,7 @@ def configure():
 
         # Disable previously enabled sites not configured sites-enabled
         changes = []
-        sites = blueprint.get('sites')
+        sites = blueprint.get('sites') or []
         auto_disable_sites = blueprint.get('auto_disable_sites', True)
         if auto_disable_sites:
             with silent():
