@@ -74,7 +74,7 @@ def install_from_source():
     with sudo():
         debian.apt_get_update()
 
-        #Install dependencies
+        # Install dependencies
         packages = ('build-essential', 'libpcre3', 'libpcre3-dev',
                     'libssl-dev', 'dpkg-dev', 'git', 'software-properties-common')
         debian.apt_get('install', *packages)
@@ -101,7 +101,7 @@ def install_from_source():
 
         if 'rtmp' in nginx_modules:
             # Download nginx-rtmp module
-            nginx_rtmp_version = '1.1.6'
+            nginx_rtmp_version = '1.1.7'
             nginx_rtmp_module_path = os.path.join(nginx_source_module_path, 'nginx-rtmp-module')
             nginx_rtmp_module_version_path = os.path.join(nginx_source_module_path,
                                                           'nginx-rtmp-module-{}'.format(nginx_rtmp_version))
@@ -121,6 +121,11 @@ def install_from_source():
             rtmp_module_string = '"s/^common_configure_flags := /common_configure_flags := \\\\\\\\\\\\\\\\\\n\\t\\t\\t--add-module=\\$\(MODULESDIR\)\/nginx-rtmp-module /g"'
             run('sed -ri {} {}'.format(rtmp_module_string,
                                        os.path.join(nginx_source_version_path, 'debian/rules')))
+
+            # Install useful tools, like ffmpeg
+            debian.add_apt_repository('ppa:mc3man/trusty-media', src=True)
+            debian.apt_get_update()
+            debian.apt_get('install', 'libfaac-dev', 'ffmpeg', 'zlib1g-dev', 'libjpeg8-dev')
 
         if 'vod' in nginx_modules:
             # Download nginx-rtmp module
@@ -171,7 +176,7 @@ def configure():
 
         # Disable previously enabled sites not configured sites-enabled
         changes = []
-        sites = blueprint.get('sites')
+        sites = blueprint.get('sites') or []
         auto_disable_sites = blueprint.get('auto_disable_sites', True)
         if auto_disable_sites:
             with silent():
