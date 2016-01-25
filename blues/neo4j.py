@@ -79,15 +79,19 @@ def install():
 
         # TODO: limits
         # And add these contents to /etc/security/limits.conf:
-        # neo4j   soft    nofile  40000
-        # neo4j   hard    nofile  40000
+        # *       hard    memlock  unlimited
+        # *       soft    memlock  unlimited
+        # neo4j   soft    nofile  100000
+        # neo4j   hard    nofile  100000
+        # ubuntu  soft    nofile  100000
+        # ubuntu  hard    nofile  100000
 
         # And uncomment this line in /etc/pam.d/su:
         # session    required   pam_limits.so
 
         # After that restart the server and validate the new limit
         # $ ulimit -n
-        # 40000
+        # 100000
 
 
 @task
