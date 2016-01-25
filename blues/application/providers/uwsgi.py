@@ -78,6 +78,7 @@ class UWSGIProvider(ManagedProvider):
             'reload_on_rss': int(uwsgi.get_reload_on_rss(total_memory)),
             'limit_as': int(uwsgi.get_limit_as(total_memory)),
             'gevent': gevent,
+            'http': blueprint.get('web.http') == 'true',
         })
 
         # Override context defaults with blueprint settings
