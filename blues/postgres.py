@@ -35,21 +35,25 @@ from refabric.contrib import blueprints
 from . import debian
 
 __all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
-           'setup_schemas', 'generate_pgtune_conf', 'dump']
+           'setup_schemas', 'generate_pgtune_conf', 'dump', 'install',
+           'download_pgtune', 'stop_all']
 
 
 blueprint = blueprints.get(__name__)
 
-start = debian.service_task('postgresql', 'start')
-stop = debian.service_task('postgresql', 'stop')
-restart = debian.service_task('postgresql', 'restart')
-reload = debian.service_task('postgresql', 'reload')
-
 version = lambda: blueprint.get('version', '9.1')
+
+start = debian.service_task('postgresql', 'start %s' % version())
+stop = debian.service_task('postgresql', 'stop %s' % version())
+stop_all = debian.service_task('postgresql', 'stop')
+restart = debian.service_task('postgresql', 'restart %s' % version())
+reload = debian.service_task('postgresql', 'reload %s' % version())
+
 postgres_root = lambda *a: os.path.join('/etc/postgresql/{}/main/'.format(version()), *a)
 pgtune_root = '/usr/local/src/pgtune'
 
 
+@task
 def install(add_repo=None):
     with sudo():
         v = version()
@@ -97,6 +101,7 @@ def install_postgis(v=None):
     info('Installing postgis...')
     debian.apt_get('install', 'postgis',
                    'postgresql-{}-postgis-scripts'.format(v))
+
 
 @task
 def setup():
