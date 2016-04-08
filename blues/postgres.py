@@ -47,6 +47,7 @@ reload = debian.service_task('postgresql', 'reload')
 
 version = lambda: blueprint.get('version', '9.1')
 postgres_root = lambda *a: os.path.join('/etc/postgresql/{}/main/'.format(version()), *a)
+pgtune_root = '/usr/local/src/pgtune'
 
 
 def install(add_repo=None):
@@ -63,7 +64,21 @@ def install(add_repo=None):
                        'postgresql-server-dev-{}'.format(v),
                        'libpq-dev',
                        'postgresql-contrib-{}'.format(v),
-                       'pgtune')
+                       )
+        download_pgtune()
+
+
+@task
+def download_pgtune():
+    run('rm -r {} || true'.format(pgtune_root))
+    run('mkdir -p {}'.format(pgtune_root))
+
+    run('curl https://codeload.github.com/andreif/pgtune/legacy.tar.gz/'
+        'allthethings | tar xzv -C {} --strip=1'.format(pgtune_root))
+
+    run('python {}/pgtune --doctest --help'.format(pgtune_root))
+
+    info('Downloaded pgtune to {}/'.format(pgtune_root))
 
 
 def add_repository():
@@ -207,14 +222,17 @@ def generate_pgtune_conf(role='db', **options):
     """
 
     options.setdefault('type', 'Web')
+    options.setdefault('version', version())
+    options.setdefault('input-config', postgres_root('postgresql.conf'))
+    options.setdefault('settings', pgtune_root)
+
     options = ' '.join(
         '--{}="{}"'.format(key, value)
         for key, value in options.items()
     )
 
-    conf_path = postgres_root('postgresql.conf')
     with sudo(), silent():
-        output = run('pgtune {} -i {}'.format(options, conf_path)).strip()
+        output = run('{}/pgtune {}'.format(pgtune_root, options)).strip()
 
         def parse(c):
             lines = [l for l in c.splitlines() if '# pgtune' in l]
