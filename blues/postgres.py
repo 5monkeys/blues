@@ -59,7 +59,7 @@ def install(add_repo=None):
             add_repository()
 
         debian.apt_get('install',
-                       'postgresql',
+                       'postgresql-{}'.format(v),
                        'postgresql-server-dev-{}'.format(v),
                        'libpq-dev',
                        'postgresql-contrib-{}'.format(v),
