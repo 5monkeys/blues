@@ -39,6 +39,8 @@ def install():
             debian.debconf_set_selections('shared/accepted-oracle-license-v1-1 select true',
                                           'shared/accepted-oracle-license-v1-1 seen true')
             package = 'oracle-java7-installer'
+        elif lbs_release >= '14.04':
+            package = 'openjdk-7-jdk'
         else:
             package = 'java7-jdk'
 
