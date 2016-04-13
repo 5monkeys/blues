@@ -225,6 +225,7 @@ def generate_pgtune_conf(role='db', **options):
 
     :param role: Which fabric role to place local pgtune.conf template under
     """
+    info('Generating pgtune conf')
 
     options.setdefault('type', 'Web')
     options.setdefault('version', version())
@@ -237,26 +238,24 @@ def generate_pgtune_conf(role='db', **options):
     )
 
     with sudo(), silent():
+        info('options: ' + options)
         output = run('{}/pgtune {}'.format(pgtune_root, options)).strip()
+        output = output.rpartition('\n# pgtune')[2].partition('\n')[2]
 
         def parse(c):
-            lines = [l for l in c.splitlines() if '# pgtune' in l]
-            for line in lines:
-                try:
-                    comment = line.index('#')
-                    line = line[:comment]
-                except ValueError:
-                    pass
-                clean = lambda s: s.strip('\n\r\t\'" ')
-                key, _, value = line.partition('=')
-                key, value = map(clean, (key, value))
-                if key:
-                    yield key, value or None
+            for line in c.splitlines():
+                line = line.split('#')[0].strip()
+                if line:
+                    clean = lambda s: s.strip('\n\r\t\'" ')
+                    key, _, value = line.partition('=')
+                    key, value = map(clean, (key, value))
+                    if key:
+                        yield key, value or None
 
         tune_conf = dict(parse(output))
         tune_conf.update(blueprint.get('pgtune', {}))
         tune_conf = '\n'.join(' = '.join(item)
-                              for item in tune_conf.iteritems())
+                              for item in sorted(tune_conf.iteritems()))
         conf_dir = os.path.join(
             os.path.dirname(env['real_fabfile']),
             'templates',
