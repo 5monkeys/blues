@@ -22,16 +22,15 @@ from refabric.context_managers import sudo
 from refabric.contrib import blueprints
 from refabric.operations import run
 
-__all__ = [
-    'install',
-]
+__all__ = ['install', 'setup']
 
 blueprint = blueprints.get(__name__)
+install_path = blueprint.get('install_path', '/usr/local/lib/metabase')
 
 
 @task
-def setup():
-    install()
+def setup(**kwargs):
+    install(**kwargs)
 
 
 @task
@@ -41,7 +40,11 @@ def install(install_java=True):
             from blues import java
             java.install()
 
-        version = blueprint.get('version', '0.13.3')
-        info('Downloading Metabase v%s' % version)
-        run('mkdir -p /etc/metabase/ && cd /etc/metabase/ && curl -O '
-            'http://downloads.metabase.com/v%s/metabase.jar' % version)
+        conf = {'version': blueprint.get('version', '0.16.1'),
+                'path': install_path}
+
+        info('Downloading Metabase v{version} to {path}', **conf)
+
+        run('mkdir -p {path} && cd {path} && curl -O '
+            'http://downloads.metabase.com/v{version}/metabase.jar'.format(
+                **conf))
