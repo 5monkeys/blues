@@ -76,7 +76,7 @@ blueprint = blueprints.get(__name__)
 
 from .application.tasks import setup, configure, deploy, deployed, start, stop,\
     reload, configure_providers, generate_nginx_conf, notify_deploy, \
-    install_requirements, notify_deploy_start
+    install_requirements, notify_deploy_start, install_system_dependencies
 
 from .application.deploy import update_source
 
