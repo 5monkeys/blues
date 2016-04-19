@@ -81,4 +81,5 @@ from .application.tasks import setup, configure, deploy, deployed, start, stop,\
 from .application.deploy import update_source
 
 __all__ = ['setup', 'configure', 'deploy', 'deployed', 'start', 'stop',
-           'reload', 'configure_providers', 'generate_nginx_conf', 'install_requirements']
+           'reload', 'configure_providers', 'generate_nginx_conf',
+           'install_requirements', 'install_system_dependencies']
