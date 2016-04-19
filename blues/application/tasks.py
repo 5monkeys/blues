@@ -45,6 +45,12 @@ def setup():
 
 
 @task
+def install_system_dependencies():
+    from .deploy import install_system_dependencies
+    install_system_dependencies()
+
+
+@task
 def configure():
     """
     Deploy and configure providers
