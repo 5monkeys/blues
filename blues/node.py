@@ -18,10 +18,11 @@ Node.js Blueprint
           # - less
 
 """
+import json
 import os
 
 from fabric.contrib import files
-from fabric.context_managers import cd, prefix
+from fabric.context_managers import cd
 from fabric.decorators import task
 
 from refabric.api import info
@@ -29,7 +30,7 @@ from refabric.context_managers import sudo
 from refabric.contrib import blueprints
 from refabric.operations import run
 
-from .application.project import git_repository_path, project_home, \
+from .application.project import git_repository_path, \
     sudo_project, project_name
 from .util import maybe_managed
 
@@ -157,19 +158,69 @@ def npm(command, *options):
         run('npm {} -g {}'.format(command, ' '.join(options)))
 
 
-def install_dependencies(path=None, production=True):
+def install_dependencies(path=None, production=True, changed=True):
     """
     Install dependencies from "package.json" at path.
 
     :param path: Package path, current directory if None. [default: None]
+    :param production:
+        Boolean flag to toggle `--production` parameter for npm
+    :param changed:
+        Boolean flag or tuple of two commit sha to check if package.json and
+        bower.json were changed.
     :return:
     """
 
     dependency_path_root = path or git_repository_path()
 
-    if not files.exists(os.path.join(dependency_path_root, 'package.json')):
-        return
+    has_file = lambda x: files.exists(os.path.join(dependency_path_root, x))
+    has_package = has_file('package.json')
+    has_bower = has_file('bower.json')
 
     with sudo_project(), cd(dependency_path_root):
-        run('npm install' + (' --production' if production else ''))
-        run('test -f bower.json && bower install --config.interactive=false')
+
+        npm_changed = bower_changed = changed
+
+        if isinstance(changed, tuple):  # i.e. commits: (from_sha, to_sha)
+            changed = '{}..{}'.format(*changed)
+
+            from blues import git
+
+            if has_package:
+                npm_changed = git.diff_stat(
+                    git_repository_path(), changed, 'package.json')[0]
+
+            if has_bower:
+                bower_changed = git.diff_stat(
+                    git_repository_path(), changed, 'bower.json')[0]
+
+        if has_package and npm_changed:
+            run('npm install' + (' --production' if production else ''))
+
+        if has_bower and bower_changed:
+            run('test -f bower.json && '
+                'bower install --config.interactive=false')
+
+
+def create_symlinks(npm_path='../node_modules',
+                    bower_path='../bower_components',
+                    bowerrc_path='.bowerrc',
+                    clear=False):
+
+    with cd(git_repository_path()):
+        # get bower components dir from config file
+        b = run('cat %s 2>/dev/null || true' % bowerrc_path) or '{}'
+        b = json.loads(b).get('directory') or 'bower_components'
+
+        for src, dst in [
+            (npm_path, ''),
+            (bower_path, b),
+        ]:
+            if src:
+                src = os.path.abspath(os.path.join(git_repository_path(), src))
+                if clear:
+                    run('rm -rf {src} || true'.format(src=src))
+                run('mkdir -p {src} && ln -sf {src} {dst}'.format(
+                    src=src,
+                    dst=dst,
+                ), user=project_name())
