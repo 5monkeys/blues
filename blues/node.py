@@ -18,6 +18,7 @@ Node.js Blueprint
           # - less
 
 """
+import io
 import json
 import os
 
@@ -207,20 +208,28 @@ def create_symlinks(npm_path='../node_modules',
                     bowerrc_path='.bowerrc',
                     clear=False):
 
-    with cd(git_repository_path()):
+    with cd(git_repository_path()), sudo_project():
         # get bower components dir from config file
-        b = run('cat %s 2>/dev/null || true' % bowerrc_path) or '{}'
-        b = json.loads(b).get('directory') or 'bower_components'
 
-        for src, dst in [
-            (npm_path, ''),
-            (bower_path, b),
-        ]:
+        bower_destination = 'bower_components'
+
+        fd = io.BytesIO()
+        files_ = files.get(bowerrc_path, fd)
+        if files_.succeeded:
+            bower_destination = json.loads(fd.getvalue()).get(
+                'directory', bower_destination)
+
+        links = [
+            (npm_path, './'),
+            (bower_path, bower_destination),
+        ]
+
+        for src, dst in links:
             if src:
                 src = os.path.abspath(os.path.join(git_repository_path(), src))
+                dst = os.path.abspath(os.path.join(git_repository_path(), dst))
                 if clear:
-                    run('rm -rf {src} || true'.format(src=src))
-                run('mkdir -p {src} && ln -sf {src} {dst}'.format(
-                    src=src,
-                    dst=dst,
-                ), user=project_name())
+                    debian.rm(src, recursive=True, force=True)
+
+                debian.mkdir(src, recursive=True, owner=project_name())
+                debian.ln(src, dst, symbolic=True)
