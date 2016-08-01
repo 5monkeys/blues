@@ -26,6 +26,7 @@ from . import debian, git
 
 import urllib2
 import urllib
+import json
 
 __all__ = ['start', 'stop', 'restart', 'setup', 'configure']
 
