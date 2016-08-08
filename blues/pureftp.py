@@ -149,11 +149,12 @@ config_defaults = {
 
 def set_pureftp_config_value(**kwargs):
     for key, value in kwargs.iteritems():
-        run("echo '{}' > /etc/pure-ftpd/conf/{}".format(value, key))
+        if key in config_defaults:
+            run("echo '{}' > /etc/pure-ftpd/conf/{}".format(value, key))
 
 
 def setup_config():
     with silent():
         config = config_defaults.copy()
         config.update(blueprint.get(''))
-        set_pureftp_config_value(**config_defaults)
+        set_pureftp_config_value(**config)
