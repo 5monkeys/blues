@@ -84,7 +84,8 @@ def clone(url, branch=None, repository_path=None, **kwargs):
             output = run(cmd)
 
         if output.return_code != 0:
-            warn('Failed to clone repository "{}", probably permission denied!'.format(name))
+            warn('Failed to clone repository "{}", return code {}:\n{}'.format(
+                 name, output.return_code, output))
             cloned = None
         else:
             cloned = True
@@ -145,8 +146,8 @@ def reset(branch, repository_path=None, **kwargs):
             output = run(' && '.join(commands))
 
         if output.return_code != 0:
-            warn('Failed to reset repository "{}", probably permission denied!'
-                 .format(name))
+            warn('Failed to clone repository "{}", return code {}:\n{}'.format(
+                 name, output.return_code, output))
         else:
             # Pipe through cat in order to suppress non-text output from
             # git-show. This includes terminal colors but also other
