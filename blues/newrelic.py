@@ -26,6 +26,7 @@ from . import debian, git
 
 import urllib2
 import urllib
+import json
 
 __all__ = ['start', 'stop', 'restart', 'setup', 'configure']
 
@@ -74,22 +75,26 @@ def configure():
 def send_deploy_event(payload=None):
     """
     Sends deploy event to newrelic
-    payload ={
-        'deployment[app_name]': app_name,
-        'deployment[description]': new_tag,
-        'deployment[revision]': commit_hash,
-        'deployment[changelog]': changes,
-        'deployment[user]': deployer,
-    }
-    :param payload: payload is a dict with newrelic api info
+    payload = json.dumps({ 'deployment': {
+            'description': new_tag,
+            'revision': commit_hash,
+            'changelog': changes,
+            'user': deployer,
+            }
+    })
+    :param payload: payload is a json dict with newrelic api info
     :return:
     """
     newrelic_key = blueprint.get('newrelic_key', None)
-    app_name = blueprint.get('app_name', None)
+    app_id = blueprint.get('app_id', None)
 
-    if newrelic_key and app_name:
-        url = 'https://api.newrelic.com/deployments.xml'
-        headers = {'x-api-key': newrelic_key}
+
+    if all([newrelic_key, app_id]):
+        url = 'https://api.newrelic.com/v2/applications/{}/deployments.json'.format(app_id)
+        headers = {
+            'x-api-key': newrelic_key,
+            'Content-Type': 'application/json'
+        }
 
         if not payload:
             path = python_path()
@@ -98,17 +103,19 @@ def send_deploy_event(payload=None):
             changes = git.log_between_tags(path, old_tag, new_tag)
             deployer = git.get_local_commiter()
 
-            payload = {
-                    'deployment[app_name]': app_name,
-                    'deployment[description]': new_tag,
-                    'deployment[revision]': commit_hash,
-                    'deployment[changelog]': changes,
-                    'deployment[user]': deployer,
+            payload = json.dumps({ 
+                'deployment': {
+                    'description': new_tag,
+                    'revision': commit_hash,
+                    'changelog': changes,
+                    'user': deployer,
                 }
+            })
 
         request = urllib2.Request(url, headers=headers)
-        request_payload = urllib.urlencode(payload)
-        urllib2.urlopen(request, data=request_payload)
+        urllib2.urlopen(request, data=payload)
         info('Deploy event sent')
     else:
-        info('No key found')
+        for i in ['app_id', 'newrelic_key']:
+             if not locals().get(i, None):
+                 info('missing key: {}'.format(i))
