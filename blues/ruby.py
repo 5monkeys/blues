@@ -89,7 +89,8 @@ def install_gems():
 
         # For newer versions of gems we can optimize the install call to a
         # single call, for what it's worth.
-        install_gem(*non_legacy_gems)
+        if non_legacy_gems:
+            install_gem(*non_legacy_gems)
 
 
 def install_gem(*options):
