@@ -57,26 +57,39 @@ def install():
 
 def install_gems():
     """
-    Example with 4 kinds of installs supported (at the same time but on
+    Example with 6 kinds of installs supported (at the same time but on
     different rows),
     * no arguments,
     * multiple gems without arguments,
     * a gem with an argument,
     * a gem with multiple arguments
+    * old style specified version
+    * new style specified version
 
     gems:
         gem2
         gem4 gem5 gem6
         gem3 -arg3s
         gem1 -arg1 -arg2
+        gem5 -v 1.0
+        gem6:1.0
     """
     gems = blueprint.get('gems', [])
     if gems:
         info('Installing Gems')
-    # for older versions of gem, you can't install on a single row while
-    # specifying version so we need to loop the install command accordingly.
-    for gem in gems:
-        install_gem(gem)
+        # For older versions of gem (1.9-), you can't install on a single row
+        # while specifying version so we need to loop the install command
+        # accordingly.
+        non_legacy_gems = []
+        for gem in gems:
+            if '-v' in gem or '--version' in gem:
+                install_gem(gem)
+            else:
+                non_legacy_gems.append(gem)
+
+        # For newer versions of gems we can optimize the install call to a
+        # single call, for what it's worth.
+        install_gem(*non_legacy_gems)
 
 
 def install_gem(*options):
