@@ -28,6 +28,7 @@ Example:
           - www.example.com
           - example.com
 
+        email: test@example.com              # Email address responsible for the certificate
         # certbot_path: /opt/certbot/        # Location to install certbot-auto script
         # webroot_path: /srv/www/letsencrypt # Location from where acme-challenge requests are served
 
@@ -64,13 +65,17 @@ def setup():
 @task
 def configure():
     domains = blueprint.get('domains')
+    email = blueprint.get('email')
     if not domains:
         warn('No domains specified for letsencrypt')
         return
+    if not email:
+        warn('No email specified for letsencrypt')
+        return
 
     domains_command = ' -d '.join(domains)
-    run(script_path + ' certonly --webroot -w {webroot} -d {domains}'.format(
-        webroot=webroot_path, domains=domains_command))
+    run(script_path + ' certonly --webroot -w {webroot} -d {domains} --email {email} --agree-tos'.format(
+        webroot=webroot_path, domains=domains_command, email=email))
 
 
 @task
