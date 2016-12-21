@@ -23,15 +23,19 @@ from fabric.context_managers import cd
 from fabric.decorators import task, runs_once
 from fabric.operations import prompt
 from fabric.state import env
+from fabric.utils import warn
 
 from refabric.api import run, info
 from refabric.context_managers import hide_prefix
 from refabric.contrib import blueprints
+from refabric.context_managers import silent
 
 from . import virtualenv
 from .application.project import virtualenv_path, python_path, sudo_project
 
-__all__ = ['manage', 'deploy', 'version', 'migrate', 'collectstatic', 'syncdb']
+__all__ = [
+    'manage', 'deploy', 'version', 'migrate',
+    'collectstatic', 'count_new_statics', 'syncdb']
 
 
 blueprint = blueprints.get(__name__)
@@ -93,12 +97,44 @@ def migrate():
 
 @task
 @runs_once
-def collectstatic():
+def collectstatic(dryrun=False):
     """
     Collect static files
     """
-    info('Collect static files')
-    manage('collectstatic --noinput')
+    if not dryrun:
+        info('Collect static files')
+
+    return manage('collectstatic --noinput{}'.format(
+        ' -n' if dryrun else ''
+    ))
+
+
+@task
+@runs_once
+def count_new_statics():
+    """
+    Return the number of static files that will be copied with a collectstatic
+    or None.
+    """
+    with silent():
+        output = collectstatic(dryrun=True).stdout
+
+        matcher = r'(?P<num>\d+) static files? copied'
+
+        matched = re.search(matcher, output)
+
+        if matched:
+            try:
+                changed = int(matched.group('num'))
+                info(
+                    '{{}} static file{} to be copied.'.format(
+                        's' if changed > 1 else ''
+                    ), changed)
+                return changed
+            except ValueError:
+                pass
+
+        warn("Couldn't determine number of static files to be copied.")
 
 
 @task

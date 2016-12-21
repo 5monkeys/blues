@@ -346,7 +346,6 @@ def parse_url(url, branch=None):
             url_branch, egg = url_branch.split('#', 1)
 
     if url is None or not url:
-        import pdb; pdb.set_trace()
         raise ValueError('The git URL is not, have you set it correctly?')
 
     if branch is None:
