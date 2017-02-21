@@ -35,20 +35,25 @@ from refabric.contrib import blueprints
 from . import debian
 
 __all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
-           'setup_schemas', 'generate_pgtune_conf', 'dump']
+           'setup_schemas', 'generate_pgtune_conf', 'dump', 'install',
+           'download_pgtune', 'stop_all']
 
 
 blueprint = blueprints.get(__name__)
 
-start = debian.service_task('postgresql', 'start')
-stop = debian.service_task('postgresql', 'stop')
-restart = debian.service_task('postgresql', 'restart')
-reload = debian.service_task('postgresql', 'reload')
-
 version = lambda: blueprint.get('version', '9.1')
+
+start = debian.service_task('postgresql', 'start %s' % version())
+stop = debian.service_task('postgresql', 'stop %s' % version())
+stop_all = debian.service_task('postgresql', 'stop')
+restart = debian.service_task('postgresql', 'restart %s' % version())
+reload = debian.service_task('postgresql', 'reload %s' % version())
+
 postgres_root = lambda *a: os.path.join('/etc/postgresql/{}/main/'.format(version()), *a)
+pgtune_root = '/usr/local/src/pgtune'
 
 
+@task
 def install(add_repo=None):
     with sudo():
         v = version()
@@ -59,11 +64,25 @@ def install(add_repo=None):
             add_repository()
 
         debian.apt_get('install',
-                       'postgresql',
+                       'postgresql-{}'.format(v),
                        'postgresql-server-dev-{}'.format(v),
                        'libpq-dev',
                        'postgresql-contrib-{}'.format(v),
-                       'pgtune')
+                       )
+        download_pgtune()
+
+
+@task
+def download_pgtune():
+    run('rm -r {} || true'.format(pgtune_root))
+    run('mkdir -p {}'.format(pgtune_root))
+
+    run('curl https://codeload.github.com/andreif/pgtune/legacy.tar.gz/'
+        'allthethings | tar xzv -C {} --strip=1'.format(pgtune_root))
+
+    run('python {}/pgtune --doctest --help'.format(pgtune_root))
+
+    info('Downloaded pgtune to {}/'.format(pgtune_root))
 
 
 def add_repository():
@@ -82,6 +101,7 @@ def install_postgis(v=None):
     info('Installing postgis...')
     debian.apt_get('install', 'postgis',
                    'postgresql-{}-postgis-scripts'.format(v))
+
 
 @task
 def setup():
@@ -205,35 +225,37 @@ def generate_pgtune_conf(role='db', **options):
 
     :param role: Which fabric role to place local pgtune.conf template under
     """
+    info('Generating pgtune conf')
 
     options.setdefault('type', 'Web')
+    options.setdefault('version', version())
+    options.setdefault('input-config', postgres_root('postgresql.conf'))
+    options.setdefault('settings', pgtune_root)
+
     options = ' '.join(
         '--{}="{}"'.format(key, value)
         for key, value in options.items()
     )
 
-    conf_path = postgres_root('postgresql.conf')
     with sudo(), silent():
-        output = run('pgtune {} -i {}'.format(options, conf_path)).strip()
+        info('options: ' + options)
+        output = run('{}/pgtune {}'.format(pgtune_root, options)).strip()
+        output = output.rpartition('\n# pgtune')[2].partition('\n')[2]
 
         def parse(c):
-            lines = [l for l in c.splitlines() if '# pgtune' in l]
-            for line in lines:
-                try:
-                    comment = line.index('#')
-                    line = line[:comment]
-                except ValueError:
-                    pass
-                clean = lambda s: s.strip('\n\r\t\'" ')
-                key, _, value = line.partition('=')
-                key, value = map(clean, (key, value))
-                if key:
-                    yield key, value or None
+            for line in c.splitlines():
+                line = line.split('#')[0].strip()
+                if line:
+                    clean = lambda s: s.strip('\n\r\t\'" ')
+                    key, _, value = line.partition('=')
+                    key, value = map(clean, (key, value))
+                    if key:
+                        yield key, value or None
 
         tune_conf = dict(parse(output))
         tune_conf.update(blueprint.get('pgtune', {}))
         tune_conf = '\n'.join(' = '.join(item)
-                              for item in tune_conf.iteritems())
+                              for item in sorted(tune_conf.iteritems()))
         conf_dir = os.path.join(
             os.path.dirname(env['real_fabfile']),
             'templates',
