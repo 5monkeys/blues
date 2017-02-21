@@ -72,12 +72,20 @@ def install():
             config_parser.readfp(fd)
             root_pw = config_parser.get('client', 'password')
 
+        lr = debian.lsb_release()
+
         # Install external PPA
         info('Adding apt key for {}', __name__)
-        run("apt-key adv --keyserver keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A")
+        run('apt-key adv --keyserver keys.gnupg.net --recv-keys %s' % {
+            '14.04': '1C4CBDCDCD2EFD2A',
+            '16.04': '8507EFA5',
+        }[lr])
 
         info('Adding apt repository for {}', __name__)
-        debian.add_apt_repository('http://repo.percona.com/apt trusty main')
+        debian.add_apt_repository('http://repo.percona.com/apt %s main' % {
+            '14.04': 'trusty',
+            '16.04': 'xenial',
+        }[lr])
         debian.apt_get_update()
 
         # Percona/MySQL base dependencies
