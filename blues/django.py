@@ -117,7 +117,11 @@ def count_new_statics():
     or None.
     """
     with silent():
-        output = collectstatic(dryrun=True).stdout
+        # NOTE: Don't call `collectstatic(dryrun=True)` here, since that
+        # function is marked with `@runs_once`. That would result in users only
+        # being able to call _either_ `collectstatic` _or_ `count_new_statics`,
+        # but not both.
+        output = manage('collectstatic --noinput -n').stdout
 
         matcher = r'(?P<num>\d+) static files? copied'
 
