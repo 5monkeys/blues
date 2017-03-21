@@ -279,16 +279,23 @@ def dump(schema=None):
     """
     Dump and download all configured, or given, schemas.
 
-    :param schema: Specific shema to dump and download.
+    :param schema: Specific schema to dump and download.
     """
+    schemas = blueprint.get('schemas', {}).keys()
+    if not schemas:
+        info("No schemas were provided in Postgres settings.")
+        return
+
     if not schema:
-        schemas = blueprint.get('schemas', {}).keys()
-        for i, schema in enumerate(schemas, start=1):
-            print("{i}. {schema}".format(i=i, schema=schema))
-        valid_indices = '[1-{}]+'.format(len(schemas))
-        schema_choice = prompt('Select schema to dump:', default='1',
-                               validate=valid_indices)
-        schema = schemas[int(schema_choice) - 1]
+        if len(schemas) == 1:
+            schema = schemas[0]
+        elif schemas:
+            for i, schema in enumerate(schemas, start=1):
+                print("{i}. {schema}".format(i=i, schema=schema))
+            valid_indices = '[1-{}]+'.format(len(schemas))
+            schema_choice = prompt('Select schema to dump:', default='1',
+                                   validate=valid_indices)
+            schema = schemas[int(schema_choice) - 1]
 
     with sudo('postgres'):
         now = datetime.now().strftime('%Y-%m-%d')
