@@ -289,7 +289,6 @@ def dump(schema=None):
         schema_choice = prompt('Select schema to dump:', default='1',
                                validate=valid_indices)
         schema = schemas[int(schema_choice) - 1]
-        dump_options = blueprint[schema].get('dump', {})
 
     with sudo('postgres'):
         now = datetime.now().strftime('%Y-%m-%d')
@@ -299,13 +298,13 @@ def dump(schema=None):
         options = [
             '-c',
             '-F', 'tar',
-            'f', output_file
+            '-f', output_file,
         ]
 
+        dump_options = blueprint.get('schemas', {})[schema].get('dump', {})
         if dump_options:
-            exclude_table_data = dump_options.get('exclude_table_data', [])
-            if exclude_table_data:
-                options += ['--exclude-table-data=' + table for table in exclude_table_data]
+            options += ['--exclude-table-data=' + table
+                        for table in dump_options.get('exclude_table_data', [])]
 
         info('Dumping schema {}...', schema)
         run('pg_dump ' + ' '.join(options + [schema]))
