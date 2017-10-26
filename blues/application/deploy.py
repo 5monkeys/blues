@@ -155,36 +155,43 @@ def install_virtualenv():
 def maybe_install_requirements(previous_commit, current_commit, force=False, update_pip=False):
     from .project import requirements_txt, git_repository_path
 
-    installation_file = requirements_txt()
-
-    installation_method = get_installation_method(installation_file)
-
-    has_changed = False
+    changed_files = []
 
     commit_range = '{}..{}'.format(previous_commit, current_commit)
 
-    if not force:
-        if installation_method == 'pip':
-            has_changed, added, removed = diff_requirements(
-                previous_commit,
-                current_commit,
-                installation_file)
+    installation_files = requirements_txt()
+
+    for installation_file in installation_files:
+        installation_method = get_installation_method(installation_file)
+
+        if not force:
+            if installation_method == 'pip':
+                has_changed, added, removed = diff_requirements(
+                    previous_commit,
+                    current_commit,
+                    installation_file)
+
+                if has_changed:
+                    info('Requirements have changed, added: {}, removed: {}'
+                        .format(', '.join(added), ', '.join(removed)))
+            else:
+                # Check if installation_file has changed
+                commit_range = '{}..{}'.format(previous_commit, current_commit)
+                has_changed, _, _ = git.diff_stat(
+                    git_repository_path(),
+                    commit_range,
+                    installation_file)
 
             if has_changed:
-                info('Requirements have changed, added: {}, removed: {}'.format(
-                    ', '.join(added),
-                    ', '.join(removed)))
-        else:
-            # Check if installation_file has changed
-            commit_range = '{}..{}'.format(previous_commit, current_commit)
-            has_changed, _, _ = git.diff_stat(
-                git_repository_path(),
-                commit_range,
-                installation_file)
+                changed_files.append(installation_file)
 
-    if has_changed or force:
-        info('Install requirements {}', installation_file)
-        install_requirements(installation_file, update_pip=update_pip)
+    if force:
+        changed_files = installation_files
+
+    if changed_files:
+        for installation_file in installation_files:
+            info('Install requirements {}', installation_file)
+            install_requirements(installation_file, update_pip=update_pip)
     else:
         info(indent('(requirements not changed in {}...skipping)'),
              commit_range)
@@ -288,33 +295,37 @@ def get_installation_method(filename):
         return 'setuptools'
 
 
-def install_requirements(installation_file=None, update_pip=False):
+def install_requirements(installation_files=None, update_pip=False):
     """
     Pip install requirements in project virtualenv.
     """
     from .project import sudo_project, virtualenv_path, requirements_txt
 
-    if not installation_file:
-        installation_file = requirements_txt()
+    if not installation_files:
+        installation_files = requirements_txt()
+
+    if isinstance(installation_files, basestring):
+        installation_files = [installation_files]
 
     with sudo_project():
         path = virtualenv_path()
 
-        info('Installing requirements from file {}', installation_file)
+        for installation_file in installation_files:
+            info('Installing requirements from file {}', installation_file)
 
-        with virtualenv.activate(path):
-            installation_method = get_installation_method(installation_file)
-            if installation_method == 'pip':
-                if update_pip:
-                    python.update_pip()
-                python.pip('install', '-r', installation_file)
-            elif installation_method == 'setuptools':
-                with cd(git_repository_path()):
-                    run('python {} develop'.format(installation_file))
-            else:
-                raise ValueError(
-                    '"{}" is not a valid installation file'.format(
-                        installation_file))
+            with virtualenv.activate(path):
+                installation_method = get_installation_method(installation_file)
+                if installation_method == 'pip':
+                    if update_pip:
+                        python.update_pip()
+                    python.pip('install', '-r', installation_file)
+                elif installation_method == 'setuptools':
+                    with cd(git_repository_path()):
+                        run('python {} develop'.format(installation_file))
+                else:
+                    raise ValueError(
+                        '"{}" is not a valid installation file'.format(
+                            installation_file))
 
 
 def install_or_update_source():

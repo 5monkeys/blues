@@ -42,16 +42,22 @@ git_repository_path = lambda: os.path.join(git_root(),
 # /srv/app/project/src/repo.git
 python_path = lambda: os.path.join(git_repository_path(),
                                    blueprint.get('git_source', 'src'))
-# /srv/app/project/src/repo.git/requirements.txt
-requirements_txt = lambda: os.path.join(git_repository_path(),
-                                        blueprint.get('requirements',
-                                                      'requirements.txt'))
 # <project>
 project_name = lambda: blueprint.get('project')
 
 # /srv/www/project
 static_base = lambda: blueprint.get('static_base',
                                     os.path.join('/srv/www/', project_name()))
+
+
+# /srv/app/project/src/repo.git/requirements.txt
+def requirements_txt():
+    reqs = blueprint.get('requirements', 'requirements.txt')
+    if isinstance(reqs, basestring):
+        reqs = [reqs]
+    assert isinstance(reqs, (list, tuple))
+    repo_path = git_repository_path()
+    return [os.path.join(repo_path, r) for r in reqs]
 
 
 @contextmanager
