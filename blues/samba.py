@@ -11,21 +11,16 @@ Samba Blueprint
 
     settings:
       samba:
-        workgroup: WORKGROUP            # default: WORKGROUP
+        workgroup: WORKGROUP          # default: WORKGROUP
 
         shares:
-          - name: SOME_NAME             # required
-            comment: "Some comment"     # optional
-            path: "/path/to/be/shared"  # required
-            public: true                # default: false
-            browseable: true            # default: true
-            writeable: true             # default: true
-            read_only: false            # default: false
-            create_mask: 0777           # default: 0777
-            directory_mask: 0777        # default: 0777
-            force_user: some_user       # optional
-            guest_ok: false             # default: false
-
+          NAME:
+            some_samba_option: value  # underscores in keys are replaced with space
+            boolean_option: true      # value resolves to 'yes'
+            boolean_option: false     # value resolves to 'no'
+            some_samba_list_option:   # lists becomes space separated
+              - value
+              - value2
 """
 
 from fabric.decorators import task
@@ -41,15 +36,20 @@ stop = debian.service_task('samba', 'stop')
 restart = debian.service_task('samba', 'restart')
 status = debian.service_task('samba', 'status')
 
-_SHARE_DEFAULTS = {
-    'public': False,
-    'browseable': True,
-    'writeable': True,
-    'read_only': False,
-    'create_mask': '0777',
-    'directory_mask': '0777',
-    'guest_ok': False,
-}
+
+def sambafy_options(options):
+    def samba_value(value):
+        if isinstance(value, list):
+            return ' '.join(value)
+        elif isinstance(value, bool):
+            return {True: 'yes', False: 'no'}[value]
+
+        return value
+
+    return {
+        key.replace('_', ' '): samba_value(value)
+        for key, value in options.iteritems()
+    }
 
 
 @task
@@ -75,8 +75,8 @@ def configure():
 
     context = {
         'workgroup': blueprint.get('workgroup', 'WORKGROUP'),
-        'shares': [dict(_SHARE_DEFAULTS, **share)
-                   for share in blueprint.get('shares', [])]
+        'shares': {name: sambafy_options(share)
+                   for name, share in blueprint.get('shares', {}).iteritems()}
     }
 
     uploaded = blueprint.upload('./smb.conf', '/etc/samba/smb.conf', context)
