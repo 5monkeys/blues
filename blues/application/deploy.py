@@ -1,7 +1,4 @@
 import os
-import pkg_resources
-import re
-
 from functools import partial
 
 from fabric.context_managers import cd
@@ -196,7 +193,7 @@ def maybe_install_requirements(previous_commit, current_commit, force=False, upd
         changed_files = tree.get_changed(all_changed_files=changed_files)
 
     if changed_files:
-        info('Install requirements {}', changed_files)
+        info('Install requirements {}', ', '.join(changed_files))
         install_requirements(changed_files, update_pip=update_pip)
     else:
         info(indent('(requirements not changed in {}...skipping)'),
@@ -229,30 +226,8 @@ def diff_requirements(previous_commit, current_commit, filename):
     return has_changed, [str(insertions)], [str(deletions)]
 
 
-def patch_requirements(s):
-    """
-    Replaces VCS urls by `pkg==version` so that setuptools can parse
-    requirements and we can diff them.
-    """
-    ex = re.compile('(\-e\s+)?(git|hg|svn|bzr)(\+|://)\S*@([\S^@]+)#egg=(\S+)',
-                    flags=re.MULTILINE)
-    return ex.sub('\\5==\\4', s)
-
-
-def parse_requirements(strs):
-    """
-    Parse requirements after VCS urls are replaced by `pkg==version`.
-    """
-    if isinstance(strs, basestring):
-        strs = patch_requirements(strs)
-    else:
-        strs = map(patch_requirements, strs)
-    return pkg_resources.parse_requirements(strs)
-
-
 def diff_requirements_smart(previous_commit, current_commit, filename,
                             strict=False):
-    filename = os.path.relpath(filename, git_repository_path())
 
     get_requirements = partial(git.show_file,
                                repository_path=git_repository_path(),
@@ -261,9 +236,8 @@ def diff_requirements_smart(previous_commit, current_commit, filename,
     force_changed = False
 
     try:
-        # Can't fit this is one line :(
-        previous = parse_requirements(get_requirements(revision=previous_commit))
-        previous = {str(r) for r in previous}
+        text = get_requirements(revision=previous_commit)
+        previous = set(util.iter_requirements(text=text))
     except ValueError as exc:
         warn('Failed to parse previous requirements: {}'.format(exc))
         previous = set()
@@ -273,9 +247,8 @@ def diff_requirements_smart(previous_commit, current_commit, filename,
             raise
 
     try:
-        # Can't fit this is one line :(
-        current = parse_requirements(get_requirements(revision=current_commit))
-        current = {str(r)for r in current}
+        text = get_requirements(revision=current_commit)
+        current = set(util.iter_requirements(text=text))
     except ValueError as exc:
         warn('Failed to parse new requirements: {}'.format(exc))
         current = set()

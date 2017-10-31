@@ -14,6 +14,22 @@ def maybe_managed(*context_managers):
         yield
 
 
+def parse_requirements(text):
+    lines_enum = req_file.preprocess(text, options=None)
+    for line_number, line in lines_enum:
+        parser = req_file.build_parser()
+        defaults = parser.get_default_values()
+        defaults.index_url = None
+        args_str, options_str = req_file.break_args_options(line)
+        opts, _ = parser.parse_args(shlex.split(options_str), defaults)
+        yield args_str, options_str, opts
+
+
+def iter_requirements(text):
+    for a, o, _ in parse_requirements(text=text):
+        yield a + o
+
+
 class RequirementTree(object):
     def __init__(self, paths):
         self.paths = paths
@@ -37,14 +53,7 @@ class RequirementTree(object):
 
     def parse(self, path):
         text = self.get_content(path=path)
-        lines_enum = req_file.preprocess(text, options=None)
-        for line_number, line in lines_enum:
-            parser = req_file.build_parser()
-            # defaults = parser.get_default_values()
-            # defaults.index_url = None
-            defaults = None
-            _, options_str = req_file.break_args_options(line)
-            opts, _ = parser.parse_args(shlex.split(options_str), defaults)
+        for args_str, options_str, opts in parse_requirements(text=text):
             if opts.constraints:
                 raise NotImplementedError
             if opts.requirements:
