@@ -56,8 +56,7 @@ def requirements_txt():
     if isinstance(reqs, basestring):
         reqs = [reqs]
     assert isinstance(reqs, (list, tuple))
-    repo_path = git_repository_path()
-    return [os.path.join(repo_path, r) for r in reqs]
+    return reqs
 
 
 @contextmanager

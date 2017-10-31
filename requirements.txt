@@ -1,0 +1,6 @@
+paramiko==1.16.0
+enum34==1.1.2
+Jinja2==2.7.3
+PyYAML==3.11
+git+https://github.com/5monkeys/fabric.git@470a5d91fab350aa7d4aa0f952e1f0eb16ea9d5c
+git+https://github.com/5monkeys/refabric.git@594b5a5fc9d3e2e184e2580a90866a8dc0aea85d

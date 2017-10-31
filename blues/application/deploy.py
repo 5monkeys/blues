@@ -20,6 +20,7 @@ from .. import debian
 from .. import git
 from .. import user
 from .. import python
+from .. import util
 from .. import virtualenv
 
 __all__ = [
@@ -161,37 +162,42 @@ def maybe_install_requirements(previous_commit, current_commit, force=False, upd
 
     installation_files = requirements_txt()
 
-    for installation_file in installation_files:
-        installation_method = get_installation_method(installation_file)
-
-        if not force:
-            if installation_method == 'pip':
-                has_changed, added, removed = diff_requirements(
-                    previous_commit,
-                    current_commit,
-                    installation_file)
-
-                if has_changed:
-                    info('Requirements have changed, added: {}, removed: {}'
-                        .format(', '.join(added), ', '.join(removed)))
-            else:
-                # Check if installation_file has changed
-                commit_range = '{}..{}'.format(previous_commit, current_commit)
-                has_changed, _, _ = git.diff_stat(
-                    git_repository_path(),
-                    commit_range,
-                    installation_file)
-
-            if has_changed:
-                changed_files.append(installation_file)
-
     if force:
         changed_files = installation_files
 
+    else:
+        with sudo(), cd(git_repository_path()), silent():
+            tree = util.RequirementTree(paths=installation_files)
+
+        for installation_file in tree.all_files():
+            installation_method = get_installation_method(installation_file)
+
+            if not force:
+                if installation_method == 'pip':
+                    has_changed, added, removed = diff_requirements(
+                        previous_commit,
+                        current_commit,
+                        installation_file)
+
+                    if has_changed:
+                        info('Requirements have changed, '
+                             'added: {}, removed: {}'
+                             .format(', '.join(added), ', '.join(removed)))
+                else:
+                    # Check if installation_file has changed
+                    has_changed, _, _ = git.diff_stat(
+                        git_repository_path(),
+                        commit_range,
+                        installation_file)
+
+                if has_changed:
+                    changed_files.append(installation_file)
+
+        changed_files = tree.get_changed(all_changed_files=changed_files)
+
     if changed_files:
-        for installation_file in installation_files:
-            info('Install requirements {}', installation_file)
-            install_requirements(installation_file, update_pip=update_pip)
+        info('Install requirements {}', changed_files)
+        install_requirements(changed_files, update_pip=update_pip)
     else:
         info(indent('(requirements not changed in {}...skipping)'),
              commit_range)
@@ -299,7 +305,8 @@ def install_requirements(installation_files=None, update_pip=False):
     """
     Pip install requirements in project virtualenv.
     """
-    from .project import sudo_project, virtualenv_path, requirements_txt
+    from .project import sudo_project, virtualenv_path, requirements_txt, \
+        git_repository_path
 
     if not installation_files:
         installation_files = requirements_txt()
@@ -313,7 +320,7 @@ def install_requirements(installation_files=None, update_pip=False):
         for installation_file in installation_files:
             info('Installing requirements from file {}', installation_file)
 
-            with virtualenv.activate(path):
+            with virtualenv.activate(path), cd(git_repository_path()):
                 installation_method = get_installation_method(installation_file)
                 if installation_method == 'pip':
                     if update_pip:
