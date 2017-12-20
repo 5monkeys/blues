@@ -39,10 +39,16 @@ def install():
             debian.debconf_set_selections('shared/accepted-oracle-license-v1-1 select true',
                                           'shared/accepted-oracle-license-v1-1 seen true')
             package = 'oracle-java7-installer'
+        elif lbs_release >= '16.04':
+            package = 'default-jdk'
         elif lbs_release >= '14.04':
             package = 'openjdk-7-jdk'
         else:
             package = 'java7-jdk'
 
-        info('Install Java 7 JDK')
+        if package != 'default-jdk':
+            info('Install Java 7 JDK')
+        else:
+            info('Install default Java JDK')
+
         debian.apt_get('install', package)
