@@ -1,0 +1,16 @@
+# Emperor uWSGI script
+[Unit]
+Description=uWSGI Emperor
+After=network.target
+
+[Service]
+User=root
+Group=app-data
+Environment=EMPEROR={{ settings.emperor|default('/srv/app/*/uwsgi.d/*.ini') }}
+Environment=LOGTO=/var/log/uwsgi/emperor.log
+RuntimeDirectory=uwsgi
+ExecStart=/usr/local/bin/uwsgi --emperor "$EMPEROR" --logto $LOGTO
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

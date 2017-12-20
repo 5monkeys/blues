@@ -80,7 +80,11 @@ def configure():
     """
     with sudo():
         # Upload templates
-        blueprint.upload('init/', '/etc/init/')
+        if debian.lsb_release() >= '16.04':
+            blueprint.upload('system/', '/etc/systemd/system/')
+        else:
+            blueprint.upload('init/', '/etc/init/')
+
 
 
 @task
