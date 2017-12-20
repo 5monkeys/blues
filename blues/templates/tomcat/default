@@ -1,0 +1,4 @@
+CATALINA_HOME="/usr/share/tomcat"
+CATALINA_OPTS="-Xms{{ xms }} -Xmx{{ xmx }}"
+JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom"
+CATALINA_PID="/run/tomcat/catalina.pid"

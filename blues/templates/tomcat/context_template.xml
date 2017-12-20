@@ -1,0 +1,5 @@
+<Context docBase="{{ war_file }}" debug="0" crossContext="true">
+  {% for name, value in environment.iteritems() -%}
+  <Environment name="{{ name }}" type="java.lang.String" value="{{ value }}" override="true" />
+  {%- endfor %}
+</Context>

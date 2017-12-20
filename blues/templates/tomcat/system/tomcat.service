@@ -1,0 +1,17 @@
+[Unit]
+Description=Tomcat
+After=network.target
+
+[Service]
+User=tomcat
+Group=tomcat
+Type=forking
+EnvironmentFile=/etc/default/tomcat
+RuntimeDirectory=tomcat
+ExecStart=/usr/share/tomcat/bin/startup.sh
+ExecStop=/usr/share/tomcat/bin/shutdown.sh
+PIDFile=/run/tomcat/catalina.pid
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
