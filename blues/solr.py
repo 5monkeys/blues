@@ -33,9 +33,16 @@ __all__ = ['start', 'stop', 'restart', 'setup', 'configure', 'tail']
 
 blueprint = blueprints.get(__name__)
 
-start = debian.service_task('solr', 'start', check_status=True)
-stop = debian.service_task('solr', 'stop', check_status=True)
-restart = debian.service_task('solr', 'restart', check_status=True)
+version = blueprint.get('version')
+version_tuple = tuple(map(int, version.split('.')))
+
+if version >= (4, 0, 0):
+    start = debian.service_task('solr', 'start', check_status=True)
+    stop = debian.service_task('solr', 'stop', check_status=True)
+    restart = debian.service_task('solr', 'restart', check_status=True)
+else:
+    __all__ = ['setup', 'configure', 'tail']
+
 
 solr_home = '/usr/share/solr'
 
@@ -72,9 +79,6 @@ def install_user():
 
 def install_solr():
     with sudo():
-        version = blueprint.get('version')
-        version_tuple = tuple(map(int, version.split('.')))
-
         archive = 'solr-{}.tgz'.format(version)
         if version_tuple < (4, 1, 0):
             archive = 'apache-{}'.format(archive)
@@ -103,13 +107,23 @@ def configure():
     """
     Configure Solr
     """
-    updated_confs = blueprint.upload('solr_home/', '/etc/solr/', user='solr')
-    updated_init = blueprint.upload('init/', '/etc/init/', context={
-        'memory': blueprint.get('memory', '512m')
-    })
 
-    if updated_confs or updated_init:
-        restart()
+    updated_confs = blueprint.upload('solr_home/', '/etc/solr', user='solr')
+
+    if version_tuple >= (4, 0, 0):
+        if debian.lsb_release() >= '16.04':
+            updated_init = blueprint.upload('system/', '/etc/systemd/system/', context={
+                'memory': blueprint.get('memory', '512m')
+            })
+            if updated_init:
+                run('systemctl daemon-reload', use_sudo=True)
+        else:
+            updated_init = blueprint.upload('init/', '/etc/init/', context={
+                'memory': blueprint.get('memory', '512m')
+            })
+
+        if updated_confs or updated_init:
+            restart()
 
 
 @task

@@ -1,0 +1,14 @@
+# Solr script
+[Unit]
+Description=Solr
+After=network.target
+
+[Service]
+User=solr
+Group=solr
+ExecStart=/usr/share/solr/bin/solr start -f -s /etc/solr -m {{ memory }} -a "-Dlog4j.configuration=file:///etc/solr/log4j.properties -Xloggc:/var/log/solr/solr_gc.log"
+TimeoutStopSec=300
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
