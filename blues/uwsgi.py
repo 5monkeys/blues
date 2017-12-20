@@ -82,6 +82,7 @@ def configure():
         # Upload templates
         if debian.lsb_release() >= '16.04':
             blueprint.upload('system/', '/etc/systemd/system/')
+            run('systemctl daemon-reload', use_sudo=True)
         else:
             blueprint.upload('init/', '/etc/init/')
 
