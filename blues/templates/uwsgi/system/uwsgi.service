@@ -9,6 +9,7 @@ Group=app-data
 Environment=EMPEROR={{ settings.emperor|default('/srv/app/*/uwsgi.d/*.ini') }}
 Environment=LOGTO=/var/log/uwsgi/emperor.log
 RuntimeDirectory=uwsgi
+RuntimeDirectoryMode=0775
 ExecStart=/usr/local/bin/uwsgi --emperor "$EMPEROR" --logto $LOGTO
 Restart=always
 
