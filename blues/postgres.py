@@ -225,13 +225,16 @@ def setup_shared_memory():
 
 
 @task
-def generate_pgtune_conf(role='db', **options):
+def generate_pgtune_conf(role=None, **options):
     """
     Run pgtune and create pgtune.conf
 
     :param role: Which fabric role to place local pgtune.conf template under
     """
     info('Generating pgtune conf')
+
+    if role is None:
+        role = env.roles[0] if env.roles else 'db'
 
     options.setdefault('type', 'Web')
     options.setdefault('version', version())
