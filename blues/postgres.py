@@ -61,9 +61,11 @@ pgtune_root = '/usr/local/src/pgtune'
 def install(add_repo=None):
     with sudo():
         v = version()
+        v_tuple = tuple(map(int, str(v).split('.')))
+        v_os = debian.lsb_release()
         if add_repo is None:
-            add_repo = (debian.lsb_release() == '14.04' and
-                        tuple(map(int, str(v).split('.'))) >= (9, 4))
+            add_repo = (v_os == '14.04' and v_tuple >= (9, 4)) or \
+                       (v_os == '16.04' and v_tuple >= (9, 6))
         if add_repo:
             add_repository()
 
