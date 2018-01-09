@@ -26,6 +26,7 @@ setup(
     install_requires=['ghp-import'],
     include_package_data=False,
     zip_safe=False,
+    test_suite='runtests.main',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',

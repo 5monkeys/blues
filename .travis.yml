@@ -1,0 +1,19 @@
+language: python
+
+python: 2.7
+
+env:
+  - TARGET=test
+  - TARGET=lint
+
+matrix:
+  allow_failures:
+    - env: TARGET=lint
+
+install:
+  - pip install -r requirements.txt
+  - pip install flake8
+  - pip install -e .
+
+script:
+  - make $TARGET
