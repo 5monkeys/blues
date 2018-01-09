@@ -140,7 +140,7 @@ def install_deb():
         info('Installing Node.js')
         debian.apt_get('install', 'nodejs')
 
-        if lbs_release == '14.04':
+        if lbs_release in ['14.04', '16.04']:
             info('Installing NPM')
             debian.apt_get('install', 'npm')
             debian.ln('/usr/bin/nodejs', '/usr/bin/node')

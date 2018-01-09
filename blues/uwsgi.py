@@ -29,7 +29,8 @@ from refabric.contrib import blueprints
 from . import debian
 from . import python
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure', 'top', 'fifo']
+__all__ = ['start', 'stop', 'restart', 'reload', 'status', 'emperor_log',
+           'setup', 'configure', 'top', 'fifo']
 
 
 blueprint = blueprints.get(__name__)
@@ -40,6 +41,7 @@ tmpfs_path = '/run/uwsgi/'
 start = debian.service_task('uwsgi', 'start')
 stop = debian.service_task('uwsgi', 'stop')
 restart = debian.service_task('uwsgi', 'restart')
+status = debian.service_task('uwsgi', 'status')
 
 
 @task
@@ -131,6 +133,12 @@ def reload(vassal_path=None):
         with sudo(), silent():
             info('Reloading {} uWSGI vassal', vassal_name)
             run('touch {}'.format(vassal_path))
+
+
+@task
+def emperor_log():
+    with sudo():
+        run('tail -n 100 %s/emperor.log' % log_path)
 
 
 def get_worker_count(cores):
