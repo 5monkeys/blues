@@ -63,7 +63,7 @@ def install():
 
 def get_version():
     r = _client_exec('db.version()', auth=False)
-    return map(int, r.split('.'))
+    return tuple(map(int, r.split('.'))[:2])
 
 
 def upload_conf(auth=None):
