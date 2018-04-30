@@ -1,8 +1,8 @@
 from contextlib import contextmanager, nested
-from pip.req import req_file
 from refabric.operations import run
 import os
 import shlex
+from .compat import req_file, req_file_build_parser
 
 
 @contextmanager
@@ -17,7 +17,7 @@ def maybe_managed(*context_managers):
 def parse_requirements(text):
     lines_enum = req_file.preprocess(text, options=None)
     for line_number, line in lines_enum:
-        parser = req_file.build_parser()
+        parser = req_file_build_parser(line=line)
         defaults = parser.get_default_values()
         defaults.index_url = None
         args_str, options_str = req_file.break_args_options(line)
