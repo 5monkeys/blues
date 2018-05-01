@@ -86,4 +86,7 @@ def configure():
     uploads = blueprint.upload(config, '/etc/redis/redis.conf', context)
 
     if uploads:
+        if debian.lbs_release() >= '16.04':
+            debian.chown(location='/etc/redis/redis.conf',
+                         owner='redis', group='root')
         restart()
