@@ -33,6 +33,12 @@ Application Blueprint
         #   - libxml2-dev      # lxml
         #   - libxslt-dev      # lxml
 
+        # directories:                                # Create additional directories.
+        #   - /some/path                              # Simply providing path
+        #   - path: /some/path                        # or also specifying group and mode
+        #     group: app-data                         # Directory's user group (Default: app-data)
+        #     mode: 1700                              # Directory's mode (Default: 1775)
+
         web:                                          # Enable web workers
           provider: uwsgi                             # Set web provider
           # module: foobar.wsgi                       # Set wsgi module (Default: django.core.handlers.wsgi:WSGIHandler())

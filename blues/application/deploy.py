@@ -84,6 +84,16 @@ def install_project_user():
         # Configure ssh for github
         user.set_strict_host_checking(username, 'github.com')
 
+        dirs = blueprint.get('directories') or []
+        for d in dirs:
+            with sudo():
+                if isinstance(d, basestring):
+                    d = {'path': d}
+                mode = d.get('mode')
+                debian.mkdir(d['path'], recursive=True,
+                             group=d.get('group') or 'app-data',
+                             mode=int(mode) if mode else 1775)
+
 
 def install_project_structure():
     """
