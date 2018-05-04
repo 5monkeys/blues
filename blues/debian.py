@@ -537,7 +537,7 @@ def add_fstab(filesystem=None, mount_point=None, type='auto', options='rw', dump
         with silent():
             output = run('cat /etc/fstab')
             fstab = output.stdout
-            if fstab_line not in fstab.split('\n'):  # TODO: Handle comments
+            if fstab_line not in fstab.replace('\r', '').split('\n'):
                 info('Adding fstab: {} on {}', filesystem, mount_point)
                 fabric.contrib.files.append('/etc/fstab', fstab_line, use_sudo=True)
 
