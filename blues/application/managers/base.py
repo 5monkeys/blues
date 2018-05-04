@@ -6,18 +6,16 @@ from ..project import *
 from ... import debian
 from ...app import blueprint
 
-from . import get_manager
-
-from refabric.contrib import blueprints
 from refabric.utils import info
-
-blueprint = blueprints.get('blues.app')
 
 
 class BaseManager(object):
+    name = None
+
     def __init__(self):
         self.updates = []
-        self.project = blueprint.get('project')
+        self.project = project_name()
+        self.user = user_name()
 
     def install(self):
         """
@@ -30,7 +28,7 @@ class BaseManager(object):
     def get_context(self):
         context = {
             'current_host': env.host_string,
-            'user': debian.get_user()
+            'user': debian.get_user(name=self.user)
         }
 
         return context

@@ -38,7 +38,7 @@ def configure():
     Update .env file with environment variables
     """
     from blues.application.tasks import configure_providers
-    from blues.application.project import project_home, project_name
+    from blues.application.project import project_home, user_name
     from fabric.state import env
 
     e = env['shell_env'].copy()
@@ -46,7 +46,7 @@ def configure():
     escape = lambda v: str(v).replace('\\', '\\\\').replace('"', '\\"')
     e = map(lambda v: (v[0], escape(v[1])), sorted(e.items()))
 
-    changed = blueprint.upload('./', project_home(), user=project_name(),
+    changed = blueprint.upload('./', project_home(), user=user_name(),
                                context={'shell_env': e})
 
     profile = project_home() + '/.profile'
@@ -54,7 +54,7 @@ def configure():
     from refabric.context_managers import silent
     with silent('warnings'):
         if not run('grep "%s" %s' % (cmd, profile),
-                   user=project_name()).succeeded:
+                   user=user_name()).succeeded:
             files.append(profile, cmd)
 
     if changed:

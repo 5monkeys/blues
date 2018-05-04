@@ -61,11 +61,11 @@ def install_project_user():
     Disable ssh host checking.
     Create log dir.
     """
-    from .project import project_home
+    from .project import project_home, user_name, log_path
 
     with sudo():
         info('Install application user')
-        username = blueprint.get('project')
+        username = user_name()
         home_path = project_home()
 
         # Setup groups for project user
@@ -77,22 +77,27 @@ def install_project_user():
         user.create_system_user(username, groups=project_user_groups,
                                 home=home_path)
 
+        # Ensure project home has right owner in case user already exists
+        debian.mkdir(home_path, owner=username, group=username, mode=1775)
+
         # Create application log path
-        application_log_path = os.path.join('/var', 'log', username)
-        debian.mkdir(application_log_path, group='app-data', mode=1775)
+        debian.mkdir(log_path(), owner=username, group='app-data', mode=1775)
 
         # Configure ssh for github
         user.set_strict_host_checking(username, 'github.com')
 
-        dirs = blueprint.get('directories') or []
-        for d in dirs:
-            with sudo():
-                if isinstance(d, basestring):
-                    d = {'path': d}
-                mode = d.get('mode')
-                debian.mkdir(d['path'], recursive=True,
-                             group=d.get('group') or 'app-data',
-                             mode=int(mode) if mode else 1775)
+    dirs = blueprint.get('directories') or []
+    if dirs:
+        info('Create application directories')
+    for d in dirs:
+        if isinstance(d, basestring):
+            d = {'path': d}
+        info('  %s' % d['path'])
+        mode = d.get('mode')
+        debian.mkdir(d['path'], recursive=True,
+                     owner=d.get('owner') or username,
+                     group=d.get('group') or 'app-data',
+                     mode=int(mode) if mode else 1775)
 
 
 def install_project_structure():
@@ -338,9 +343,9 @@ def install_source():
     with sudo():
         git.install()
 
-    with sudo_project() as project:
+    with sudo_project() as username:
         path = git_root()
-        debian.mkdir(path, owner=project, group=project)
+        debian.mkdir(path, owner=username, group=username)
         with cd(path):
             repository = git_repository()
             path, cloned = git.clone(repository['url'], branch=repository['branch'])

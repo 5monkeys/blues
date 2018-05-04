@@ -9,7 +9,8 @@ from .. import git
 __all__ = [
     'app_root', 'project_home', 'git_root', 'use_virtualenv', 'virtualenv_path',
     'git_repository', 'git_repository_path', 'python_path', 'sudo_project',
-    'requirements_txt', 'use_python', 'static_base', 'project_name'
+    'requirements_txt', 'use_python', 'static_base', 'project_name',
+    'user_name', 'log_path',
 ]
 
 blueprint = blueprints.get('blues.app')
@@ -26,7 +27,7 @@ use_static = lambda: blueprint.get('use_static', True)
 # /srv/app
 app_root = lambda: blueprint.get('root_path') or '/srv/app'
 # /srv/app/project
-project_home = lambda: os.path.join(app_root(), blueprint.get('project'))
+project_home = lambda: os.path.join(app_root(), project_name())
 # /srv/app/project/src
 git_root = lambda: os.path.join(project_home(),
                                 'src')
@@ -45,9 +46,14 @@ python_path = lambda: os.path.join(git_repository_path(),
 # <project>
 project_name = lambda: blueprint.get('project')
 
+user_name = lambda: blueprint.get('user') or project_name()
+
 # /srv/www/project
 static_base = lambda: blueprint.get('static_base',
                                     os.path.join('/srv/www/', project_name()))
+
+# /var/log/project
+log_path = lambda: os.path.join('/var', 'log', project_name())
 
 
 # /srv/app/project/src/repo.git/requirements.txt
@@ -61,5 +67,5 @@ def requirements_txt():
 
 @contextmanager
 def sudo_project():
-    with sudo(project_name()):
-        yield project_name()
+    with sudo(user_name()):
+        yield user_name()

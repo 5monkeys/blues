@@ -32,7 +32,7 @@ from refabric.contrib import blueprints
 from refabric.operations import run
 
 from .application.project import git_repository_path, \
-    sudo_project, project_name
+    sudo_project, user_name
 from .util import maybe_managed
 
 from . import debian
@@ -231,5 +231,5 @@ def create_symlinks(npm_path='../node_modules',
                 if clear:
                     debian.rm(src, recursive=True, force=True)
 
-                debian.mkdir(src, recursive=True, owner=project_name())
+                debian.mkdir(src, recursive=True, owner=user_name())
                 debian.ln(src, dst, symbolic=True)

@@ -1,17 +1,18 @@
+# coding=utf-8
 from fabric.state import env
 
 from ..project import *
-
 from ... import debian
-from ...app import blueprint
-
 from ..managers import get_manager
 
 
 class BaseProvider(object):
+    default_manager = None
+
     def __init__(self):
         self.updates = []
-        self.project = blueprint.get('project')
+        self.project = project_name()
+        self.user = user_name()
 
     def install(self):
         """
@@ -41,7 +42,7 @@ class BaseProvider(object):
 
         context.update(get_project_info())
 
-        owner = debian.get_user(self.project)
+        owner = debian.get_user(self.user)
         context.update(owner)  # name, uid, gid, ...
 
         return context
@@ -79,12 +80,14 @@ def get_project_info():
                         'git_repository_path',
                         'python_path',
                         'requirements_txt',
+                        'user_name',
+                        'log_path',
                         'project_name']}
 
 
 class ManagedProvider(BaseProvider):
     def __init__(self, manager=None, *args, **kw):
-        super(ManagedProvider, self).__init__(*args, **kw)
+        super(ManagedProvider, self).__init__()
 
         if not hasattr(self, 'default_manager'):
             raise AttributeError('%s has no default_manager attribute.' %

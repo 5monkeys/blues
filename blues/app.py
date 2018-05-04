@@ -11,6 +11,7 @@ Application Blueprint
 
     settings:
       app:
+        user: foobar                                  # Username (Default: Project name)
         project: foobar                               # Name of the application, used as username, home, etc.
         git_url: git@github.com:foo/bar.git[@branch]  # Git repository to clone
         # git_branch: master                          # Branch to clone, if not specified in `git_url` setting
@@ -36,6 +37,7 @@ Application Blueprint
         # directories:                                # Create additional directories.
         #   - /some/path                              # Simply providing path
         #   - path: /some/path                        # or also specifying group and mode
+        #     owner: apa                              # Directory's owner (Default: project user)
         #     group: app-data                         # Directory's user group (Default: app-data)
         #     mode: 1700                              # Directory's mode (Default: 1775)
 
