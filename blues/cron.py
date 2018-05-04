@@ -22,6 +22,7 @@ from refabric.contrib import blueprints
 from refabric.operations import run
 from refabric.utils import info
 
+from blues.application.providers.base import get_project_info
 from blues import debian
 
 __all__ = ['configure']
@@ -37,7 +38,8 @@ def configure():
     """
     with sudo(), silent():
         with debian.temporary_dir(mode=555) as temp_dir:
-            updates = blueprint.upload('./', temp_dir)
+            updates = blueprint.upload('./', temp_dir,
+                                       context=get_project_info())
             for update in updates:
                 user = os.path.basename(update)
                 info('Installing new crontab for {}...', user)
