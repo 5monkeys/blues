@@ -31,7 +31,8 @@ from refabric.contrib import blueprints
 
 from blues import debian
 
-__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure']
+__all__ = ['start', 'stop', 'restart', 'reload', 'setup', 'configure',
+           'show_exports']
 
 
 blueprint = blueprints.get(__name__)
@@ -89,6 +90,13 @@ def get_existing_exports():
         out = run('cat /etc/exports')
     return [r for r in out.replace('\r', '').split('\n')
             if not r.strip().startswith('#')]
+
+
+@task
+def show_exports():
+    info('Showing existing exports:')
+    for ex in get_existing_exports():
+        info('  ' + ex)
 
 
 def export(path, host, options='rw,async,no_root_squash,no_subtree_check'):
