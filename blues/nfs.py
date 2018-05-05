@@ -25,9 +25,9 @@ from fabric.contrib import files
 
 from fabric.decorators import task
 
-from refabric.context_managers import sudo
+from refabric.api import run, info
+from refabric.context_managers import sudo, silent
 from refabric.contrib import blueprints
-from refabric.utils import info
 
 from blues import debian
 
@@ -84,10 +84,18 @@ def configure():
         restart()
 
 
+def get_existing_exports():
+    with silent('warnings'):
+        out = run('cat /etc/exports')
+    return [r for r in out.replace('\r', '').split('\n')
+            if not r.strip().startswith('#')]
+
+
 def export(path, host, options='rw,async,no_root_squash,no_subtree_check'):
     config_line = '%s\t\t%s(%s)' % (path, host, options)
     with sudo(), cd('/etc'):
-        if not files.contains('exports', config_line):
+        existing_lines = get_existing_exports()
+        if config_line not in existing_lines:
             info('Exporting: {}', path)
             files.append('exports', config_line)
             return True
