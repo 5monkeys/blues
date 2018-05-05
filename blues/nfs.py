@@ -63,6 +63,9 @@ def configure():
     """
     Configure nfs server exports table
     """
+    updates = blueprint.upload('nfs-kernel-server', '/etc/default/')
+
+    info('Exporting')
     export_changes = []
     for path, config in blueprint.get('exports', {}).items():
         with sudo():
@@ -81,7 +84,10 @@ def configure():
             exported = export(path, **kwargs)
             export_changes.append(exported)
 
-    if any(export_changes):
+    if not any(export_changes):
+        info('    (no changes found)')
+
+    if updates or any(export_changes):
         restart()
 
 
