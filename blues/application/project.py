@@ -46,7 +46,7 @@ python_path = lambda: os.path.join(git_repository_path(),
 # <project>
 project_name = lambda: blueprint.get('project')
 
-user_name = lambda: blueprint.get('user') or project_name()
+user_name = lambda: blueprint.get('username') or project_name()
 
 # /srv/www/project
 static_base = lambda: blueprint.get('static_base',

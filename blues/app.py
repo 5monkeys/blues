@@ -11,8 +11,8 @@ Application Blueprint
 
     settings:
       app:
-        user: foobar                                  # Username (Default: Project name)
         project: foobar                               # Name of the application, used as username, home, etc.
+        username: foobar                              # Username (Default: project name)
         git_url: git@github.com:foo/bar.git[@branch]  # Git repository to clone
         # git_branch: master                          # Branch to clone, if not specified in `git_url` setting
         # git_source: ./                              # Relative path within repository added to python path (Default: src/)
