@@ -25,7 +25,7 @@ from refabric.contrib import blueprints
 from refabric.operations import run
 from refabric.utils import info
 
-from blues.application.providers.base import get_project_info
+from blues.application.providers.base import get_project_info, project_name
 from blues import debian
 
 __all__ = ['setup', 'configure']
@@ -54,7 +54,8 @@ def configure():
     Install incrontab per template (i.e. user)
     """
     with sudo(), silent():
-        updates = blueprint.upload('./', '/etc', context=get_project_info())
+        ctx = get_project_info() if project_name() else {}
+        updates = blueprint.upload('./', '/etc', context=ctx)
 
         users = [os.path.basename(update) for update in updates]
         put(StringIO('\n'.join(users)), '/etc/incron.allow', use_sudo=True)
