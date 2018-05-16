@@ -170,7 +170,8 @@ def configure():
     with sudo():
         # Upload templates
         context = {
-            'num_cores': debian.nproc()
+            'num_cores': debian.nproc(),
+            'ipv4_addresses': debian.get_ipv4_addresses(),
         }
         uploads = blueprint.upload('./', nginx_root, context)
 
