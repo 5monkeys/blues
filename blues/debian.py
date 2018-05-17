@@ -562,5 +562,5 @@ def get_ipv4_addresses():
     Returns a dict containing pairs of interface names and their respective
     ipv4 addresses.
     """
-    output = run('ip r show | grep " src " | cut -d " " -f 3,12')
+    output = run('ip r show | grep " src " | awk -F " " \'{print $3 " " $NF}\'')
     return dict(entry.split() for entry in output.split("\n"))
