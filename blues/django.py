@@ -72,7 +72,7 @@ def version():
     if not hasattr(version, 'version'):
         v = manage('--version')
         try:
-            v = re.search('^((\d+\.){2}\d+)', v, flags=re.MULTILINE).group(0)
+            v = re.search('^((\d+\.){1,2}\d+)', v, flags=re.MULTILINE).group(0)
         except Exception:
             raise ValueError(u"Invalid version string: %r" % v)
         version.version = tuple(map(int, v.split('.')))
