@@ -1,0 +1,14 @@
+[Unit]
+Description=MailDev
+After=network.target
+
+[Service]
+User=maildev
+Group=maildev
+Type=simple
+EnvironmentFile=/etc/default/maildev
+ExecStart=/usr/bin/env maildev $MAILDEV_OPTS
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
