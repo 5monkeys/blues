@@ -1,1 +1,1 @@
-MAILDEV_OPTS="{% if ip %}--ip {{ ip }}{% endif %}{% if smtp_port %} --smtp {{ smtp_port }}{% endif %}{% if web %} --web {{ web_port }}{% endif %}"
+MAILDEV_OPTS="{% if ip %}--ip {{ ip }}{% endif %}{% if smtp_port %} --smtp {{ smtp_port }}{% endif %}{% if web %} --web {{ web_port }}{% endif %}{% if web_user and web_pass %} --web-user {{ web_user }} --web-pass {{ web_pass }}{% endif %}"

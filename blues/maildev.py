@@ -14,6 +14,8 @@ MailDev Blueprint
          web_port: 5000 # default: 5200
          smtp_port: 1025 # default: 5201
          ip: 0.0.0.0 # default: 127.0.0.1
+         web_user: admin # default: None
+         web_pass: supersecret # default: None
 
 """
 from fabric.decorators import task
@@ -77,6 +79,8 @@ def configure():
         'smtp_port': blueprint.get('smtp_port', 5201),
         'ip': blueprint.get('ip', '127.0.0.1'),
         'ipv4_addresses': debian.get_ipv4_addresses(),
+        'web_user': blueprint.get('web_user'),
+        'web_pass': blueprint.get('web_pass'),
     }
     updated_env = blueprint.upload(
         './default', '/etc/default/maildev', context
