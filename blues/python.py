@@ -88,7 +88,7 @@ def install():
         debian.chmod(pip_log_file, mode=777)
 
         # Install latest setuptools via pip, since debian has on old version.
-        pip('install', 'setuptools', '--upgrade')
+        upgrade_setuptools()
 
 
 def pip(command, *options, **kwargs):
@@ -109,3 +109,16 @@ def pip(command, *options, **kwargs):
 def update_pip():
     info('Updating pip')
     pip('install -U pip')
+
+
+def upgrade_setuptools():
+    """
+    Upgrade setuptools. Limit version to <45 on Python 2.7 since legacy
+    compatibility has been dropped, otherwise install latest.
+    https://setuptools.readthedocs.io/en/latest/history.html#v45-0-0
+    """
+    info("Upgrading setuptools")
+    setuptools_version = (
+        "'setuptools<45'" if requested_version() < (3, 0) else 'setuptools'
+    )
+    pip('install', setuptools_version, '--upgrade')

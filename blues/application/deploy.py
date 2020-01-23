@@ -164,6 +164,9 @@ def install_virtualenv():
     with sudo_project():
         virtualenv.create(virtualenv_path())
 
+    with virtualenv.activate(virtualenv_path()):
+        python.upgrade_setuptools()
+
 
 def maybe_install_requirements(previous_commit, current_commit, force=False, update_pip=False):
     from .project import requirements_txt, git_repository_path
